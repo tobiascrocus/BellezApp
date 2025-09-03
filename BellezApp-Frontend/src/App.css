@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Playfair+Display&display=swap');
+
+/* Variables globales */
+:root {
+  --font-primary: 'Open Sans', sans-serif;
+  --font-title: 'Playfair Display', serif;
+
+  --color-bg-dark: #111111;
+  --color-bg-medium: #1D1D1D;
+  --color-bg-card: #2E2E2E;
+  --color-text-light: #F9F9F9;
+  --color-text-muted: #DDDFE2;
+  --color-accent: #C8A15D;
+  --color-accent2: #8B2E2E;
+  --color-grey: #666666;
+
+  --radius: 8px;
+}
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-medium);
+  color: var(--color-text-light);
+  overflow-x: hidden;
+}
+
+/* Contenedor y layout principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 90px;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  text-align: center;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  padding: 1rem;
+}
+
+/* Formularios */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 400px;
+  margin: 1rem auto;
+}
+
+form label {
+  margin-top: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+form input,
+form select,
+form button {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus {
+  outline: 2px solid var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Botones */
+button {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.25s, border 0.25s;
+}
+
+button:hover {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-accent);
+}
+
+/* Tarjetas / listas */
+.card {
+  border: 1px solid var(--color-grey);
+  padding: 1rem;
+  margin: 0.5rem 0;
+  text-align: left;
+  border-radius: var(--radius);
+  background-color: var(--color-bg-card);
+}
+
+/* Tipografía */
+h1, h2, h3 {
+  font-family: var(--font-title);
+  color: var(--color-accent);
+}
+
+p, label {
+  font-family: var(--font-primary);
+  color: var(--color-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .app-container {
+    padding: 90px 1rem 0 1rem;
+  }
+
+  .main-content {
+    padding: 1rem 0;
+  }
+
+  form {
+    width: 90%;
+  }
+}

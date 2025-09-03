@@ -1,0 +1,31 @@
+.footer-center {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  text-align: center;
+  padding: 20px 1rem;
+  font-family: var(--font-primary);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+  border-top: 3px solid var(--color-accent);
+  border-radius: 0;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .footer-center {
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius);
+    padding: 16px 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+.footer-center .autor {
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0 4px;
+}
+
+.footer-center .marca {
+  font-weight: 700;
+  color: var(--color-accent2);
+}
