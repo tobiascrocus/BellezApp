@@ -1,0 +1,36 @@
+/* Tarjeta base para los login (y reutilizada en registro) */
+.login-card{
+  width: 370px;
+  height: 370px;
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  box-sizing: border-box;
+  align-content: center;
+}
+
+/* Contenedor vertical que gestiona el espaciado */
+.form-group{
+  display: flex;
+  flex-direction: column;
+  gap: var(--input-gap);
+  width: 100%;
+}
+
+/* Link de “¿Olvidaste…?” */
+.forgot{
+  color: var(--gray);
+  font-size: 14px;
+  text-align: center;
+  display: block;
+  margin-top: 12px;
+  text-decoration: none;
+}
+
+/* Separador fino dentro de la tarjeta */
+.sep{
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  margin-top: 14px;
+}

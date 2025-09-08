@@ -1,0 +1,24 @@
+/* Centra TODO el contenido de la página de registro */
+.register-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical */
+  align-items: center;       /* horizontal */
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Reutilizamos .login-card pero la hacemos más ancha para el form de registro */
+.register-wrapper .login-card{
+  width: 540px;
+  height: auto;      /* el alto crece según el contenido */
+  padding: 26px;
+}
+
+/* Texto pequeño debajo del botón */
+.register-hint{
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--gray);
+}
