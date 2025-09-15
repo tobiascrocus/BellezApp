@@ -1,0 +1,76 @@
+.inicio-container {
+  min-height: 100vh; /* ocupa toda la altura */
+  background-color: var(--bg); /* usa la variable */
+}
+
+.navbar-separator {
+  height: 1rem; /* este es el espacio que se ve entre navbar y banner */
+}
+
+/* Banner */
+.banner {
+  background-color: var(--white);
+  padding: 40px 20px;   /* espacio interno */
+  margin-top: 40px;     /* separación del navbar */
+}
+
+.banner-text {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.banner-link {
+  margin-top: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: #666666;
+}
+
+.register-link {
+  color: #c7a15a;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+/* Tarjetas */
+.card {
+  width: 300px;
+  height: 300px;
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+  padding: 10px;
+}
+
+.card-description {
+  font-size: 22px;
+  font-weight: 600;
+  color: #000000;
+}
+
+#mainCarousel {
+  max-width: 100%;     /* ocupa todo el ancho */
+  height: 450px;       
+  overflow: hidden;    /* evita que se desborde */
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+#mainCarousel img {
+  object-fit: cover;   /* recorta y ajusta */
+  height: 100%;
+  width: 100%;
+  border-radius: 30px; /* si querés bordes redondeados */
+}
+

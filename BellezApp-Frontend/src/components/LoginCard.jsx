@@ -1,7 +1,9 @@
+// src/components/LoginCard.jsx
 import React, { useState } from "react";
 import "../styles/LoginCard.css";
 import "../styles/InputField.css";
 import ButtonCustom from "./ButtonCustom";
+import { login } from "../services/authService"; // 🔹 Importa authService
 
 export default function LoginCard({
   titulo = "BellezApp",
@@ -17,19 +19,27 @@ export default function LoginCard({
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setErr("");
-    if (!email || !pass) {
-      setErr("Completá email y contraseña.");
-      return;
-    }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onLoginOk({ email, role: "cliente" });
-    }, 600);
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErr("");
+
+  if (!email || !pass) {
+    setErr("Completá email y contraseña.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const data = await login(email, pass); 
+    // data debería ser { token }
+    const payload = JSON.parse(atob(data.token.split(".")[1])); // decodificar JWT
+    onLoginOk(payload); // mando al padre { id, email, rol }
+  } catch (err) {
+    setErr(err.message || "Error en login");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="contenedor-general">
@@ -74,11 +84,7 @@ export default function LoginCard({
             {err && <div style={{ color: "#B00020", marginTop: 10 }}>{err}</div>}
 
             {/* Botón de login */}
-            <ButtonCustom
-              type="submit"
-              variant="primary"
-              disabled={loading}
-            >
+            <ButtonCustom type="submit" variant="primary" disabled={loading}>
               {loading ? "Iniciando..." : "Iniciar sesión"}
             </ButtonCustom>
 
@@ -88,11 +94,7 @@ export default function LoginCard({
             <div className="sep"></div>
 
             {/* Botón secundario */}
-            <ButtonCustom
-              type="button"
-              variant="dark"
-              onClick={onSecundarioClick}
-            >
+            <ButtonCustom type="button" variant="dark" onClick={onSecundarioClick}>
               {botonSecundarioTexto}
             </ButtonCustom>
           </form>
@@ -101,3 +103,4 @@ export default function LoginCard({
     </div>
   );
 }
+

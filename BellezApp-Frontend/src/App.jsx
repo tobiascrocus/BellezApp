@@ -12,6 +12,7 @@ import Perfil from './pages/Perfil';
 
 import LoginCliente from "./pages/LoginCliente";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 import './App.css';
 
@@ -26,8 +27,14 @@ function App() {
             <Route path="/inicio" element={<Inicio />} />
             <Route path="/login/usuarios" element={<LoginCliente />} />
             <Route path="/register" element={<Register />} />
+
+            {/* 👇 Un único dashboard para todos los roles */}
+            <Route path="/dashboard" element={<Dashboard />} />
+
+            {/* Paneles accesibles solo con botón según rol */}
             <Route path="/administrador" element={<Administrador />} />
             <Route path="/administrador-peluquero" element={<AdministradorPeluquero />} />
+
             <Route path="/quienes-somos" element={<QuienesSomos />} />
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/turnos" element={<Turnos />} />

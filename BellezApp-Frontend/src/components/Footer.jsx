@@ -1,16 +1,12 @@
-import "./Footer.css";
+import React from "react";
+import "../styles/Footer.css";
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="footer footer-center">
-      <p>
-        Desarrollado por <span className="autor">Tobias Tinaro</span>,{" "}
-        <span className="autor">Jeremías Vergara</span>,{" "}
-        <span className="autor">Chiara Seco</span> |{" "}
-        <span className="marca">© BellezApp</span>
+    <footer className="text-white text-center py-4 mt-5"> 
+      <p className="mb-0">
+        © {new Date().getFullYear()} BellezApp. Todos los derechos reservados.
       </p>
     </footer>
   );
-};
-
-export default Footer;
+}

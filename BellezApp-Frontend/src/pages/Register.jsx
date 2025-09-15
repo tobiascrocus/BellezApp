@@ -1,21 +1,20 @@
-// src/pages/Register.jsx
 import React, { useState } from "react";
-import api from "../utils/api"; // si querés conectar a backend
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
-import "../styles/LoginCard.css";   // reutiliza .login-card
-import "../styles/InputField.css";  // inputs + iconos
-import "../styles/ButtonCustom.css"; // botones
+import "../styles/LoginCard.css";
+import "../styles/InputField.css";
+import "../styles/ButtonCustom.css";
 
 import EmailIcon from "../assets/icons/email.png";
 import PhoneIcon from "../assets/icons/phone.png";
 import PasswordIcon from "../assets/icons/password-lock.png";
 import VerifyPasswordIcon from "../assets/icons/password-verify.png";
 
+import { register } from "../services/authService";
+
 export default function Register() {
   const navigate = useNavigate();
 
-  // estados del formulario
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -35,7 +34,6 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    // validación simple
     if (!form.nombre || !form.apellido || !form.email || !form.password || !form.confirmPassword) {
       setError("Completá todos los campos obligatorios.");
       return;
@@ -47,25 +45,19 @@ export default function Register() {
 
     setLoading(true);
     try {
-      // Si querés conectar al backend:
-      // const resp = await api.post("/auth/register", {
-      //   firstName: form.nombre,
-      //   lastName: form.apellido,
-      //   email: form.email,
-      //   phone: form.telefono,
-      //   password: form.password,
-      // });
-      // console.log("Registro ok", resp.data);
+      await register({
+        nombre: form.nombre,
+        apellido: form.apellido,
+        email: form.email,
+        telefono: form.telefono,
+        password: form.password,
+      });
 
-      // Simulación:
-      setTimeout(() => {
-        setLoading(false);
-        // redirigir al login de usuarios
-        navigate("/login/usuarios");
-      }, 900);
+      setLoading(false);
+      navigate("/login/usuarios");
     } catch (err) {
       setLoading(false);
-      setError(err?.response?.data?.message || "Error al registrarse");
+      setError(err.message || "Error al registrarse");
     }
   };
 

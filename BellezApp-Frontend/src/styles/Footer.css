@@ -1,0 +1,10 @@
+footer {
+  font-family: 'Open Sans', sans-serif;
+  background-color: var(--black); /* o el color que quieras */
+  color: var(--white);
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0;
+}

@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const util = require('util');
 
 const server = express();
-const SERVER_PORT = 3000;
+const SERVER_PORT = 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'REPLACE_WITH_SECURE_KEY';
 
 server.use(cors());
@@ -21,6 +21,8 @@ server.use(bodyParser.json());
 const USER_ROLES = { ADMIN: 'admin', PELUQUERO: 'peluquero', CLIENTE: 'cliente' };
 const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado' };
 const CANCELLATION_MIN_HOURS = 3;
+const bcrypt = require("bcrypt");
+const SALT_ROUNDS = 10;
 
 // ----------------------
 // UTILIDADES DE FECHA
@@ -237,14 +239,19 @@ server.post('/registro', async (req, res) => {
     if (error) return res.status(400).json({ error });
 
     const { nombre, apellido, email, telefono, password_hash } = req.body;
+
     const existeEmail = await database.get('SELECT id FROM usuarios WHERE email = ?', [email]);
     if (existeEmail) return res.status(400).json({ error: 'Email ya registrado.' });
+
+    // 🔹 hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password_hash, SALT_ROUNDS);
 
     const rol = USER_ROLES.CLIENTE;
     const result = await database.runAsync(
       `INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, apellido, email, telefono || null, rol, password_hash]
+      [nombre, apellido, email, telefono || null, rol, hashedPassword] // guardamos el hash
     );
+
     res.json({ id: result.lastID, nombre, apellido, email, telefono, rol });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -263,10 +270,14 @@ server.post('/usuarios', authenticateToken, authorizeRoles(USER_ROLES.ADMIN), as
     const existeEmail = await database.get('SELECT id FROM usuarios WHERE email = ?', [email]);
     if (existeEmail) return res.status(400).json({ error: 'Email ya registrado.' });
 
+    // 🔹 hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password_hash, SALT_ROUNDS);
+
     const result = await database.runAsync(
       `INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, apellido, email, telefono || null, rol, password_hash]
+      [nombre, apellido, email, telefono || null, rol, hashedPassword] // guardamos el hash
     );
+
     res.json({ id: result.lastID, nombre, apellido, email, telefono, rol });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -280,9 +291,18 @@ server.post('/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos' });
 
     const user = await database.get('SELECT * FROM usuarios WHERE email = ?', [email]);
-    if (!user || password !== user.password_hash) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    if (!user) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
 
-    const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, JWT_SECRET, { expiresIn: '8h' });
+    // 🔹 comparar contraseña en texto plano con el hash
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, rol: user.rol },
+      JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
     res.json({ token });
   } catch (err) {
     res.status(500).json({ error: err.message });

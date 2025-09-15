@@ -1,55 +1,56 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import "./Navbar.css";
+import { NavLink } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "../styles/Navbar.css";
 
-const Navbar = () => {
-  const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const botones = [
-    { nombre: "Administrador", ruta: "/administrador" },
-    { nombre: "Administrador Peluqueros", ruta: "/administrador-peluquero" },
-    { nombre: "Inicio", ruta: "/" },
-    { nombre: "Quienes Somos", ruta: "/quienes-somos" },
-    { nombre: "Catálogo", ruta: "/catalogo" },
-    { nombre: "Turnos", ruta: "/turnos" },
-    { nombre: "Perfil", ruta: "/perfil" },
-  ];
-
+export default function Navbar() {
   return (
-    <header>
-      <nav className="navbar">
-        <div className="nombreEmpresa">BellezApp</div>
+    <nav className="navbar navbar-expand-lg navbar-dark px-4">
+      <NavLink to="/" className="navbar-brand">
+        BellezApp
+      </NavLink>
 
-        <ul className={`navButtons ${menuOpen ? "open" : ""}`}>
-          {botones.map((btn, index) => (
-            <li key={index}>
-              <Link
-                to={btn.ruta}
-                className={location.pathname === btn.ruta ? "active" : ""}
-                onClick={() => setMenuOpen(false)}
-              >
-                {btn.nombre}
-              </Link>
-            </li>
-          ))}
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span className="navbar-toggler-icon"></span>
+      </button>
+
+      <div className="collapse navbar-collapse" id="navbarNav">
+        <ul className="navbar-nav ms-auto">
+          <li className="nav-item">
+            <NavLink to="/" className="nav-link">
+              Home
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/login/usuarios" className="nav-link">
+              Iniciar sesión
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/register" className="nav-link">
+              Registrarse
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/catalogo" className="nav-link">
+              Catálogo
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/quienes-somos" className="nav-link">
+              ¿Quiénes somos?
+            </NavLink>
+          </li>
         </ul>
-
-        <div
-          className={`hamburger ${menuOpen ? "active" : ""}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && setMenuOpen(!menuOpen)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
-};
-
-export default Navbar;
+}
