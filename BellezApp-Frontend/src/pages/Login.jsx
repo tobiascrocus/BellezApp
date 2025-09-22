@@ -1,6 +1,4 @@
 import { useState, useContext } from 'react';
-import Input from '../components/Input';
-import Boton from '../components/Boton';
 import { UserContext } from '../context/UserContext';
 
 export default function Login() {
@@ -16,9 +14,27 @@ export default function Login() {
     <div>
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
-        <Input label="Usuario" name="usuario" value={formData.usuario} onChange={e => setFormData({...formData, usuario: e.target.value})} />
-        <Input label="Contraseña" type="password" name="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-        <Boton type="submit">Entrar</Boton>
+        <div>
+          <label>Usuario:</label>
+          <input
+            type="text"
+            name="usuario"
+            value={formData.usuario}
+            onChange={e => setFormData({ ...formData, usuario: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label>Contraseña:</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={e => setFormData({ ...formData, password: e.target.value })}
+          />
+        </div>
+
+        <button type="submit">Entrar</button>
       </form>
     </div>
   );

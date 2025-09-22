@@ -19,7 +19,20 @@ const Navbar = () => {
   return (
     <header>
       <nav className="navbar">
-        <div className="nombreEmpresa">BellezApp</div>
+        <div className="nombreEmpresa">
+          <Link
+            to="/"
+            className="logoLink"
+            onClick={() => setMenuOpen(false)}
+          >
+            <img
+              src="/assets/images/Logos/logoBellezApp.png"
+              alt="Logo BellezApp"
+              className="logo"
+            />
+            BellezApp
+          </Link>
+        </div>
 
         <ul className={`navButtons ${menuOpen ? "open" : ""}`}>
           {botones.map((btn, index) => (

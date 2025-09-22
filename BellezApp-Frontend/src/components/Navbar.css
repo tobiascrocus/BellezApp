@@ -19,6 +19,24 @@
   color: var(--color-accent);
 }
 
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: var(--color-accent);
+  transition: none;
+}
+
+.logoLink:hover {
+  color: var(--color-accent);
+}
+
+.nombreEmpresa .logo {
+  height: 60px;
+  width: auto;
+}
+
 .navButtons {
   display: flex;
   list-style: none;
@@ -101,5 +119,22 @@
     width: 100%;
     padding: 10px 15px;
     justify-content: flex-start;
+  }
+
+  .navbar {
+    padding-left: 0;
+  }
+
+  .nombreEmpresa {
+    margin-left: 8px;
+  }
+
+  .logoLink {
+    gap: 5px;
+  }
+
+  .nombreEmpresa .logo {
+    height: 50px;
+    width: auto;
   }
 }

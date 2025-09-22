@@ -6,11 +6,13 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const util = require('util');
 
 const server = express();
 const SERVER_PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'REPLACE_WITH_SECURE_KEY';
+const SALT_ROUNDS = 10;
 
 server.use(cors());
 server.use(bodyParser.json());
@@ -65,6 +67,9 @@ database.runAsync = function (sql, params) {
   });
 };
 
+// Activar claves foráneas
+database.run('PRAGMA foreign_keys = ON;');
+
 // ----------------------
 // CREACIÓN DE TABLAS Y SEED
 // ----------------------
@@ -96,7 +101,6 @@ async function initializeDatabase() {
   await database.runAsync(sqlUsuarios, []);
   await database.runAsync(sqlTurnos, []);
 
-  // Seed si no existen
   const seeds = [
     { nombre: 'Admin', apellido: 'Admin', email: 'admin@hotmail.com', telefono: '0123456789', rol: USER_ROLES.ADMIN, password: 'admin' },
     { nombre: 'Juan', apellido: 'Salas', email: '1@hotmail.com', telefono: '0123456789', rol: USER_ROLES.PELUQUERO, password: '123456' },
@@ -106,9 +110,10 @@ async function initializeDatabase() {
   for (const u of seeds) {
     const existe = await database.get(`SELECT * FROM usuarios WHERE email = ?`, [u.email]);
     if (!existe) {
+      const hash = await bcrypt.hash(u.password, SALT_ROUNDS);
       await database.runAsync(
         `INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-        [u.nombre, u.apellido, u.email, u.telefono, u.rol, u.password]
+        [u.nombre, u.apellido, u.email, u.telefono, u.rol, hash]
       );
     }
   }
@@ -163,12 +168,28 @@ function isWithinBusinessHours(fecha_hora) {
   if (!date) return false;
   const hora = date.getHours();
   const minutos = date.getMinutes();
-
   const withinMorning = (hora >= 9 && hora < 12);
   const withinEvening = (hora >= 17 && hora < 21);
   const validMinutes = (minutos === 0 || minutos === 30);
-
   return (withinMorning || withinEvening) && validMinutes;
+}
+
+// --- Funciones divididas ---
+async function checkUserTurnLimit(usuario_id, excludeTurnId = null) {
+  const params = excludeTurnId ? [usuario_id, APPOINTMENT_STATUS.CONFIRMADO, excludeTurnId] : [usuario_id, APPOINTMENT_STATUS.CONFIRMADO];
+  const query = `SELECT COUNT(*) AS count FROM turnos WHERE usuario_id = ? AND estado = ? ${excludeTurnId ? 'AND id != ?' : ''}`;
+  const row = await database.get(query, params);
+  if (row && row.count >= 3) return 'Máximo 3 turnos confirmados permitidos.';
+  return null;
+}
+
+async function checkConflict(peluquero_id, fecha_hora, excludeTurnId = null) {
+  const fechaFmt = formatToSqlDatetime(parseIsoOrSpaceDate(fecha_hora));
+  const params = excludeTurnId ? [peluquero_id, fechaFmt, APPOINTMENT_STATUS.CONFIRMADO, excludeTurnId] : [peluquero_id, fechaFmt, APPOINTMENT_STATUS.CONFIRMADO];
+  const query = `SELECT id FROM turnos WHERE peluquero_id = ? AND fecha_hora = ? AND estado = ? ${excludeTurnId ? 'AND id != ?' : ''}`;
+  const conflicto = await database.get(query, params);
+  if (conflicto) return 'El horario ya está ocupado para ese peluquero.';
+  return null;
 }
 
 async function validateAppointmentFull({ id, usuario_id, peluquero_id, fecha_hora, estado }) {
@@ -178,18 +199,11 @@ async function validateAppointmentFull({ id, usuario_id, peluquero_id, fecha_hor
   if (!isWithinBusinessHours(fecha_hora)) return { ok: false, code: 'fuera_horario', message: 'Turnos solo entre 9-12 y 17-21 con intervalos de 30 minutos.' };
 
   if (estado === APPOINTMENT_STATUS.CONFIRMADO) {
-    const countRow = await database.get(
-      `SELECT COUNT(*) AS count FROM turnos WHERE usuario_id = ? AND estado = ? ${id ? 'AND id != ?' : ''}`,
-      id ? [usuario_id, APPOINTMENT_STATUS.CONFIRMADO, id] : [usuario_id, APPOINTMENT_STATUS.CONFIRMADO]
-    );
-    if (countRow && countRow.count >= 3) return { ok: false, code: 'limite_turnos', message: 'Máximo 3 turnos confirmados permitidos.' };
+    const limiteErr = await checkUserTurnLimit(usuario_id, id);
+    if (limiteErr) return { ok: false, code: 'limite_turnos', message: limiteErr };
 
-    const fechaFmt = formatToSqlDatetime(fecha_hora);
-    const conflicto = await database.get(
-      `SELECT id FROM turnos WHERE peluquero_id = ? AND fecha_hora = ? AND estado = ? ${id ? 'AND id != ?' : ''}`,
-      id ? [peluquero_id, fechaFmt, APPOINTMENT_STATUS.CONFIRMADO, id] : [peluquero_id, fechaFmt, APPOINTMENT_STATUS.CONFIRMADO]
-    );
-    if (conflicto) return { ok: false, code: 'conflicto', message: 'El horario ya está ocupado para ese peluquero.' };
+    const conflicto = await checkConflict(peluquero_id, fecha_hora, id);
+    if (conflicto) return { ok: false, code: 'conflicto', message: conflicto };
   }
 
   return { ok: true };
@@ -227,7 +241,7 @@ async function ensureUserExists(usuario_id) {
 }
 
 // ----------------------
-// ENDPOINTS: USUARIOS
+// ENDPOINTS
 // ----------------------
 
 // Registro cliente
@@ -241,31 +255,10 @@ server.post('/registro', async (req, res) => {
     if (existeEmail) return res.status(400).json({ error: 'Email ya registrado.' });
 
     const rol = USER_ROLES.CLIENTE;
+    const hash = await bcrypt.hash(password_hash, SALT_ROUNDS);
     const result = await database.runAsync(
       `INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, apellido, email, telefono || null, rol, password_hash]
-    );
-    res.json({ id: result.lastID, nombre, apellido, email, telefono, rol });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Registro usuario (solo admin)
-server.post('/usuarios', authenticateToken, authorizeRoles(USER_ROLES.ADMIN), async (req, res) => {
-  try {
-    const error = validateUserPayload(req.body);
-    if (error) return res.status(400).json({ error });
-
-    const { nombre, apellido, email, telefono, rol, password_hash } = req.body;
-    if (rol === USER_ROLES.CLIENTE) return res.status(400).json({ error: 'Clientes se registran desde /registro' });
-
-    const existeEmail = await database.get('SELECT id FROM usuarios WHERE email = ?', [email]);
-    if (existeEmail) return res.status(400).json({ error: 'Email ya registrado.' });
-
-    const result = await database.runAsync(
-      `INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, apellido, email, telefono || null, rol, password_hash]
+      [nombre, apellido, email, telefono || null, rol, hash]
     );
     res.json({ id: result.lastID, nombre, apellido, email, telefono, rol });
   } catch (err) {
@@ -280,7 +273,10 @@ server.post('/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos' });
 
     const user = await database.get('SELECT * FROM usuarios WHERE email = ?', [email]);
-    if (!user || password !== user.password_hash) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    if (!user) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
 
     const token = jwt.sign({ id: user.id, email: user.email, rol: user.rol }, JWT_SECRET, { expiresIn: '8h' });
     res.json({ token });
@@ -313,6 +309,7 @@ server.put('/usuarios/:id/password', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Password debe tener al menos 6 caracteres.' });
     }
 
+    // Solo el propio usuario o un admin pueden cambiar la contraseña
     if (req.usuario.id != id && req.usuario.rol !== USER_ROLES.ADMIN) {
       return res.status(403).json({ error: 'No autorizado' });
     }
@@ -320,7 +317,9 @@ server.put('/usuarios/:id/password', authenticateToken, async (req, res) => {
     const usuario = await database.get('SELECT * FROM usuarios WHERE id = ?', [id]);
     if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
 
-    await database.runAsync('UPDATE usuarios SET password_hash = ? WHERE id = ?', [password_hash, id]);
+    const hash = await bcrypt.hash(password_hash, SALT_ROUNDS);
+    await database.runAsync('UPDATE usuarios SET password_hash = ? WHERE id = ?', [hash, id]);
+
     res.json({ mensaje: 'Contraseña actualizada correctamente.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -375,14 +374,21 @@ server.put('/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADMIN),
     if (error) return res.status(400).json({ error });
 
     if (req.body.email) {
-      const emailExistente = await database.get('SELECT id FROM usuarios WHERE email = ? AND id != ?', [req.body.email, id]);
+      const emailExistente = await database.get(
+        'SELECT id FROM usuarios WHERE email = ? AND id != ?',
+        [req.body.email, id]
+      );
       if (emailExistente) return res.status(400).json({ error: 'Email ya registrado en otro usuario.' });
     }
 
     const usuarioActual = await database.get('SELECT * FROM usuarios WHERE id = ?', [id]);
     if (!usuarioActual) return res.status(404).json({ error: 'Usuario no encontrado.' });
 
-    const { nombre, apellido, email, telefono, rol, password_hash } = { ...usuarioActual, ...req.body };
+    let { nombre, apellido, email, telefono, rol, password_hash } = { ...usuarioActual, ...req.body };
+
+    if (req.body.password_hash && req.body.password_hash !== usuarioActual.password_hash) {
+      password_hash = await bcrypt.hash(req.body.password_hash, SALT_ROUNDS);
+    }
 
     await database.runAsync(
       `UPDATE usuarios SET nombre = ?, apellido = ?, email = ?, telefono = ?, rol = ?, password_hash = ? WHERE id = ?`,
