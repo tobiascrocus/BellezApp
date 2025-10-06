@@ -1,37 +1,23 @@
-/* ====== Variables (reusamos del catálogo) ====== */
-:root {
-  --bg-dark: #111111;
-  --bg-medium: #1d1d1d;
-  --bg-card: #2e2e2e;
-  --text-light: #f9f9f9;
-  --text-muted: #dddfE2;
-  --accent1: #c8a15d;
-  --accent2: #8b2e2e;
-  --accent3: #f9f9f9;
-  --accent4: #666666;
-}
-
-/* ====== Contenedor ====== */
 .quienes-container {
   min-height: 100vh;
-  padding: 3rem 2rem;
-  background: var(--bg-dark);
-  color: var(--text-light);
+  padding: 7rem 2rem 3rem 2rem; /* padding-top = altura del navbar + espacio extra */
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
   text-align: center;
 }
 
 /* ====== Títulos ====== */
 .quienes-titulo {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-title);
   font-size: 2.5rem;
-  color: var(--accent1);
+  color: var(--color-accent);
   margin-bottom: 0.5rem;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .quienes-subtitulo {
   font-size: 1.2rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   margin-bottom: 3rem;
 }
 
@@ -46,7 +32,7 @@
 
 /* ====== Card ====== */
 .quienes-card {
-  background: linear-gradient(to bottom, #2e2e2e, #1d1d1d);
+  background: linear-gradient(to bottom, var(--color-bg-card), var(--color-bg-medium));
   border-radius: 1rem;
   overflow: hidden;
   position: relative;
@@ -58,7 +44,6 @@
   align-items: center;
 }
 
-/* Línea decorativa superior */
 .quienes-card::before {
   content: "";
   position: absolute;
@@ -69,10 +54,10 @@
   border-radius: 1rem 1rem 0 0;
   background: linear-gradient(
     90deg,
-    var(--accent1),
-    var(--accent2),
-    var(--accent3),
-    var(--accent4)
+    var(--color-accent),
+    var(--color-accent2),
+    var(--color-text-light),
+    var(--color-grey)
   );
 }
 
@@ -101,23 +86,23 @@
 
 /* ====== Texto ====== */
 .quienes-card-nombre {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-title);
   font-size: 1.3rem;
   margin: 0.5rem 0;
-  color: var(--accent1);
+  color: var(--color-accent);
 }
 
 .quienes-card-rol {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--accent2);
+  color: var(--color-accent2);
   margin-bottom: 0.5rem;
 }
 
 .quienes-card-desc {
-  font-family: "Open Sans", sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.95rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   line-height: 1.5;
   text-align: center;
 }

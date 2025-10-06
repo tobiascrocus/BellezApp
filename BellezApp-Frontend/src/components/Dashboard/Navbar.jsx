@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "./Navbar.css";
+import '../../styles/Navbar.css';
 
 const Navbar = () => {
   const location = useLocation();
@@ -18,10 +18,23 @@ const Navbar = () => {
 
   return (
     <header>
-      <nav className="navbar">
-        <div className="nombreEmpresa">BellezApp</div>
+      <nav className="navbar-main">
+        <div className="navbar-brand">
+          <Link
+            to="/"
+            className="navbar-logo-link"
+            onClick={() => setMenuOpen(false)}
+          >
+            <img
+              src="/assets/images/Logos/logoBellezApp.png"
+              alt="Logo BellezApp"
+              className="navbar-logo"
+            />
+            BellezApp
+          </Link>
+        </div>
 
-        <ul className={`navButtons ${menuOpen ? "open" : ""}`}>
+        <ul className={`navbar-buttons ${menuOpen ? "open" : ""}`}>
           {botones.map((btn, index) => (
             <li key={index}>
               <Link
@@ -36,9 +49,8 @@ const Navbar = () => {
         </ul>
 
         <div
-          className={`hamburger ${menuOpen ? "active" : ""}`}
+          className={`navbar-hamburger ${menuOpen ? "active" : ""}`}
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && setMenuOpen(!menuOpen)}

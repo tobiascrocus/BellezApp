@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+
+import Navbar from './components/Dashboard/Navbar';
+import Footer from './components/Dashboard/Footer';
 
 import Inicio from './pages/Inicio';
-import Login from './pages/Login';
-import Registro from './pages/Registro';
-import Administrador from './pages/Administrador';
-import AdministradorPeluquero from './pages/AdministradorPeluquero';
+import Login from './pages/Auth/Login';
+import Registro from './pages/Auth/Registro';
+import Administrador from './pages/Auth/Administrador';
+import AdministradorPeluquero from './pages/Auth/AdministradorPeluquero';
 import QuienesSomos from './pages/QuienesSomos';
 import Catalogo from './pages/Catalogo';
 import Turnos from './pages/Turnos';

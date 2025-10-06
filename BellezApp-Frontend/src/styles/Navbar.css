@@ -1,4 +1,4 @@
-.navbar {
+.navbar-main {
   background-color: var(--color-bg-dark);
   display: flex;
   justify-content: space-between;
@@ -11,41 +11,55 @@
   left: 0;
   z-index: 1000;
   box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  font-family: var(--font-primary);
 }
 
-.nombreEmpresa {
+.navbar-brand {
   font-family: var(--font-title);
   font-size: 24px;
   color: var(--color-accent);
 }
 
-.navButtons {
+.navbar-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: var(--color-accent);
+}
+
+.navbar-logo {
+  height: 60px;
+  width: auto;
+}
+
+.navbar-buttons {
   display: flex;
   list-style: none;
   gap: 15px;
+  margin: 0;
+  padding: 0;
 }
 
-.navButtons li a {
+.navbar-buttons li a {
   text-decoration: none;
   color: var(--color-text-light);
   padding: 8px 15px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  height: 100%;
   border-radius: var(--radius);
   transition: all 0.2s ease;
 }
 
-.navButtons li a:hover,
-.navButtons li a.active {
+.navbar-buttons li a:hover,
+.navbar-buttons li a.active {
   background-color: var(--color-accent);
   color: var(--color-bg-dark);
   transform: scale(1.05);
 }
 
-/* Hamburger responsive */
-.hamburger {
+.navbar-hamburger {
   display: none;
   flex-direction: column;
   justify-content: space-between;
@@ -54,7 +68,7 @@
   cursor: pointer;
 }
 
-.hamburger span {
+.navbar-hamburger span {
   display: block;
   height: 3px;
   background: var(--color-text-light);
@@ -62,25 +76,21 @@
   transition: all 0.3s ease;
 }
 
-.hamburger.active span:nth-child(1) {
+.navbar-hamburger.active span:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
-
-.hamburger.active span:nth-child(2) {
+.navbar-hamburger.active span:nth-child(2) {
   opacity: 0;
 }
-
-.hamburger.active span:nth-child(3) {
+.navbar-hamburger.active span:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Responsive */
 @media (max-width: 767px) {
-  .hamburger {
+  .navbar-hamburger {
     display: flex;
   }
-
-  .navButtons {
+  .navbar-buttons {
     position: absolute;
     top: 70px;
     right: -100%;
@@ -92,14 +102,21 @@
     transition: right 0.3s ease;
     box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
   }
-
-  .navButtons.open {
+  .navbar-buttons.open {
     right: 0;
   }
-
-  .navButtons li a {
+  .navbar-buttons li a {
     width: 100%;
     padding: 10px 15px;
     justify-content: flex-start;
+  }
+  .navbar-main {
+    padding-left: 0;
+  }
+  .navbar-brand {
+    margin-left: 8px;
+  }
+  .navbar-logo {
+    height: 50px;
   }
 }
