@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import '../../styles/Navbar.css';
 
 const Navbar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    // Simulación: token guardado
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiIyQGhvdG1haWwuY29tIiwicm9sIjoiY2xpZW50ZSIsImlhdCI6MTc1OTk2MDMwNiwiZXhwIjoxNzU5OTg5MTA2fQ.h2yBppXfU2PqL-bN-sC-i7dSfkeNBpcak2bwAKTJrWY";
+
+    // Para testeo, no hacemos fetch al backend, solo simulamos usuario logueado
+    setUsuario({ nombre: "Tobías" });
+  }, []);
 
   const botones = [
     { nombre: "Administrador", ruta: "/administrador" },
@@ -13,7 +22,7 @@ const Navbar = () => {
     { nombre: "Quienes Somos", ruta: "/quienes-somos" },
     { nombre: "Catálogo", ruta: "/catalogo" },
     { nombre: "Turnos", ruta: "/turnos" },
-    { nombre: "Perfil", ruta: "/perfil" },
+    { nombre: usuario ? `Perfil ${usuario.nombre}` : "Perfil", ruta: "/perfil" },
   ];
 
   return (

@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import Navbar from './components/Dashboard/Navbar';
 import Footer from './components/Dashboard/Footer';
+import Sidebar from './components/Dashboard/Sidebar';
 
 import Inicio from './pages/Inicio';
 import Login from './pages/Auth/Login';
@@ -12,17 +13,24 @@ import QuienesSomos from './pages/QuienesSomos';
 import Catalogo from './pages/Catalogo';
 import Turnos from './pages/Turnos';
 import Perfil from './pages/Perfil';
-
+import Panel from "./pages/Panel";
 import './App.css';
 
-function App() {
+// 🔹 Este componente maneja la lógica de rutas y cuándo mostrar el Sidebar
+function AppContent() {
+  const location = useLocation();
+
+  const mostrarSidebar = location.pathname === "/"; // 👈 solo en Inicio
+
   return (
-    <Router>
+    <>
       <Navbar />
       <div className="app-container">
+        {mostrarSidebar && <Sidebar />} {/* Sidebar solo en Inicio */}
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Inicio />} />
+            <Route path="/panel" element={<Panel />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/administrador" element={<Administrador />} />
@@ -35,6 +43,15 @@ function App() {
         </main>
       </div>
       <Footer />
+    </>
+  );
+}
+
+// 🔹 El componente principal solo envuelve AppContent dentro del Router
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
