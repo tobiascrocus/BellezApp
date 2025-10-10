@@ -1,0 +1,31 @@
+/* Variables globales */
+:root {
+  --font-primary: 'Open Sans', sans-serif;
+  --font-title: 'Playfair Display', serif;
+
+  --color-bg-dark: #111111;
+  --color-bg-medium: #1D1D1D;
+  --color-bg-card: #2E2E2E;
+  --color-text-light: #F9F9F9;
+  --color-text-muted: #DDDFE2;
+  --color-accent: #C8A15D;
+  --color-accent2: #8B2E2E;
+  --color-grey: #666666;
+
+  --radius: 8px;
+}
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-medium);
+  color: var(--color-text-light);
+  overflow-x: hidden;
+}

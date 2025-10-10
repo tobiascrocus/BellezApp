@@ -1,0 +1,30 @@
+.footer-main {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  text-align: center;
+  padding: 20px 1rem;
+  font-family: var(--font-primary);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+  border-top: 3px solid var(--color-accent);
+  border-radius: 0;
+}
+
+.footer-main .footer-author {
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0 4px;
+}
+
+.footer-main .footer-brand {
+  font-weight: 700;
+  color: var(--color-accent2);
+}
+
+@media (max-width: 767px) {
+  .footer-main {
+    border: 2px solid var(--color-accent);
+    border-radius: 8px;
+    padding: 16px 1rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,84 @@
+/* ====== Contenedor principal ====== */
+.inicio-container {
+  min-height: 100vh;
+  padding: 6rem 2rem 3rem 270px; /* espacio a la izquierda para el sidebar */
+  background-color: #111111;
+  color: #F9F9F9;
+  font-family: 'Open Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* las cards alineadas al inicio */
+  text-align: left;
+}
+
+/* ====== Título ====== */
+.inicio-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #C8A15D;
+  margin-bottom: 2rem;
+}
+
+/* ====== Contenedor de cards en columna ====== */
+.inicio-cards {
+  display: flex;
+  flex-direction: column; /* una debajo de la otra */
+  gap: 2rem;
+  width: 100%;
+  max-width: 800px; /* ancho máximo de las cards */
+}
+
+/* ====== Card general ====== */
+.inicio-card {
+  background-color: #1D1D1D;
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover efecto */
+.inicio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(200, 161, 93, 0.5);
+}
+
+/* ====== Cards específicas ====== */
+.promo-card {
+  border-top: 5px solid #C8A15D;
+}
+
+.turnos-card {
+  border-top: 5px solid #8B2E2E;
+}
+
+/* ====== Texto dentro de las cards ====== */
+.inicio-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #F9F9F9;
+}
+
+.inicio-card p {
+  font-size: 1rem;
+  color: #DDDFE2;
+  margin: 0.3rem 0;
+  line-height: 1.5;
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 768px) {
+  .inicio-container {
+    padding-left: 1.5rem; /* menos espacio en móvil */
+  }
+
+  .inicio-titulo {
+    font-size: 2rem;
+  }
+
+  .inicio-cards {
+    max-width: 100%;
+  }
+}

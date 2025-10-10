@@ -1,0 +1,38 @@
+.sidebar {
+  width: 230px;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  padding: 25px 15px;
+  border-right: 2px solid var(--color-accent);
+  height: calc(100vh - 70px); /* para que encaje con el navbar fijo */
+  margin-top: 70px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  font-family: var(--font-title);
+  color: var(--color-accent);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-list li {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.sidebar-list li:hover {
+  background-color: var(--color-accent);
+  color: var(--color-bg-dark);
+  transform: translateX(5px);
+}
