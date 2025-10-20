@@ -1,13 +1,13 @@
 /* ====== Contenedor principal ====== */
 .inicio-container {
   min-height: 100vh;
-  padding: 6rem 2rem 3rem 270px; /* espacio a la izquierda para el sidebar */
-  background-color: #111111;
+  padding: 6rem 2rem 3rem 270px; 
+  background-color: #3a3a3a;
   color: #F9F9F9;
   font-family: 'Open Sans', sans-serif;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* las cards alineadas al inicio */
+  align-items: flex-start; 
   text-align: left;
 }
 
@@ -23,10 +23,10 @@
 /* ====== Contenedor de cards en columna ====== */
 .inicio-cards {
   display: flex;
-  flex-direction: column; /* una debajo de la otra */
+  flex-direction: column; 
   gap: 2rem;
   width: 100%;
-  max-width: 800px; /* ancho máximo de las cards */
+  max-width: 800px; 
 }
 
 /* ====== Card general ====== */
