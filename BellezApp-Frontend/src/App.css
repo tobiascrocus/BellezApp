@@ -1,14 +1,33 @@
-.app-container {
+/* src/App.css */
+
+/* === WRAPPER PRINCIPAL === */
+.app-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
 }
 
+/* === CONTAINER PRINCIPAL === */
+.app-container {
+  flex: 1;
+  display: flex;
+  margin-top: 70px; /* Compensar navbar fijo */
+  width: 100%;
+  position: relative;
+}
+
+/* === MAIN CONTENT === */
 .main-content {
-  flex: 1;          /* ocupa todo el espacio disponible */
-  display: flex;    /* permite que Inicio se centre */
+  flex: 1;
+  display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+/* Main content cuando hay sidebar (solo en /inicio) */
+.main-content.with-sidebar {
+  margin-left: 230px; /* Espacio para el sidebar */
 }
 
 /* Footer */
@@ -20,4 +39,60 @@ footer {
   padding: 20px;
   position: relative;
   bottom: 0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .main-content.with-sidebar {
+    margin-left: 0; /* Sin sidebar en móvil */
+  }
+}
+
+/* ============================================ */
+/* ====== ESTILOS EXCLUSIVOS PARA ADMIN ======= */
+/* ============================================ */
+
+body.admin-mode .inicio-container {
+  background-color: #0e0e0e !important;
+  color: #ffffff;
+  padding: 2rem 0rem 2rem 2rem !important;
+  align-items: stretch !important;
+  min-height: 100vh;
+}
+
+body.admin-mode .inicio-titulo {
+  font-size: 2.3rem !important;
+  color: #c8a15d !important;
+  margin-left: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+body.admin-mode .inicio-card {
+  background-color: #1a1a1a !important;
+  border-radius: 0.6rem;
+  box-shadow: none !important;
+  padding: 1.5rem;
+}
+
+body.admin-mode .inicio-cards {
+  gap: 1.2rem;
+  max-width: 100%;
+}
+
+/* Ocultar secciones del cliente en vista admin */
+body.admin-mode .promo-card,
+body.admin-mode .turnos-card {
+  display: none !important;
+}
+
+/* Adaptación responsive */
+@media (max-width: 768px) {
+  body.admin-mode .inicio-container {
+    padding: 1.5rem !important;
+  }
+
+  body.cliente-mode .inicio-container {
+    padding: 2rem 1rem !important;
+  }
 }

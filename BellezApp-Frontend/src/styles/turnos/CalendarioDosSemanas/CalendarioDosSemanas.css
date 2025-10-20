@@ -1,0 +1,113 @@
+.calendar-twoweeks {
+  width: 100%;
+  max-width: 415px;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  margin-right: 50px;
+  border: 1px solid var(--muted-bg);
+}
+
+/* Encabezado fijo */
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: var(--black);
+  color: var(--white);
+  text-align: center;
+  font-size: 12px;
+  padding: 8px 0;
+  height: 30px; /* Altura fija */
+}
+
+/* Grid con altura exacta - SIN espacios blancos */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(2, 60px); /* 2 filas de 60px exactas */
+  width: 100%;
+}
+
+/* Celdas que ocupan todo el espacio asignado */
+.calendar-cell {
+  border: 1px solid var(--muted-bg);
+  background: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  font-size: 14px;
+  height: 100%; /* Ocupa toda la altura de la celda grid */
+  box-sizing: border-box;
+}
+/* Fin de semana - SIEMPRE gris, sin importar disponibilidad */
+.calendar-cell.weekend {
+  background: var(--muted-bg) !important;
+  color: var(--gray);
+  cursor: not-allowed;
+}
+
+/* Estados de disponibilidad SOLO para días de semana */
+.calendar-cell:not(.weekend).free {
+  background: var(--white);
+}
+
+.calendar-cell:not(.weekend).half {
+  background: #FFD83A;
+  color: var(--black);
+}
+
+.calendar-cell:not(.weekend).full {
+  background: #8B2E2E;
+  color: var(--white);
+}
+
+/* Día resaltado (solo para días de semana) */
+.calendar-cell:not(.weekend).highlighted {
+  outline: 2px solid #FFD83A;
+  z-index: 1;
+}
+
+/* Número del día */
+.cell-num {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .calendar-twoweeks {
+    max-width: 100%;
+  }
+  
+  .calendar-header {
+    font-size: 11px;
+    padding: 6px 0;
+  }
+  
+  .calendar-cell {
+    min-height: 40px; /* Reducir en móviles */
+    padding: 4px;
+    font-size: 12px;
+  }
+  
+  .cell-num {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .calendar-cell {
+    min-height: 35px; /* Más pequeño en móviles muy pequeños */
+    font-size: 11px;
+  }
+  
+  .cell-num {
+    font-size: 11px;
+  }
+}

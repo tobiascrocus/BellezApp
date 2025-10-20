@@ -1,0 +1,161 @@
+/* src/components/layout/navbar/Navbar.css */
+
+.navbar-main {
+  background-color: var(--color-bg-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 70px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-body);
+}
+
+.navbar-brand {
+  font-family: var(--font-title);
+  font-size: 30px;
+  color: var(--color-accent);
+}
+
+.navbar-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: var(--color-accent);
+}
+
+.navbar-logo {
+  height: 60px;
+  width: auto;
+}
+
+.navbar-buttons {
+  display: flex;
+  list-style: none;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.navbar-buttons li a {
+  text-decoration: none;
+  color: var(--color-text-light);
+  padding: 8px 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.navbar-buttons li a:hover,
+.navbar-buttons li a.active {
+  background-color: var(--color-accent);
+  color: var(--color-bg-dark);
+  transform: scale(1.05);
+}
+
+/* Botón de cerrar sesión */
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--color-accent2);
+  color: var(--color-text-light);
+  padding: 8px 15px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background-color: var(--color-accent2);
+  color: var(--color-text-light);
+  transform: scale(1.05);
+}
+
+/* Hamburger menu */
+.navbar-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.navbar-hamburger span {
+  display: block;
+  height: 3px;
+  background: var(--color-text-light);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.navbar-hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  .navbar-hamburger {
+    display: flex;
+  }
+
+  .navbar-buttons {
+    position: absolute;
+    top: 70px;
+    right: -100%;
+    flex-direction: column;
+    width: 220px;
+    background: var(--color-bg-dark);
+    padding: 20px;
+    gap: 10px;
+    transition: right 0.3s ease;
+    box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.5);
+    align-items: stretch;
+  }
+
+  .navbar-buttons.open {
+    right: 0;
+  }
+
+  .navbar-buttons li a {
+    width: 100%;
+    padding: 10px 15px;
+    justify-content: flex-start;
+  }
+
+  .logout-btn {
+    width: 100%;
+    text-align: left;
+  }
+
+  .navbar-main {
+    padding-left: 0;
+  }
+
+  .navbar-brand {
+    margin-left: 8px;
+  }
+
+  .navbar-logo {
+    height: 50px;
+  }
+}

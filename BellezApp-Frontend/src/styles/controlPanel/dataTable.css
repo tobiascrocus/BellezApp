@@ -1,0 +1,101 @@
+/* src/styles/controlPanel/dataTable */
+/* Contenedor de la tabla */
+.dataTableContainer {
+  width: 100%;
+  overflow-x: auto; /* scroll horizontal en móviles */
+}
+
+/* Tabla */
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* evita que las columnas se compriman demasiado */
+  border-radius: 0; /* elimina bordes redondeados */
+  box-shadow: none; /* asegura que no haya sombra */
+}
+
+/* Encabezado */
+.theadRow {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.th {
+  padding: 20px 15px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Filas */
+.tbodyRow {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.td {
+  padding: 25px 15px;
+  font-size: 15px;
+  color: #000000;
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btnEdit, .btnDelete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnEdit { color: #C8A15D; }
+.btnDelete { color: #8B2E2E; }
+
+/* RESPONSIVE */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .th, .td {
+    padding: 18px 12px;
+    font-size: 15px;
+  }
+
+  .dataTable {
+    min-width: 500px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .dataTableContainer {
+    overflow-x: auto;
+  }
+
+  .th, .td {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+
+  .dataTable {
+    min-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .th, .td {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  .dataTable {
+    min-width: 300px;
+  }
+}

@@ -1,0 +1,248 @@
+/* src/styles/controlPanel/ControlPanel.css */
+
+/* Contenedor principal - OCUPAR TODO EL ANCHO DISPONIBLE */
+.controlPanel {
+  width: 100%; 
+  margin: 0; 
+  padding: 0 1.5rem 0 0; 
+}
+
+/* Tabs */
+.tabsContainer {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+/* Estilo base de las pestañas */
+.tab {
+  background-color: #f8f8f8;
+  border: none;
+  padding: 18px 40px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #333333;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+/* Hover visual suave */
+.tab:hover:not(:disabled) {
+  background-color: #E6E6E6;
+}
+
+.tab:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pestaña activa */
+.tabActive {
+  background-color: #FFFFFF;
+  color: #000000;
+  box-shadow: none;
+  border-bottom: 2px solid transparent;
+  z-index: 2;
+}
+
+/* Contenido */
+.contentContainer {
+  background-color: #FFFFFF;
+  border-radius: 0 0px 8px 8px;
+  padding: 30px;
+  position: relative;
+  z-index: 2;
+  overflow-x: auto;
+}
+
+/* Estados de carga y error */
+.loadingContainer,
+.errorContainer {
+  text-align: center;
+  padding: 40px;
+}
+
+.errorContainer button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #C8A15D;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.errorContainer button:hover {
+  background-color: #B08F4D;
+}
+
+/* Tabla */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.theadRow {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.th {
+  padding: 20px 15px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.tbodyRow {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.td {
+  padding: 25px 15px;
+  font-size: 15px;
+  color: #000000;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btnEdit, 
+.btnDelete, 
+.btnCancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btnEdit { 
+  color: #C8A15D; 
+}
+
+.btnEdit:hover {
+  background-color: rgba(200, 161, 93, 0.1);
+}
+
+.btnCancel {
+  color: #D97706;
+}
+
+.btnCancel:hover {
+  background-color: rgba(217, 119, 6, 0.1);
+}
+
+.btnDelete { 
+  color: #8B2E2E; 
+}
+
+.btnDelete:hover {
+  background-color: rgba(139, 46, 46, 0.1);
+}
+
+/* RESPONSIVE */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .controlPanel {
+    padding: 0 1rem 0 0;
+  }
+
+  .tab {
+    font-size: 18px;
+    padding: 16px 30px;
+  }
+
+  .th, .td {
+    padding: 18px 12px;
+    font-size: 15px;
+  }
+
+  .contentContainer {
+    padding: 20px;
+  }
+}
+
+/* Móviles medianos */
+@media (max-width: 768px) {
+  .controlPanel {
+    padding: 0 0.5rem 0 0;
+  }
+
+  .tabsContainer {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+
+  .contentContainer {
+    padding: 16px;
+  }
+
+  .th, .td {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+
+  .dataTable {
+    min-width: 500px;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .tab {
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .th, .td {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  .contentContainer {
+    padding: 12px;
+  }
+
+  .dataTable {
+    min-width: 400px;
+  }
+
+  .btnEdit, 
+  .btnDelete, 
+  .btnCancel {
+    font-size: 16px;
+    padding: 6px;
+  }
+}

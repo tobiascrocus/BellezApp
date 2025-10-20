@@ -1,0 +1,31 @@
+.turnos-page {
+  background: var(--color-bg-medium);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: auto;
+  margin: 10 auto;
+}
+
+.turnos-card-container {
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .turnos-page {
+    padding: 15px;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .turnos-page {
+    padding: 10px;
+    gap: 15px;
+  }
+}

@@ -1,58 +1,141 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import Navbar from "./components/layout/navbar/Navbar";
+import Footer from "./components/layout/footer/Footer";
+import Sidebar from "./components/Dashboard/Sidebar";
+import SidebarAdmin from "./components/Dashboard/SidebarAdmin";
+import { UserContext } from "./contexts/UserContext";
 
-import Navbar from './components/Dashboard/Navbar';
-import Footer from './components/Dashboard/Footer';
-import Sidebar from './components/Dashboard/Sidebar';
+// Páginas públicas
+import Home from "./pages/home/Home";
+import QuienesSomos from "./pages/QuienesSomos";
+import Catalogo from "./pages/Catalogo";
 
-import Inicio from './pages/Inicio';
-import Login from './pages/Auth/Login';
-import Registro from './pages/Auth/Registro';
-import Administrador from './pages/Auth/Administrador';
-import AdministradorPeluquero from './pages/Auth/AdministradorPeluquero';
-import QuienesSomos from './pages/QuienesSomos';
-import Catalogo from './pages/Catalogo';
-import Turnos from './pages/Turnos';
-import Perfil from './pages/Perfil';
-import Panel from "./pages/Panel";
-import './App.css';
+// Páginas de autenticación
+import LoginCliente from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 
-// 🔹 Este componente maneja la lógica de rutas y cuándo mostrar el Sidebar
+// Páginas protegidas
+import Inicio from "./pages/Inicio";
+import Turnos from "./pages/turnos/Turnos";
+import Perfil from "./pages/Perfil";
+import Administrador from "./pages/auth/Administrador";
+import AdministradorPeluquero from "./pages/auth/AdministradorPeluquero";
+
+// Contexto y componentes de protección
+import UserProvider from "./contexts/UserProvider";
+import ProtectedRoute from "./components/auth/LoginCard/ProtectedRoute";
+
+import "./App.css";
+
 function AppContent() {
   const location = useLocation();
+  const { user } = useContext(UserContext);
 
-  const mostrarSidebar = location.pathname === "/"; // 👈 solo en Inicio
+  // Mostrar sidebar SOLO en /inicio
+  const mostrarSidebar = location.pathname === "/inicio";
+
+  // Determinar si es admin
+  const esAdmin = user?.rol === "admin";
+
+  useEffect(() => {
+    if (esAdmin) {
+      document.body.classList.add("admin-mode");
+      document.body.classList.remove("cliente-mode");
+    } else {
+      document.body.classList.add("cliente-mode");
+      document.body.classList.remove("admin-mode");
+    }
+
+    // limpieza al desmontar
+    return () => {
+      document.body.classList.remove("admin-mode", "cliente-mode");
+    };
+  }, [esAdmin]);
 
   return (
-    <>
+    <div className="app-wrapper">
       <Navbar />
+
       <div className="app-container">
-        {mostrarSidebar && <Sidebar />} {/* Sidebar solo en Inicio */}
-        <main className="main-content">
+        {/* Sidebar condicional según rol */}
+        {mostrarSidebar && (esAdmin ? <SidebarAdmin /> : <Sidebar />)}
+
+        <main className={`main-content ${mostrarSidebar ? "with-sidebar" : ""}`}>
           <Routes>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/panel" element={<Panel />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/registro" element={<Registro />} />
-            <Route path="/administrador" element={<Administrador />} />
-            <Route path="/administrador-peluquero" element={<AdministradorPeluquero />} />
+            {/* Rutas públicas */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login/usuarios" element={<LoginCliente />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/quienes-somos" element={<QuienesSomos />} />
             <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/turnos" element={<Turnos />} />
-            <Route path="/perfil" element={<Perfil />} />
+
+            {/* Rutas protegidas */}
+            <Route
+              path="/inicio"
+              element={
+                <ProtectedRoute>
+                  <Inicio />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/turnos"
+              element={
+                <ProtectedRoute>
+                  <Turnos />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute>
+                  <Perfil />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rutas exclusivas por rol */}
+            <Route
+              path="/administrador"
+              element={
+                <ProtectedRoute role="admin">
+                  <Administrador />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/administrador-peluquero"
+              element={
+                <ProtectedRoute role="peluquero">
+                  <AdministradorPeluquero />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Cualquier otra ruta redirige a home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
+
       <Footer />
-    </>
+    </div>
   );
 }
 
-// 🔹 El componente principal solo envuelve AppContent dentro del Router
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <UserProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </UserProvider>
   );
 }
 

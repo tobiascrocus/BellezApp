@@ -1,0 +1,75 @@
+/* src/styles/auth/loginPage/Login.css */
+/* Layout general: texto izquierda + tarjeta derecha */
+.contenedor-general{
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--color-bg-dark); 
+  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+.grid-left{
+  flex: 1 1 50%;
+  max-width: 540px;
+  padding-right: 24px;
+}
+.grid-right{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Título */
+.titulo{
+  font-family: "Playfair Display", serif;
+  font-size: 48px;
+  color: #C8A15D !important;
+  margin: 0 0 6px 0;
+  line-height: .95;
+  position: relative; /* para el overlay */
+  font-weight: 400;
+}
+
+/* Bloque descriptivo bajo el título */
+.mensaje-bienvenida{
+  color: var(--white);
+  margin-top: 28px;
+  font-size: 22px;
+  line-height: 1.4;
+  position: relative;
+}
+.mensaje-bienvenida.compact{
+  margin-top: 12px; /* usuarios */
+  font-size: 20px;
+  line-height: 1.35;
+}
+.brand-sub b { font-weight: 600; }
+
+/* Link de asistencia (ej: ¿Olvidaste tu contraseña?) */
+.link-assist {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 16px;
+  color: #666666;
+  cursor: pointer;
+}
+
+.link-assist:hover {
+  color: var(--gold);
+}
+
+/* Responsive: si el overlay molesta en móvil, lo apilamos */
+@media (max-width: 900px){
+  .subtitulo-overlay{
+    position: relative;
+    right: 0;
+    bottom: 0;
+    display: block;
+    transform: none;
+    margin-top: 4px;
+    font-size: 18px;
+    text-align: center;
+  }
+}

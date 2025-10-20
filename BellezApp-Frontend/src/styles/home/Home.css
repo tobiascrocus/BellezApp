@@ -1,0 +1,128 @@
+/* src/styles/home/Home.css */
+
+.home-container {
+  min-height: 100vh;
+  background-color: var(--color-bg-dark); 
+  width: 100%;
+  padding-bottom: 40px;
+  position: relative;
+}
+
+.navbar-separator {
+  height: 2rem; /* Espacio entre Navbar y el banner */
+}
+
+.banner {
+  background-color: transparent; 
+  padding: 40px 20px;
+  margin-top: 40px;
+}
+
+.banner .container {
+  background-color: var(--color-bg-card);
+  padding: 40px;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.banner-text {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 32px;
+  color: var(--color-text-light);
+  font-weight: 400;
+  line-height: 1.4;
+  margin-bottom: 0;
+}
+
+.banner-link {
+  margin-top: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: #666666;
+}
+
+.register-link {
+  color: #c7a15a;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+.card {
+  width: 100%;
+  height: 300px;
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+  padding: 10px;
+  border: none;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.card-description {
+  font-size: 22px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+/* Carrusel */
+#mainCarousel {
+  max-width: 100%;
+  height: 450px;
+  overflow: hidden;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  background-color: transparent; /* Evitar fondos heredados */
+}
+
+#mainCarousel img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  border-radius: 30px;
+}
+
+/* Controles del carrusel - Asegurar visibilidad */
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background-color: transparent !important;
+  color: inherit !important;
+  opacity: 0.5; /* o el valor que prefieras */
+  filter: none !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .banner-text {
+    font-size: 24px;
+  }
+  
+  .card {
+    height: 200px;
+  }
+  
+  .card-description {
+    font-size: 18px;
+  }
+  
+  #mainCarousel {
+    height: 300px;
+  }
+}
