@@ -1,8 +1,9 @@
 /* src/styles/controlPanel/dataTable */
 /* Contenedor de la tabla */
 .dataTableContainer {
+  background-color: var(--color-bg-card);
   width: 100%;
-  overflow-x: auto; /* scroll horizontal en móviles */
+  overflow-x: auto; 
 }
 
 /* Tabla */
@@ -24,7 +25,7 @@
   text-align: left;
   font-size: 16px;
   font-weight: 600;
-  color: #000000;
+  color: var(--color-text-light);
 }
 
 /* Filas */
@@ -35,7 +36,7 @@
 .td {
   padding: 25px 15px;
   font-size: 15px;
-  color: #000000;
+  color: var(--color-text-muted);
 }
 
 /* Acciones */

@@ -1,8 +1,8 @@
 // src/components/turnos/TablaMisTurnos/TablaMisTurnos.jsx
 
 import React, { useState, useEffect, useContext } from "react";
-import { UserContext } from "../../../contexts/UserContext";
-import "../../../styles/turnos/TablaMisTurnos/TablaMisTurnos.css";
+import { UserContext } from "../../contexts/UserContext";
+import "../../styles/turnos/TablaMisTurnos.css";
 
 const TablaMisTurnos = () => {
   const [turnos, setTurnos] = useState([]);

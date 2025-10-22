@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import LoginCard from "../../components/auth/LoginCard/LoginCard";
-import "../../styles/auth/loginPage/Login.css";
+import "../../styles/auth/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 // Turnos.jsx
 
 import React, { useState } from "react";
-import FormularioTurno from "../../components/turnos/FormularioTurno/FormularioTurno";
-import TablaMisTurnos from "../../components/turnos/TablaMisTurnos/TablaMisTurnos";
+import FormularioTurno from "../../components/turnos/FormularioTurno";
+import TablaMisTurnos from "../../components/turnos/TablaMisTurnos";
 import "../../styles/turnos/Turnos.css";
 
 const Turnos = () => {

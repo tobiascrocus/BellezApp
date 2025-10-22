@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import "../../styles/auth/Register/Register.css";
+import "../../styles/auth/Register.css";
 import "../../components/auth/LoginCard/LoginCard";
-import "../../components/common/input/InputField";
-import "../../components/common/button/ButtonCustom";
+import "../../components/common/InputField";
+import "../../components/common/ButtonCustom";
 
 import EmailIcon from "../../assets/icons/email.png";
 import PhoneIcon from "../../assets/icons/phone.png";

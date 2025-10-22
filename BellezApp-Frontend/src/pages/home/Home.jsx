@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import ButtonCustom from "../../components/common/button/ButtonCustom";
+import ButtonCustom from "../../components/common/ButtonCustom";
 import "../../styles/home/Home.css";
 
 import iconTurnos from "../../assets/icons/icon-turnos.png";

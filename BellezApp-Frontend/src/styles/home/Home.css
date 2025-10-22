@@ -2,7 +2,7 @@
 
 .home-container {
   min-height: 100vh;
-  background-color: var(--color-bg-dark); 
+  background-color: var(--color-bg-grey); 
   width: 100%;
   padding-bottom: 40px;
   position: relative;
@@ -19,7 +19,7 @@
 }
 
 .banner .container {
-  background-color: var(--color-bg-card);
+  background-color: var(--color-bg-dark);
   padding: 40px;
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
@@ -38,7 +38,7 @@
   margin-top: 10px;
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
-  color: #666666;
+  color: var(--color-text-muted);
 }
 
 .register-link {

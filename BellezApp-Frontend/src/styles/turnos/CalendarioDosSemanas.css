@@ -10,14 +10,14 @@
   box-sizing: border-box;
   margin-bottom: 12px;
   margin-right: 50px;
-  border: 1px solid var(--muted-bg);
+  border: 1px solid var(--color-bg-medium);
 }
 
 /* Encabezado fijo */
 .calendar-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background-color: var(--black);
+  background-color: var(--color-bg-card);
   color: var(--white);
   text-align: center;
   font-size: 12px;
@@ -35,7 +35,7 @@
 
 /* Celdas que ocupan todo el espacio asignado */
 .calendar-cell {
-  border: 1px solid var(--muted-bg);
+  border: 1px solid var(--color-bg-medium);
   background: var(--white);
   display: flex;
   justify-content: center;

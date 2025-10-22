@@ -3,7 +3,7 @@
 .contenedor-general{
   min-height: 100vh;
   display: flex;
-  background-color: var(--color-bg-dark); 
+  background-color: var(--color-bg-grey); 
   align-items: flex-start;
   align-items: center;
   justify-content: center;
@@ -33,7 +33,7 @@
 
 /* Bloque descriptivo bajo el título */
 .mensaje-bienvenida{
-  color: var(--white);
+  color: var(--color-text-light);
   margin-top: 28px;
   font-size: 22px;
   line-height: 1.4;
@@ -52,7 +52,7 @@
   margin-top: 12px;
   text-align: center;
   font-size: 16px;
-  color: #666666;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 

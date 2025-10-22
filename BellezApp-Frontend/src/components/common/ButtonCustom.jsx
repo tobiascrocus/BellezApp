@@ -1,6 +1,6 @@
 // ButtonCustom.jsx
 import React from "react";
-import "../../../styles/common/button/ButtonCustom.css"; 
+import "../../styles/common/ButtonCustom.css"; 
 
 export default function ButtonCustom({
   children,

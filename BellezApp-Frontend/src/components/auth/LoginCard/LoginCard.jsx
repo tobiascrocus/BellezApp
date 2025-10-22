@@ -2,8 +2,8 @@
 
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../../styles/auth/LoginCard/LoginCard.css";
-import ButtonCustom from "../../common/button/ButtonCustom";
+import "../../../styles/auth/LoginCard.css";
+import ButtonCustom from "../../common/ButtonCustom";
 import { UserContext } from "../../../contexts/UserContext";
 
 export default function LoginCard({

@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--color-bg-dark);
+  background-color: var(--color-bg-grey);
   padding: 40px 0 80px 0;
 }
 
@@ -31,7 +31,7 @@
   max-width: 480px; 
   min-height: 420px; 
   padding: 40px 45px; 
-  background: var(--white) !important;
+  background: var(--color-bg-card);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
   display: flex;
@@ -53,12 +53,16 @@
   font-size: 20px; 
   border: 1px solid var(--muted-bg);
   border-radius: var(--control-radius);
-  background-color: var(--white) !important;
-  color: var(--black) !important;
+  background-color: var(--color-text-muted);
+  color: var(--color-bg-card);
   box-shadow: var(--input-shadow);
   font-family: var(--font-body);
   transition: all 0.3s ease;
   box-sizing: border-box;
+}
+
+.register-card .form-control.custom::placeholder {
+  color: var(--color-grey);
 }
 
 .register-card .form-control.custom:focus {

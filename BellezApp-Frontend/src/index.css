@@ -3,6 +3,7 @@
 /* === VARIABLES GLOBALES === */
 :root {
   --color-bg-dark: #111111;
+  --color-bg-grey: #3a3a3a;
   --color-bg-medium: #1D1D1D;
   --color-bg-card: #2E2E2E;
   --color-text-light: #F9F9F9;
@@ -16,7 +17,6 @@
   --gold: #C8A15D;
   --black: #000000;
   --muted-bg: #DEDFE1;
-  --gray: #666666;
   --white: #FFFFFF;
 
   /* Sombras y radios */

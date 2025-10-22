@@ -3,7 +3,7 @@
   justify-content: space-between;
   gap: 40px;
   padding: 30px;
-  background: var(--white);
+  background: var(--color-bg-card);
 }
 
 /* LADO IZQUIERDO - Formulario completo + botón */
@@ -30,7 +30,7 @@
   font-size: 16px;
   border: 1px solid var(--muted-bg);
   border-radius: var(--control-radius);
-  background-color: var(--white);
+  background-color: var(--color-text-muted);
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
   font-family: var(--font-body);
   transition: border-color 0.3s ease;
@@ -64,6 +64,12 @@
   gap: 20px;
   width: 415px; /* Ancho fijo para el calendario */
   flex-shrink: 0; /* No se reduce */
+}
+
+.form-select:disabled{
+  background-color: var(--color-grey)!important;
+  border: var(--color-bg-card);
+  cursor: not-allowed;
 }
 
 /* Leyenda debajo del calendario */

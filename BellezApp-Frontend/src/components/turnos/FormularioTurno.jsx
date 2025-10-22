@@ -1,10 +1,10 @@
 // src/components/turnos/FormularioTurno.jsx
 
 import React, { useState, useEffect, useContext } from "react";
-import CalendarioDosSemanas from "../CalendarioDosSemanas/CalendarioDosSemanas";
-import ButtonCustom from "../../common/button/ButtonCustom";
-import { UserContext } from "../../../contexts/UserContext";
-import "../../../styles/turnos/FormularioTurno/FormularioTurno.css";
+import CalendarioDosSemanas from "./CalendarioDosSemanas";
+import ButtonCustom from "../common/ButtonCustom";
+import { UserContext } from "../../contexts/UserContext";
+import "../../styles/turnos/FormularioTurno.css";
 
 // CONSTANTES LOCALES
 const PELUQUEROS = [

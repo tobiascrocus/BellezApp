@@ -1,5 +1,5 @@
 .turnos-page {
-  background: var(--color-bg-medium);
+  background: var(--color-bg-grey);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@
 }
 
 .turnos-card-container {
-  background: var(--white);
+  background: var(--color-bg-card);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;

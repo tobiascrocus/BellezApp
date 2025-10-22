@@ -1,6 +1,6 @@
 // src/components/CalendarioDosSemanas.jsx
 import React from "react";
-import "../../../styles/turnos/CalendarioDosSemanas/CalendarioDosSemanas.css";
+import "../../styles/turnos/CalendarioDosSemanas.css";
 
 export default function CalendarioDosSemanas({ startDate, daysStatus = {}, highlightedDate }) {
   let start = new Date(startDate);
@@ -45,7 +45,7 @@ export default function CalendarioDosSemanas({ startDate, daysStatus = {}, highl
           day.iso ? (
             <div
               key={day.iso}
-              className={`calendar-cell ${day.status} ${day.weekday === 0 || day.weekday === 6 ? "weekend" : ""} ${
+              className={`calendar-cell ${day.status} ${day.weekday === 1 || day.weekday === 2 ? "weekend" : ""} ${
                 highlightedDate === day.iso ? "highlighted" : ""
               }`}
             >
