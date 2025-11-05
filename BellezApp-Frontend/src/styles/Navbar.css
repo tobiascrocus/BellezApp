@@ -59,6 +59,21 @@
   transform: scale(1.05);
 }
 
+/* Usuario */
+.navbar-usuario {
+  color: var(--color-text-light);
+  font-weight: 500;
+  margin-left: 1rem;
+  white-space: nowrap;
+}
+
+.navbar-saludo {
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
+/* Hamburguesa */
 .navbar-hamburger {
   display: none;
   flex-direction: column;
@@ -86,10 +101,12 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
+/* Responsive */
 @media (max-width: 767px) {
   .navbar-hamburger {
     display: flex;
   }
+
   .navbar-buttons {
     position: absolute;
     top: 70px;
@@ -102,21 +119,18 @@
     transition: right 0.3s ease;
     box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
   }
+
   .navbar-buttons.open {
     right: 0;
   }
+
   .navbar-buttons li a {
     width: 100%;
     padding: 10px 15px;
     justify-content: flex-start;
   }
-  .navbar-main {
-    padding-left: 0;
-  }
-  .navbar-brand {
-    margin-left: 8px;
-  }
-  .navbar-logo {
-    height: 50px;
+
+  .navbar-usuario {
+    display: none;
   }
 }

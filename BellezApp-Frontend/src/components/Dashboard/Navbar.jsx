@@ -1,39 +1,47 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import '../../styles/Navbar.css';
+import "../../styles/Navbar.css";
 
 const Navbar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [usuario, setUsuario] = useState(null);
 
-  useEffect(() => {
-    // Simulación: token guardado
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiIyQGhvdG1haWwuY29tIiwicm9sIjoiY2xpZW50ZSIsImlhdCI6MTc1OTk2MDMwNiwiZXhwIjoxNzU5OTg5MTA2fQ.h2yBppXfU2PqL-bN-sC-i7dSfkeNBpcak2bwAKTJrWY";
+  // Token simulado
+  const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiIxQGhvdG1haWwuY29tIiwicm9sIjoicGVsdXF1ZXJvIiwiaWF0IjoxNzYyMzgxOTQ5LCJleHAiOjE3NjI0MTA3NDl9.PJCupbTSBrFc5Dcib5_iUrdKCxAph-9sgw7mGMIE1FM";
 
-    // Para testeo, no hacemos fetch al backend, solo simulamos usuario logueado
-    setUsuario({ nombre: "Tobías" });
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/me", {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+        if (!res.ok) throw new Error("No se pudo obtener usuario");
+        const data = await res.json();
+        setUsuario(data);
+      } catch (err) {
+        console.error(err);
+        setUsuario(null);
+      }
+    };
+    fetchUsuario();
   }, []);
 
   const botones = [
     { nombre: "Administrador", ruta: "/administrador" },
     { nombre: "Administrador Peluqueros", ruta: "/administrador-peluquero" },
     { nombre: "Inicio", ruta: "/" },
-    { nombre: "Quienes Somos", ruta: "/quienes-somos" },
-    { nombre: "Catálogo", ruta: "/catalogo" },
-    { nombre: "Turnos", ruta: "/turnos" },
-    { nombre: usuario ? `Perfil ${usuario.nombre}` : "Perfil", ruta: "/perfil" },
+    {
+      nombre: usuario ? `Perfil (${usuario.nombre})` : "Perfil",
+      ruta: "/perfil",
+    },
   ];
 
   return (
     <header>
       <nav className="navbar-main">
         <div className="navbar-brand">
-          <Link
-            to="/"
-            className="navbar-logo-link"
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link to="/" className="navbar-logo-link" onClick={() => setMenuOpen(false)}>
             <img
               src="/assets/images/Logos/logoBellezApp.png"
               alt="Logo BellezApp"

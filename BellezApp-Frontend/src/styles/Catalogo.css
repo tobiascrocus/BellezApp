@@ -1,8 +1,13 @@
 .catalogo-container {
+    flex: 1; 
   min-height: 100vh;
   padding: 7rem 2rem 3rem 2rem; /* padding-top = navbar altura + espacio extra */
+  overflow-y: auto;  
   background: var(--color-bg-dark);
   color: var(--color-text-light);
+  display: flex;
+  flex-direction: column;
+  background: #3a3a3a; 
 }
 
 .catalogo-titulo {

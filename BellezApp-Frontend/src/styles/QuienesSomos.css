@@ -1,7 +1,7 @@
 .quienes-container {
   min-height: 100vh;
   padding: 7rem 2rem 3rem 2rem; /* padding-top = altura del navbar + espacio extra */
-  background: var(--color-bg-dark);
+  
   color: var(--color-text-light);
   text-align: center;
 }

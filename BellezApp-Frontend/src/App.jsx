@@ -1,32 +1,28 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
-import Navbar from './components/Dashboard/Navbar';
-import Footer from './components/Dashboard/Footer';
-import Sidebar from './components/Dashboard/Sidebar';
+import Navbar from "./components/Dashboard/Navbar";
+import Footer from "./components/Dashboard/Footer";
 
-import Inicio from './pages/Inicio';
-import Login from './pages/Auth/Login';
-import Registro from './pages/Auth/Registro';
-import Administrador from './pages/Auth/Administrador';
-import AdministradorPeluquero from './pages/Auth/AdministradorPeluquero';
-import QuienesSomos from './pages/QuienesSomos';
-import Catalogo from './pages/Catalogo';
-import Turnos from './pages/Turnos';
-import Perfil from './pages/Perfil';
+import Inicio from "./pages/Inicio";
+import Login from "./pages/Auth/Login";
+import Registro from "./pages/Auth/Registro";
+import Administrador from "./pages/Auth/Administrador";
+import AdministradorPeluquero from "./pages/Auth/AdministradorPeluquero";
+import QuienesSomos from "./pages/QuienesSomos";
+import Catalogo from "./pages/Catalogo";
+import Turnos from "./pages/Turnos";
+import Perfil from "./pages/Perfil";
 import Panel from "./pages/Panel";
-import './App.css';
+import "./App.css";
 
-// 🔹 Este componente maneja la lógica de rutas y cuándo mostrar el Sidebar
+// 🔹 Manejador principal de rutas
 function AppContent() {
   const location = useLocation();
-
-  const mostrarSidebar = location.pathname === "/"; // 👈 solo en Inicio
 
   return (
     <>
       <Navbar />
       <div className="app-container">
-        {mostrarSidebar && <Sidebar />} {/* Sidebar solo en Inicio */}
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Inicio />} />
@@ -47,7 +43,6 @@ function AppContent() {
   );
 }
 
-// 🔹 El componente principal solo envuelve AppContent dentro del Router
 function App() {
   return (
     <Router>

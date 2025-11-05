@@ -1,14 +1,35 @@
-/* ====== Contenedor principal ====== */
-.inicio-container {
+/* ====== Layout principal con sidebar ====== */
+.inicio-layout {
+  display: flex;
   min-height: 100vh;
-  padding: 6rem 2rem 3rem 270px; 
+  background-color: #3a3a3a;
+}
+
+/* Sidebar fijo */
+.sidebar {
+  flex: 0 0 250px;
+  background-color: #1D1D1D;
+  border-right: 2px solid #C8A15D;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  padding-top: 6rem; /* espacio para Navbar */
+  box-sizing: border-box;
+}
+
+/* Contenedor principal ajustado al sidebar */
+.inicio-container {
+  flex: 1;
+  margin-left: 250px;
+  padding: 6rem 2rem 3rem;
   background-color: #3a3a3a;
   color: #F9F9F9;
-  font-family: 'Open Sans', sans-serif;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; 
-  text-align: left;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* ====== Título ====== */
@@ -26,19 +47,18 @@
   flex-direction: column; 
   gap: 2rem;
   width: 100%;
-  max-width: 800px; 
+  max-width: 800px;
 }
 
 /* ====== Card general ====== */
 .inicio-card {
   background-color: #1D1D1D;
   border-radius: 1rem;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1rem;
   box-shadow: 0 8px 20px rgba(0,0,0,0.7);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover efecto */
 .inicio-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(200, 161, 93, 0.5);
@@ -68,17 +88,40 @@
   line-height: 1.5;
 }
 
-/* ====== Responsivo ====== */
-@media (max-width: 768px) {
-  .inicio-container {
-    padding-left: 1.5rem; /* menos espacio en móvil */
-  }
+/* ====== Contenedor del catálogo dentro de inicio ====== */
+.inicio-catalogo {
+  flex: 1;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #3a3a3a;
+}
 
-  .inicio-titulo {
-    font-size: 2rem;
-  }
+/* Botón de reservar turno */
+.btn-reservar-turno {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 10px;
+}
 
-  .inicio-cards {
-    max-width: 100%;
-  }
+.btn-reservar-turno:hover {
+  background-color: #ff4c4c;
+  transform: translateY(-2px);
+}
+
+.btn-reservar-turno:active {
+  transform: translateY(1px);
+}
+
+/* Card de turno */
+.turnos-card .turno-info p {
+  margin: 5px 0;
 }

@@ -1,7 +1,7 @@
 /* ====== Contenedor ====== */
 .perfil-container {
   min-height: 100vh;
-  padding: 7rem 2rem 3rem 2rem; /* padding-top = altura navbar + espacio */
+  padding: 7rem 2rem 3rem 2rem;
   background: var(--color-bg-dark);
   color: var(--color-text-light);
   display: flex;
@@ -49,12 +49,27 @@
   transition: all 0.3s ease;
 }
 
-.perfil-form input:focus {
+/* ====== Focus y hover dorado SOLO al editar ====== */
+.perfil-form.editing input:focus,
+.perfil-form.editing input:hover {
   box-shadow: 0 0 8px var(--color-accent);
 }
 
-/* ====== Botón ====== */
-.perfil-form button {
+/* ====== El email NUNCA se ilumina ====== */
+.readonly-email:focus,
+.readonly-email:hover {
+  box-shadow: none !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* ====== Botones ====== */
+.botones-edicion {
+  display: flex;
+  flex-direction: column;
+}
+
+.guardar-btn {
   padding: 0.9rem 1.5rem;
   background: var(--color-accent);
   color: var(--color-bg-dark);
@@ -67,9 +82,114 @@
   transition: all 0.3s ease;
 }
 
-.perfil-form button:hover {
+.guardar-btn:hover {
   background: var(--color-accent);
   color: var(--color-text-light);
+}
+
+.cancelar-btn {
+  padding: 0.9rem 1.5rem;
+  background: var(--color-accent2);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.8rem;
+  box-shadow: 0 4px 12px rgba(139, 46, 46, 0.6);
+  transition: all 0.3s ease;
+}
+
+.cancelar-btn:hover {
+  background: #a03a3a;
+}
+
+.editar-btn {
+  padding: 0.9rem 1.5rem;
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(200, 161, 93, 0.6);
+  transition: all 0.3s ease;
+}
+
+.editar-btn:hover {
+  background: var(--color-accent);
+  color: var(--color-text-light);
+}
+
+/* ====== Modal ====== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-bg-card);
+  color: var(--color-text-light);
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius);
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+  position: relative;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Tipos de modal */
+.modal.success {
+  border: 2px solid var(--color-accent);
+}
+
+.modal.error {
+  border: 2px solid var(--color-accent2);
+}
+
+/* Botón de cierre */
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-close:hover {
+  transform: scale(1.2);
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ====== Responsivo ====== */
