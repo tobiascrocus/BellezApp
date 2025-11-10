@@ -1,0 +1,106 @@
+.promos-admin-container {
+  background-color: #1d1d1d;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  max-width: 800px;
+  border-top: 5px solid #c8a15d;
+}
+
+.promos-admin-titulo {
+  font-family: "Playfair Display", serif;
+  font-size: 2.5rem;
+  color: #c8a15d;
+  margin-bottom: 0.5rem;
+}
+
+.promos-admin-subtitulo {
+  font-size: 1rem;
+  color: #dddfe2;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.promos-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.promos-admin-textarea {
+  width: 100%;
+  padding: 1rem;
+  font-family: "Open Sans", sans-serif;
+  font-size: 1rem;
+  background-color: #3a3a3a;
+  color: #f9f9f9;
+  border: 1px solid #555;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.promos-admin-button {
+  align-self: flex-start;
+  background-color: #c8a15d;
+  color: #1d1d1d;
+  font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.promos-admin-button:hover {
+  background-color: #e6b873;
+}
+
+/* ====== Estilos del Modal Integrado ====== */
+.promos-admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.promos-admin-modal {
+  background-color: #2a2a2a;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  border-top: 4px solid #4caf50; /* Borde de éxito */
+}
+
+.promos-admin-modal p {
+  color: #f0f0f0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.promos-admin-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.promos-admin-modal-close:hover {
+  color: #fff;
+}

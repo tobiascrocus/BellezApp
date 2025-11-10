@@ -1,45 +1,69 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../styles/Inicio.css";
 import Sidebar from "../components/Dashboard/Sidebar";
+import Promociones from "./Promociones";
 import Catalogo from "./Catalogo";
 import QuienesSomos from "./QuienesSomos";
 import Turnos from "./Turnos"; // Sección completa de turnos
+
+const API_URL = "http://localhost:3000";
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiIyQGhvdG1haWwuY29tIiwicm9sIjoiY2xpZW50ZSIsImlhdCI6MTc2MjgwMDUxOSwiZXhwIjoxNzYyODI5MzE5fQ.4rz05UuDJy1H67Vnm2e4y8n_DQd4hJRqcXnqZO8h9q8";
+
+// Datos iniciales de promociones, ahora en el estado.
+const initialPromos = [
+  "Descuento Primera Visita – 10% OFF",
+  "Corte Clásico – 10% OFF",
+  "Descuento Estudiantes – 15% OFF",
+];
 
 const Inicio = ({ initialSection = "inicio" }) => {
   const [section, setSection] = useState(initialSection);
   const [proximoTurno, setProximoTurno] = useState(null);
   const [loadingTurno, setLoadingTurno] = useState(true);
+  const [promociones, setPromociones] = useState(initialPromos);
+
+  const apiFetch = useCallback(async (endpoint, options = {}) => {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${TOKEN}`,
+        ...options.headers,
+      },
+    });
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || `Error en la petición: ${res.statusText}`);
+    }
+    return res.json();
+  }, []);
 
   useEffect(() => {
-    const fetchUltimoTurnoMock = async () => {
+    const fetchProximoTurno = async () => {
       setLoadingTurno(true);
+      setProximoTurno(null);
       try {
-        // Simulamos un retraso de 1 segundo como si viniera del backend
-        await new Promise((res) => setTimeout(res, 1000));
+        const todosLosTurnos = await apiFetch('/turnos?limit=100'); // Pedimos una cantidad grande para asegurar que traemos todos
+        
+        const ahora = new Date();
+        
+        const proximo = todosLosTurnos
+          .filter(turno => 
+            turno.estado.toLowerCase() === 'confirmado' && new Date(turno.fecha_hora) > ahora
+          )
+          .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora))[0]; // Ordenamos y tomamos el primero
 
-        // Datos mock
-        const mockData = [
-          {
-            id: 1,
-            fecha_hora: "2025-11-10T15:30:00",
-            peluquero: "Juan Pérez",
-            estado: "Confirmado",
-          },
-        ];
-
-        // Para probar "no hay turnos", usar: const mockData = [];
-        if (mockData.length > 0) {
-          setProximoTurno(mockData[0]);
+        if (proximo) {
+          setProximoTurno(proximo);
         }
       } catch (err) {
-        console.error("Error cargando el turno mock:", err);
+        console.error("Error cargando el próximo turno:", err);
       } finally {
         setLoadingTurno(false);
       }
     };
-
-    fetchUltimoTurnoMock();
-  }, []);
+    fetchProximoTurno();
+  }, [apiFetch]);
 
   return (
     <div className="inicio-layout">
@@ -47,7 +71,13 @@ const Inicio = ({ initialSection = "inicio" }) => {
       <Sidebar onSelect={setSection} />
 
       {/* Contenedor principal dinámico */}
-      <div className="inicio-container">
+      <div
+        className={`inicio-container ${
+          section === "catalogo" || section === "quienes"
+            ? "no-padding-top"
+            : ""
+        }`}
+      >
         {section === "inicio" && (
           <>
             <h1 className="inicio-titulo">Bienvenido a BellezApp</h1>
@@ -56,9 +86,9 @@ const Inicio = ({ initialSection = "inicio" }) => {
               {/* Card de promociones */}
               <div className="inicio-card promo-card">
                 <h2>Promociones</h2>
-                <p>Descuento Primera Visita – 10% OFF</p>
-                <p>Corte Clásico – 10% OFF</p>
-                <p>Descuento Estudiantes – 15% OFF</p>
+                {promociones.map((promo, index) => (
+                  <p key={index}>{promo}</p>
+                ))}
               </div>
 
               {/* Card de turnos */}
@@ -76,7 +106,7 @@ const Inicio = ({ initialSection = "inicio" }) => {
                       <strong>Peluquero:</strong> {proximoTurno.peluquero}
                     </p>
                     <p>
-                      <strong>Estado:</strong> {proximoTurno.estado}
+                      <strong>Estado:</strong> <span style={{textTransform: 'capitalize'}}>{proximoTurno.estado}</span>
                     </p>
                   </div>
                 ) : (
@@ -98,6 +128,9 @@ const Inicio = ({ initialSection = "inicio" }) => {
         {section === "catalogo" && <Catalogo />}
         {section === "quienes" && <QuienesSomos />}
         {section === "turnos" && <Turnos />}
+        {section === "promos" && (
+          <Promociones promos={promociones} onSave={setPromociones} />
+        )}
       </div>
     </div>
   );

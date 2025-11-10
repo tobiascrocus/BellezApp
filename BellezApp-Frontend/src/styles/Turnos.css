@@ -1,0 +1,182 @@
+.turnos-wrapper {
+  width: 100%;
+  min-height: 100%;
+  border-radius: 1rem;
+  box-sizing: border-box;
+
+  /* Fondo gris oscuro sólido */
+  background-color: #1d1d1d;
+}
+
+.turnos-container {
+  padding: 2rem;
+  color: #f9f9f9;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.turnos-header {
+  display: flex;
+  flex-direction: column; /* Para poner el botón debajo del título */
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #c8a15d;
+  padding-bottom: 1rem;
+}
+
+.turnos-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: #c8a15d;
+  margin-bottom: 1rem; /* Espacio entre el título y el botón */
+}
+
+.btn-nuevo-turno {
+  background-color: #c8a15d;
+  color: #1d1d1d;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-nuevo-turno:hover {
+  background-color: #e0b870;
+  transform: translateY(-2px);
+}
+
+/* Formulario de nuevo turno */
+.nuevo-turno-form {
+  background-color: #2b2b2b; /* Un gris más claro que el fondo */
+  padding: 2rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+.nuevo-turno-form h2 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 1.5rem;
+  color: #f9f9f9;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  background-color: #333;
+  color: #f9f9f9;
+  font-size: 1rem;
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.slot-btn {
+  background-color: #444;
+  color: #f9f9f9;
+  border: 1px solid #666;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.slot-btn:hover {
+  background-color: #555;
+}
+
+.slot-btn.selected {
+  background-color: #c8a15d;
+  color: #1d1d1d;
+  font-weight: bold;
+}
+
+.btn-confirmar-reserva {
+  background-color: #8b2e2e;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.btn-confirmar-reserva:hover {
+  background-color: #a83a3a;
+}
+
+.btn-confirmar-reserva:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+/* Lista de turnos */
+.turnos-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.turno-card {
+  background-color: #2b2b2b; /* Mismo gris claro que el formulario */
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border-left: 5px solid #c8a15d; /* Dorado para confirmado */
+}
+
+.turno-card.cancelado {
+  border-left-color: #8b2e2e; /* Rojo para cancelado */
+  opacity: 0.7;
+}
+
+.turno-card p {
+  margin: 0.5rem 0;
+}
+
+.turno-estado {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.btn-cancelar {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-cancelar:hover {
+  background-color: #ff4c4c;
+}
+
+.error-msg {
+  color: #ff6b6b;
+  font-weight: bold;
+}

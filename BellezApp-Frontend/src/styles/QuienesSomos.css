@@ -1,6 +1,6 @@
 .quienes-container {
   min-height: 100vh;
-  padding: 7rem 2rem 3rem 2rem; /* padding-top = altura del navbar + espacio extra */
+  padding: 2rem 2rem 3rem; /* Eliminamos el padding-top fijo */
   
   color: var(--color-text-light);
   text-align: center;
@@ -95,7 +95,7 @@
 .quienes-card-rol {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--color-accent2);
+  color: #ff6b6b; /* Rojo claro para visibilidad */
   margin-bottom: 0.5rem;
 }
 

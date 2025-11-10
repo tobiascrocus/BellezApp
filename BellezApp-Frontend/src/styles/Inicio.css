@@ -32,6 +32,11 @@
   box-sizing: border-box;
 }
 
+/* Clase para reducir el padding superior en secciones específicas */
+.inicio-container.no-padding-top {
+  padding-top: 90px; /* Suficiente para despejar el Navbar de 70px */
+}
+
 /* ====== Título ====== */
 .inicio-titulo {
   font-family: 'Playfair Display', serif;

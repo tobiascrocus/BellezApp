@@ -441,6 +441,20 @@ server.delete('/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADMI
   }
 });
 
+// Obtener lista de peluqueros
+server.get('/peluqueros', authenticateToken, async (req, res) => {
+  try {
+    const peluqueros = await database.all(
+      `SELECT id, nombre, apellido FROM usuarios WHERE rol = ? ORDER BY apellido, nombre`,
+      [USER_ROLES.PELUQUERO]
+    );
+    res.json(peluqueros);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // ----------------------
 // ENDPOINTS: TURNOS
 // ----------------------
@@ -597,8 +611,12 @@ server.post('/turnos/:id/cancelar', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'No autorizado para cancelar este turno' });
     }
 
+    if (turno.estado === APPOINTMENT_STATUS.CANCELADO) {
+      return res.status(400).json({ error: 'El turno ya está cancelado.' });
+    }
+
     await database.runAsync('UPDATE turnos SET estado = ? WHERE id = ?', [APPOINTMENT_STATUS.CANCELADO, id]);
-    res.json({ mensaje: 'Turno cancelado' });
+    res.json({ mensaje: 'Turno cancelado', turno: { ...turno, estado: APPOINTMENT_STATUS.CANCELADO } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

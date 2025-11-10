@@ -8,7 +8,7 @@ const Navbar = () => {
   const [usuario, setUsuario] = useState(null);
 
   // Token simulado
-  const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiIxQGhvdG1haWwuY29tIiwicm9sIjoicGVsdXF1ZXJvIiwiaWF0IjoxNzYyMzgxOTQ5LCJleHAiOjE3NjI0MTA3NDl9.PJCupbTSBrFc5Dcib5_iUrdKCxAph-9sgw7mGMIE1FM";
+  const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiIyQGhvdG1haWwuY29tIiwicm9sIjoiY2xpZW50ZSIsImlhdCI6MTc2MjgwMDUxOSwiZXhwIjoxNzYyODI5MzE5fQ.4rz05UuDJy1H67Vnm2e4y8n_DQd4hJRqcXnqZO8h9q8";
 
   useEffect(() => {
     const fetchUsuario = async () => {
