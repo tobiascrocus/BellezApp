@@ -1,38 +1,37 @@
-// QuienesSomos.jsx
-import "./QuienesSomos.css";
+import './QuienesSomos.css';
 
 const equipo = [
   {
     id: 1,
-    nombre: "Agustín",
+    nombre: "Damian",
     rol: "Fundador & Dueño",
     descripcion:
-      "Desde chico supe que mi vocación estaba en transformar estilos y brindar un espacio donde cada persona se sienta cómoda. Con más de 10 años en el rubro, decidí abrir este lugar para combinar profesionalismo, calidez y estilo.",
-    img: "/assets/images/QuienesSomos/agustin.jpg",
+      "Hola, soy Damián. Soy quien fundó esta barbershop con la idea de que cada cliente se sienta cómodo y salga con un estilo que lo haga sentir seguro. Me encanta que este lugar sea más que cortes de cabello: un espacio para relajarse y disfrutar.",
+    img: "/assets/images/QuienesSomos/Damian.png",
   },
   {
     id: 2,
-    nombre: "Marcos",
-    rol: "Barbero",
+    nombre: "Gustavo",
+    rol: "Estilista",
     descripcion:
-      "Me dedico a la barbería clásica y moderna desde hace más de 10 años. Me apasionan los cortes masculinos, degradados y arreglos de barba.",
-    img: "/assets/images/QuienesSomos/marcos.jpg",
+      "Soy Gustavo y me apasiona hacer cortes clásicos y cuidados al detalle. Me gusta que cada cliente salga con un look impecable y que la experiencia sea tan agradable como el corte mismo.",
+    img: "/assets/images/QuienesSomos/Gustavo.png",
   },
   {
     id: 3,
-    nombre: "Sofía",
+    nombre: "Franco",
     rol: "Estilista",
     descripcion:
-      "Estilista con más de 8 años de experiencia en coloración, cortes y peinados. Amo transformar looks y realzar la belleza natural de cada cliente.",
-    img: "/assets/images/QuienesSomos/sofia.jpg",
+      "Hola, soy Franco. Me especializo en afeitados y cuidado de la barba, y disfruto que cada barba luzca perfecta y con estilo. Además, me encanta charlar y compartir algún consejo mientras trabajamos.",
+    img: "/assets/images/QuienesSomos/Franco.png",
   },
   {
     id: 4,
-    nombre: "Mauricio",
-    rol: "Barbero",
+    nombre: "Pedro",
+    rol: "Estilista",
     descripcion:
-      "Apasionado por los cortes prolijos, rápidos y con estilo. Me especializo en looks clásicos y modernos, siempre con buena onda y atención personalizada.",
-    img: "/assets/images/QuienesSomos/mauricio.jpg",
+      "Soy Pedro y mi fuerte son los estilos modernos y creativos. Me encanta experimentar con degradados y diseños personalizados, siempre asegurándome de que cada cliente se sienta cómodo y con un look único.",
+    img: "/assets/images/QuienesSomos/Pedro.png",
   },
 ];
 
@@ -41,7 +40,7 @@ export default function QuienesSomos() {
     <section className="quienes-container">
       <h1 className="quienes-titulo">¿Quiénes Somos?</h1>
       <p className="quienes-subtitulo">
-        Conocé a las personas detrás de <strong>BellezApp</strong>
+        Conocé a las personas detrás de <strong><span className="bellezapp-rojo">BellezApp</span></strong>
       </p>
 
       <div className="quienes-grid">
@@ -51,6 +50,7 @@ export default function QuienesSomos() {
               <img src={persona.img} alt={persona.nombre} loading="lazy" />
             </div>
             <h2 className="quienes-card-nombre">{persona.nombre}</h2>
+            <div className="quienes-card-separator"></div>
             <h3 className="quienes-card-rol">{persona.rol}</h3>
             <p className="quienes-card-desc">{persona.descripcion}</p>
           </article>

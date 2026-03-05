@@ -1,13 +1,13 @@
-import "./Footer.css";
+// Footer.jsx
+
+import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="footer footer-center">
+    <footer className="footer-main">
       <p>
-        Desarrollado por <span className="autor">Tobias Tinaro</span>,{" "}
-        <span className="autor">Jeremías Vergara</span>,{" "}
-        <span className="autor">Chiara Seco</span> |{" "}
-        <span className="marca">© BellezApp</span>
+        Desarrollado por <span className="footer-author">Tobias Tinaro</span> |{" "}
+        <span className="footer-brand">© BellezApp</span>
       </p>
     </footer>
   );

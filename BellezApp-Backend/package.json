@@ -10,13 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^10.0.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "faker": "^5.5.3",
     "jsonwebtoken": "^9.0.2",
     "sqlite3": "^5.1.7"
   },
-  "devDependencies": {},
-  "description": ""
+  "description": "Proyecto para la materia \"Practica profesionalizante\" para la carrera \"Tecnicatura en desarrollo de software\".\r Tobias Tinaro\r Jeremías Vergara"
 }

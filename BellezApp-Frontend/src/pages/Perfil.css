@@ -1,0 +1,415 @@
+.perfil-container {
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.perfil-titulo {
+  font-family: var(--font-title);
+  color: var(--color-accent);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.perfil-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(200, 161, 93, 0.8);
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px rgba(200, 161, 93, 0.3);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.perfil-avatar-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--color-accent);
+  object-fit: cover;
+  cursor: default;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+}
+
+.hover-enabled:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.perfil-info {
+  margin-top: 1.5rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* Contenedor para el contenido animado dentro de perfil-info */
+.perfil-info-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.perfil-info h2 {
+  color: var(--color-accent);
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.perfil-rol {
+  color: var(--color-accent2);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.perfil-info p {
+  font-size: 1rem;
+  margin: 0.8rem 0;
+  line-height: 1.5;
+}
+
+.perfil-info p .label {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.perfil-info p .value {
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+.perfil-info input {
+  width: 100%;  
+  margin-bottom: 0.75rem;
+  padding: 0.7rem;
+  font-size: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-bg-dark);
+  background: var(--color-bg-card);
+  color: var(--color-text-light);
+  transition: border 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.perfil-info input[readOnly] {
+  background-color: #3a3a3a;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.perfil-info input:not([type="password"]):not([readOnly]):focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(255, 150, 50, 0.4);
+  outline: none;
+}
+
+.perfil-info input[type="password"] {
+  border-color: darkred;
+}
+
+.perfil-info input[type="password"]:focus {
+  border-color: red;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+  outline: none;
+}
+
+/* --- NUEVO: Estilos para el contenedor de contraseña y el ojito --- */
+.perfil-password-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.75rem; /* Mantenemos el espacio entre inputs */
+}
+
+.perfil-password-container input {
+  margin-bottom: 0; /* El margen ahora lo controla el contenedor */
+  padding-right: 3rem; /* Espacio para el ícono */
+}
+
+.perfil-password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 20px; /* Tamaño más adecuado para estos inputs */
+  height: 20px;
+  filter: invert(1); /* Cambia el color del ícono de negro a blanco */
+}
+
+/* Botón Editar Perfil (modo lectura) */
+.perfil-info .btn-editar {
+  display: block;
+  margin: 1.5rem auto 0 auto;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  min-height: 44px;
+  width: auto;
+  max-width: 200px;
+}
+
+.perfil-info .btn-editar:hover {
+  background: #d4a017;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* CONTENEDOR DE BOTONES - CORREGIDO */
+.perfil-botones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 1.5rem; /* Aumentamos el espacio para compensar la falta de errores en línea */
+  width: 100%;
+}
+
+/* BOTONES DENTRO DEL PERFIL - ESTILOS ESPECÍFICOS */
+.perfil-botones .btn-guardar,
+.perfil-botones .btn-cancelar {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.perfil-botones .btn-guardar {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+}
+
+.perfil-botones .btn-guardar:hover {
+  background: #d4a017;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.perfil-botones .btn-cancelar {
+  background: var(--color-accent2);
+  color: var(--color-text-light);
+}
+
+.perfil-botones .btn-cancelar:hover {
+  background: #ff4d4d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* MODAL STYLES */
+.modal-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--color-bg-dark);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 550px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+  border: 2px solid rgba(200, 161, 93, 0.8);
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--color-accent);
+}
+
+.avatar-selector {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  justify-items: center;
+}
+
+.avatar-option {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border 0.2s;
+  object-fit: cover;
+}
+
+.avatar-option:hover {
+  transform: scale(1.1);
+}
+
+.avatar-option.selected-red {
+  border: 3px solid red;
+  transform: scale(1.15);
+}
+
+/* Botón cerrar del modal */
+.btn-cerrar {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  background: var(--color-accent2);
+  color: var(--color-text-light);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cerrar:hover {
+  background: #ff4d4d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Mensajes de error y éxito */
+.perfil-error, .perfil-success {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  text-align: center;
+}
+
+.perfil-error {
+  background-color: rgba(255, 77, 77, 0.2);
+  color: #ff4d4d;
+}
+
+.perfil-success {
+  background-color: rgba(77, 255, 150, 0.2);
+  color: #4dff96;
+}
+
+/* --- Modal de Error --- */
+.perfil-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001; /* Un z-index alto para estar sobre el modal de avatares */
+}
+
+.perfil-modal-content {
+  background: var(--color-bg-dark);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border: 2px solid var(--color-accent); /* Borde dorado para consistencia */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.perfil-modal-content h3 {
+  font-family: var(--font-title);
+  color: var(--color-accent2); /* Título en rojo */
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.perfil-modal-text {
+  color: var(--color-text-light);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  white-space: pre-line; /* Permite que los saltos de línea (\n) funcionen */
+}
+
+.perfil-modal-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-modal-entendido {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-entendido:hover {
+  background: #d4a017;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* --- Media Queries para Responsividad --- */
+@media (max-width: 768px) {
+  /* Ajusta el modal de avatares para móviles */
+  .avatar-selector {
+    grid-template-columns: repeat(3, 1fr); /* Cambia a 3 columnas */
+    gap: 15px; /* Aumenta un poco el espacio para que sea más fácil de tocar */
+  }
+
+  .avatar-option {
+    width: 70px; /* Hacemos los avatares un poco más grandes */
+    height: 70px;
+  }
+
+  /* Ajusta el contenedor principal para eliminar espacio muerto */
+  .perfil-container {
+    min-height: auto; /* Quitamos la altura mínima para que se ajuste al contenido */
+    justify-content: flex-start; /* Alineamos la tarjeta al inicio (arriba) */
+    padding-top: 3rem; /* Aumentamos el espacio superior para separarlo del navbar */
+    padding-bottom: 2rem; /* Añadimos espacio inferior para que no quede pegado al footer */
+  }
+
+  .perfil-titulo {
+    font-size: 1.8rem; /* Hacemos el título un poco más pequeño */
+    margin-bottom: 0.8rem; /* Reducimos el margen inferior del título */
+  }
+}

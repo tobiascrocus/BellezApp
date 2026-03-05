@@ -1,4 +1,3 @@
-// Catalogo.jsx
 import './Catalogo.css';
 
 const cortes = [

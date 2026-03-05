@@ -1,0 +1,388 @@
+/* Wrapper principal */
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--color-bg-medium), var(--color-bg-card));
+  font-family: var(--font-primary);
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Lado izquierdo */
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  color: var(--color-text-light);
+  max-width: 600px;
+  max-height: 100%;
+}
+
+.login-left h1 {
+  font-family: var(--font-title);
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.login-left h1 span.dorado {
+  display: block;
+  color: var(--color-accent);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+}
+
+.login-left h1 span.rojo {
+  display: block;
+  color: var(--color-accent2);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+}
+
+.login-left p {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  max-width: 600px;
+  line-height: 1.5;
+  margin-top: 1.5rem;
+  white-space: pre-line;
+}
+
+/* Lado derecho */
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  max-width: 600px;
+  max-height: 100%;
+}
+
+/* Card de login */
+.login-card {
+  background: linear-gradient(145deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 100%);
+  padding: 4rem;
+  border-radius: 1.2rem;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-card h2 {
+  font-family: var(--font-title);
+  color: var(--color-accent);
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card input:not([type="checkbox"]) {
+  padding: 1.3rem 1.5rem;
+  font-size: 1.2rem;
+  border: 1px solid var(--color-bg-dark);
+  border-radius: var(--radius);
+  background: var(--color-bg-card);
+  color: var(--color-text-light);
+  width: 100%; /* Aseguramos que ocupe todo el ancho */
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.login-card input:not([type="checkbox"]):focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(255, 150, 50, 0.4);
+  outline: none;
+}
+
+/* --- Contenedor para el input de contraseña y el ícono --- */
+.password-input-container {
+  /* 1. Creamos un contexto de posicionamiento para el ícono. */
+  position: relative;
+  /* 2. El contenedor en sí no necesita margen, se lo daremos a los inputs. */
+}
+
+/* 3. Devolvemos el margen inferior al input de email para separarlo del de contraseña. */
+.login-card input[type="email"] {
+  margin-bottom: 1.5rem;
+}
+
+.password-input-container input {
+  /* 3. Añadimos padding al input para que el texto no quede debajo del ícono. */
+  padding-right: 4rem;
+}
+
+.password-toggle-icon {
+  /* 4. Posicionamiento absoluto RELATIVO AL CONTENEDOR. */
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%); /* 5. Este es el truco para un centrado vertical perfecto. */
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  filter: invert(1); /* Cambia el color del ícono de negro a blanco */
+  transition: transform 0.2s ease;
+}
+
+.login-card button {
+  padding: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  transition: all 0.3s ease;
+  margin-top: 0; /* Eliminamos el margen superior para acercarlo al contenido de arriba */
+}
+
+.login-card button:hover {
+  background: var(--color-accent2);
+  color: var(--color-text-light);
+  transform: scale(1.05);
+}
+
+/* --- NUEVO ENFOQUE PARA "MANTENER SESIÓN INICIADA" --- */
+.form-group-remember {
+  display: flex; /* Usamos flexbox para alinear los elementos */
+  margin-top: 1rem; /* 4. Le damos un margen superior para separarlo del input de contraseña. */
+  gap: 0.5rem;
+  margin-bottom: 0.5rem; /* Y un pequeño margen inferior para separarlo del botón/error. */
+  align-items: flex-start; /* Alineamos los elementos por su parte superior */
+}
+
+.checkbox-wrapper {
+  /* Este contenedor no necesita estilos, pero es útil para la estructura */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px; /* Ajuste fino para bajar el checkbox y alinearlo con el texto */
+}
+
+.form-group-remember input[type="checkbox"] {
+  appearance: none; /* Reseteamos la apariencia del checkbox */
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden; /* Oculta el círculo cuando está fuera de la caja */
+  background-color: var(--color-bg-card);
+  transition: border-color 0.3s ease; /* Transición suave para el borde */
+}
+
+/* Círculo dorado animado (inicialmente invisible) */
+.form-group-remember input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.form-group-remember input[type="checkbox"]:checked {
+  border-color: var(--color-accent);
+  /* Efecto de resplandor dorado */
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.7), 0 0 12px rgba(255, 152, 0, 0.5);
+}
+
+.form-group-remember input[type="checkbox"]:checked::before {
+  width: 200%; /* Hacemos el círculo más grande que la caja para llenarla por completo */
+  height: 200%;
+}
+
+.remember-label {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  user-select: none; /* Evita que el texto se pueda seleccionar */
+}
+
+/* Contenedor del mensaje de error para reservar espacio */
+.error-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem; /* Reducimos el espacio para acercar el botón */
+  /* Eliminamos la altura mínima para que no ocupe espacio cuando está vacío */
+}
+
+/* Mensaje de error */
+.login-error {
+  color: var(--color-accent2);
+  font-size: 0.9rem;
+  margin: 0; /* Eliminamos los márgenes */
+}
+
+/* Link de olvidaste contraseña */
+.forgot-password-link {
+  text-align: center;
+  margin-top: 1rem; /* Añade espacio sobre este enlace */
+  font-size: 0.9rem;
+}
+
+.forgot-password-link a {
+  color: var(--color-accent2);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.forgot-password-link a:hover {
+  color: #ff4d4d; /* Un rojo más brillante al pasar el mouse */
+}
+/* Link de registro */
+.login-card .register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.login-card .register-link a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.login-card .register-link a:hover {
+  color: var(--color-accent2);
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .login-left,
+  .login-right {
+    flex: unset;
+    width: 100%;
+    padding: 1rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .login-left {
+    margin-bottom: 1rem;
+  }
+
+  .login-card {
+    padding: 3rem 2rem;
+    max-width: 95%;
+  }
+
+  .login-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .login-card input {
+    font-size: 1.1rem;
+    padding: 1.1rem 1.3rem;
+  }
+
+  .login-card button {
+    font-size: 1.2rem;
+    padding: 1.3rem;
+  }
+}
+
+/* Clase para ocultar elementos visualmente pero mantenerlos accesibles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Modal de "Olvidaste Contraseña" */
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.login-modal-content {
+  background: var(--color-bg-dark);
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.login-modal-content h3 {
+  font-family: var(--font-title);
+  color: var(--color-accent);
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.modal-text {
+  color: var(--color-text-light);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.login-modal-content .modal-email {
+  display: inline-block; /* Para que el margen funcione */
+  margin-top: 0.5rem; /* Espacio sobre el email */
+  font-weight: bold;
+  color: var(--color-accent2);
+}
+
+.btn-modal-entendido {
+  background: var(--color-accent);
+  color: var(--color-bg-dark);
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-modal-entendido:hover {
+  background: #d4a017;
+}
