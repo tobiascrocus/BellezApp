@@ -3,15 +3,21 @@
 // ---------- IMPORTS ----------
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const util = require('util');
+require('dotenv').config();
 
 // ---------- CONSTANTES ----------
 const SERVER_PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'REPLACE_WITH_SECURE_KEY';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('ERROR FATAL: La variable de entorno JWT_SECRET no está definida en el archivo .env');
+  process.exit(1);
+}
+
 const SALT_ROUNDS = 10;
 
 const USER_ROLES = { ADMIN: 'admin', PELUQUERO: 'peluquero', CLIENTE: 'cliente' };
@@ -19,6 +25,8 @@ const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado', A
 const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
 const SLOT_INTERVAL = 30; // minutos
 const MAX_TURNOS_CLIENTE = 3;
+
+const BUSINESS_TIMEZONE_OFFSET = parseInt(process.env.BUSINESS_TIMEZONE_OFFSET || '-3'); // Offset del negocio (ej. Argentina = -3)
 
 // --- Constantes para el Límite de Intentos de Contraseña ---
 const PASSWORD_ATTEMPT_LIMIT = 5; // Máximo de intentos fallidos
@@ -35,7 +43,7 @@ const failedLoginAttempts = new Map(); // Almacén en memoria para los intentos 
 // ---------- INICIALIZACIÓN EXPRESS ----------
 const server = express();
 server.use(cors());
-server.use(bodyParser.json());
+server.use(express.json());
 
 // ---------- BASE DE DATOS ----------
 const db = new sqlite3.Database('./bellezapp.db', err => {
@@ -63,16 +71,14 @@ const sendResponse = (res, ok, data = null, message = '', code = 200) =>
 
 const parseDate = input => {
   if (!input) return null;
-  const s = String(input).includes('T') ? input : String(input).replace(' ', 'T');
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
+  const d = new Date(input);
+  return isNaN(d.getTime()) ? null : d.getTime();
 };
 
-const formatDate = input => {
-  const d = input instanceof Date ? input : new Date(input);
-  if (isNaN(d)) return null;
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const formatDate = timestamp => {
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().replace('T', ' ').slice(0, 19);
 };
 
 const asyncHandler = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
@@ -127,26 +133,34 @@ const updateTable = async (table, id, fields) => {
 };
 
 // ---------- TURNOS HELPERS ----------
-const isWithinBusinessHours = fechaHora => {
-  const d = parseDate(fechaHora);
-  if (!d) return false;
-  const h = d.getHours();
-  const m = d.getMinutes();
-  return BUSINESS_HOURS.some(b => (h >= b.start && h < b.end)) && (m === 0 || m === 30);
+const isWithinBusinessHours = timestamp => {
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return false;
+  // Convertir hora UTC a la hora local del negocio usando el offset
+  const hUTC = d.getUTCHours();
+  const hLocal = (hUTC + BUSINESS_TIMEZONE_OFFSET + 24) % 24;
+  const m = d.getUTCMinutes();
+  return BUSINESS_HOURS.some(b => (hLocal >= b.start && hLocal < b.end)) && (m === 0 || m === 30);
+};
+
+const getLocalDayOfWeek = (timestamp) => {
+  const d = new Date(timestamp);
+  const localDate = new Date(d.getTime() + BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
+  return localDate.getUTCDay();
 };
 
 const checkConflict = async (peluqueroId, fechaHora, excludeId = null) => {
-  const fecha = parseDate(fechaHora);
-  const fechaStr = formatDate(fecha);
+  const timestampMs = parseDate(fechaHora);
+  const ts = Math.floor(timestampMs / 1000); // SQLite unixepoch usa segundos
 
   let sql = `
     SELECT t.id FROM turnos t
     JOIN servicios s ON t.servicio_id = s.id
     WHERE t.peluquero_id = ? AND t.estado = ?
-    AND ? >= t.fecha_hora 
-    AND ? < datetime(t.fecha_hora, '+' || s.duracion_minutos || ' minutes')
+    AND ? >= unixepoch(t.fecha_hora) 
+    AND ? < (unixepoch(t.fecha_hora) + (s.duracion_minutos * 60))
   `;
-  const params = [peluqueroId, APPOINTMENT_STATUS.CONFIRMADO, fechaStr, fechaStr];
+  const params = [peluqueroId, APPOINTMENT_STATUS.CONFIRMADO, ts, ts];
 
   if (excludeId) { sql += ' AND t.id != ?'; params.push(excludeId); }
   return (await db.get(sql, params)) ? 'Horario ocupado para ese peluquero.' : null;
@@ -160,20 +174,19 @@ const checkUserTurnLimit = async (usuarioId, excludeId = null) => {
 };
 
 const validateAppointment = async ({ id, usuarioId, peluqueroId, fechaHora, estado, servicioId }) => {
-  if (!usuarioId || !peluqueroId || !fechaHora || !parseDate(fechaHora)) return { ok: false, message: 'Datos de turno inválidos' };
-  const d = parseDate(fechaHora);
-  if ([0, 6].includes(d.getDay())) return { ok: false, message: 'No se pueden reservar turnos en fines de semana' };
-  if (!isWithinBusinessHours(fechaHora)) return { ok: false, message: 'Turnos solo entre 9-12 y 17-21 con intervalos de 30 min.' };
+  const timestamp = parseDate(fechaHora);
+  if (!usuarioId || !peluqueroId || !timestamp) return { ok: false, message: 'Datos de turno inválidos' };
+  if ([0, 6].includes(getLocalDayOfWeek(timestamp))) return { ok: false, message: 'No se pueden reservar turnos en fines de semana' };
+  if (!isWithinBusinessHours(timestamp)) return { ok: false, message: 'Turnos solo entre 9-12 y 17-21 con intervalos de 30 min.' };
   const serv = await db.get('SELECT duracion_minutos FROM servicios WHERE id=?', [servicioId]);
   if (!serv) return { ok: false, message: 'Servicio inválido.' };
   if (estado === APPOINTMENT_STATUS.CONFIRMADO) {
-    if (d < new Date()) return { ok: false, message: 'No se pueden confirmar turnos en el pasado.' };
+    if (timestamp < Date.now()) return { ok: false, message: 'No se pueden confirmar turnos en el pasado.' };
     const limite = await checkUserTurnLimit(usuarioId, id);
     if (limite) return { ok: false, message: limite };
-    const start = parseDate(fechaHora);
+    const start = new Date(timestamp);
     for (let offset = 0; offset < serv.duracion_minutos; offset += SLOT_INTERVAL) {
-      const checkStart = new Date(start);
-      checkStart.setMinutes(checkStart.getMinutes() + offset);
+      const checkStart = new Date(start.getTime() + offset * 60 * 1000);
       const conflict = await checkConflict(peluqueroId, checkStart, id);
       if (conflict) return { ok: false, message: conflict };
     }
@@ -243,6 +256,17 @@ async function initDB() {
 
   await db.runAsync('CREATE INDEX IF NOT EXISTS idx_turnos_peluquero_fecha ON turnos(peluquero_id, fecha_hora);');
   await db.runAsync(`CREATE UNIQUE INDEX IF NOT EXISTS ux_turno_peluquero_fecha_confirmado ON turnos(peluquero_id, fecha_hora) WHERE estado='confirmado';`);
+
+  // Crear usuario administrador por defecto si no existe
+  const adminEmail = 'admin@hotmail.com';
+  const existingAdmin = await db.get('SELECT id FROM usuarios WHERE email = ?', [adminEmail]);
+  if (!existingAdmin) {
+    const adminPassHash = await hashPassword('admin');
+    await db.runAsync(
+      'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
+      ['Tobias', 'Tinaro', adminEmail, '123456', USER_ROLES.ADMIN, adminPassHash]
+    );
+  }
 }
 
 initDB().catch(e => { console.error('Error inicializando DB:', e); process.exit(1); });
@@ -448,7 +472,7 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   const { rol, id } = req.usuario;
   const { view } = req.query; // Leemos el parámetro 'view'
   let query = `
-    SELECT t.*, (u.nombre || ' ' || u.apellido) AS cliente_nombre, (p.nombre || ' ' || p.apellido) AS peluquero_nombre, s.nombre AS servicio_nombre
+    SELECT t.*, unixepoch(t.fecha_hora) * 1000 as fecha_timestamp, (u.nombre || ' ' || u.apellido) AS cliente_nombre, (p.nombre || ' ' || p.apellido) AS peluquero_nombre, s.nombre AS servicio_nombre
     FROM turnos t
     LEFT JOIN usuarios u ON t.usuario_id=u.id
     LEFT JOIN usuarios p ON t.peluquero_id=p.id
@@ -474,7 +498,7 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   // Lógica para tratar turnos pasados como "asistio" si siguen "confirmado"
   const ahora = new Date();
   const turnosProcesados = turnos.map(turno => {
-    const fechaTurno = new Date(turno.fecha_hora);
+    const fechaTurno = turno.fecha_timestamp;
     if (turno.estado === APPOINTMENT_STATUS.CONFIRMADO && fechaTurno < ahora) {
       return { ...turno, estado: APPOINTMENT_STATUS.ASISTIO };
     }
@@ -493,6 +517,7 @@ server.post('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   }
   const d = parseDate(fecha_hora);
   if (!d) return sendResponse(res, false, null, 'Fecha inválida', 400);
+  const fechaStr = formatDate(d);
 
   // Verificamos que los IDs existen antes de crear el turno
   await ensureExists('usuarios', usuario_id); // Ya no se exige que sea cliente
@@ -504,7 +529,7 @@ server.post('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
 
   await db.runAsync(
     'INSERT INTO turnos (usuario_id, peluquero_id, servicio_id, fecha_hora, estado) VALUES (?,?,?,?,?)',
-    [usuario_id, peluquero_id, servicio_id, formatDate(d), APPOINTMENT_STATUS.CONFIRMADO]
+    [usuario_id, peluquero_id, servicio_id, fechaStr, APPOINTMENT_STATUS.CONFIRMADO]
   );
   sendResponse(res, true, null, 'Turno creado correctamente');
 }));
@@ -566,11 +591,15 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   const { fecha, peluquero_id } = req.query;
   if (!fecha) return sendResponse(res, false, null, 'Fecha requerida (YYYY-MM-DD)', 400);
 
-  // Corrección: Interpretar la fecha como local para evitar desajustes de zona horaria.
-  // new Date('YYYY-MM-DD') lo trata como UTC. 'YYYY-MM-DDTHH:mm:ss' lo trata como local.
-  const dia = new Date(`${fecha}T00:00:00`);
-  if (isNaN(dia)) return sendResponse(res, false, null, 'Fecha inválida', 400);
-  if ([0, 6].includes(dia.getDay())) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
+  const [year, month, day] = fecha.split('-').map(Number);
+  // Definimos el inicio y fin del día ajustados a la zona horaria del negocio
+  const startOfDayUTC = Date.UTC(year, month - 1, day, 0, 0, 0) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
+  const endOfDayUTC = startOfDayUTC + 86400000 - 1;
+
+  // Validar día (fines de semana) usando el objeto Date UTC
+  const dia = new Date(startOfDayUTC);
+  if (isNaN(dia.getTime())) return sendResponse(res, false, null, 'Fecha inválida', 400);
+  if ([0, 6].includes(getLocalDayOfWeek(startOfDayUTC + 12 * 60 * 60 * 1000))) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
 
   const peluqueros = peluquero_id
     ? [await ensureExists('usuarios', peluquero_id, USER_ROLES.PELUQUERO)]
@@ -578,11 +607,12 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
 
   // Obtener todos los turnos confirmados para la fecha y peluqueros seleccionados
   const turnosDelDia = await db.all(`
-    SELECT t.peluquero_id, t.fecha_hora, s.duracion_minutos
+    SELECT t.peluquero_id, unixepoch(t.fecha_hora) * 1000 as start_ts, s.duracion_minutos
     FROM turnos t
     JOIN servicios s ON t.servicio_id = s.id
-    WHERE t.estado = ? AND strftime('%Y-%m-%d', t.fecha_hora) = ? AND t.peluquero_id IN (${peluqueros.map(p => '?').join(',')})
-  `, [APPOINTMENT_STATUS.CONFIRMADO, fecha, ...peluqueros.map(p => p.id)]);
+    WHERE t.estado = ? AND unixepoch(t.fecha_hora) * 1000 BETWEEN ? AND ?
+      AND t.peluquero_id IN (${peluqueros.map(() => '?').join(',')})
+  `, [APPOINTMENT_STATUS.CONFIRMADO, startOfDayUTC, endOfDayUTC, ...peluqueros.map(p => p.id)]);
 
   const disponibilidad = {};
   for (const p of peluqueros) {
@@ -590,11 +620,12 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
     disponibilidad[p.id] = [];
     for (const bloque of BUSINESS_HOURS) {
       for (let h = bloque.start; h < bloque.end; h++) {
-        for (let m of [0,30]) {
-          const slotTime = new Date(`${fecha}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00Z`).getTime();
+        for (let m of [0, 30]) {
+          // Generamos el timestamp UTC exacto que corresponde a la hora local del negocio
+          const slotTime = Date.UTC(year, month - 1, day, h, m) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
           
           const ocupado = turnosPeluquero.some(turno => {
-            const turnoStart = new Date(turno.fecha_hora + 'Z').getTime();
+            const turnoStart = turno.start_ts; // Usamos el timestamp directamente de la DB
             const turnoEnd = turnoStart + turno.duracion_minutos * 60 * 1000;
             return slotTime >= turnoStart && slotTime < turnoEnd;
           });

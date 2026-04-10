@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_BASE } from '../config';
 
 export const UserContext = createContext(null);
 
@@ -11,7 +10,7 @@ export const UserProvider = ({ children }) => {
   // Función para obtener los datos del usuario desde el backend usando el token
   const fetchUser = async (token) => {
     try {
-      const response = await fetch(`${API_URL}/me`, {
+      const response = await fetch(`${API_BASE}/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -69,7 +68,7 @@ export const UserProvider = ({ children }) => {
     login,
     logout,
     updateUser,
-    API_URL,
+    API_URL: API_BASE,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

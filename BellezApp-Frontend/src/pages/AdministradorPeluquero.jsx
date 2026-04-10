@@ -61,14 +61,15 @@ export default function AdministradorPeluquero() {
 
   const turnosFiltrados = useMemo(() => {
     if (!selectedPeluqueroId) return [];
-    const fechaSeleccionada = new Date(selectedDate + 'T00:00:00').toISOString().split('T')[0];
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    const fechaRef = new Date(Date.UTC(y, m - 1, d)).toISOString().split('T')[0];
     return turnos
       .filter(
         (turno) =>
           turno.peluquero_id === selectedPeluqueroId &&
-          turno.fecha_hora.startsWith(fechaSeleccionada)
+          new Date(turno.fecha_timestamp).toISOString().startsWith(fechaRef)
       )
-      .sort((a, b) => a.fecha_hora.localeCompare(b.fecha_hora));
+      .sort((a, b) => a.fecha_timestamp - b.fecha_timestamp);
   }, [turnos, selectedPeluqueroId, selectedDate]);
 
   const fetchData = useCallback(async () => {
@@ -192,7 +193,7 @@ export default function AdministradorPeluquero() {
         usuario_id: parseInt(newTurno.usuario_id, 10),
         peluquero_id: parseInt(newTurno.peluquero_id, 10),
         servicio_id: parseInt(newTurno.servicio_id, 10),
-        fecha_hora: `${newTurno.fecha} ${newTurno.hora}:00`,
+        fecha_hora: new Date(`${newTurno.fecha}T${newTurno.hora}:00`).getTime(),
       };
       const data = await api.createTurno(payload);
       if (!data.ok) throw new Error(data.message || "Error al crear el turno.");
@@ -406,7 +407,7 @@ export default function AdministradorPeluquero() {
           ) : turnosFiltrados.length > 0 ? (
             turnosFiltrados.map((turno) => (
               <div key={turno.id} className={`turno-agenda-card estado-${turno.estado}`}>
-                <div className="turno-hora">{new Date(turno.fecha_hora).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div className="turno-hora">{new Date(turno.fecha_timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</div>
                 <div className="turno-detalle">
                   <p><strong>Cliente:</strong> {turno.cliente_nombre || 'No especificado'}</p>
                   <p><strong>Servicio:</strong> {turno.servicio_nombre}</p>
@@ -424,7 +425,7 @@ export default function AdministradorPeluquero() {
                     {/* Solo mostrar acciones si el turno no está ya cancelado */}
                     {turno.estado !== 'cancelado' && (
                       <div className="turno-acciones">
-                        {new Date(turno.fecha_hora) > new Date() ? ( // Turno futuro
+                        {turno.fecha_timestamp > Date.now() ? (
                           <>
                             {turno.estado === 'confirmado' && (
                               <button className="accion-btn accion-cancelar" onClick={() => handleCancelClick(turno.id)}>Cancelar</button>

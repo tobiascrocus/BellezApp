@@ -191,7 +191,7 @@ const Turnos = () => {
       usuario_id: user.id,
       peluquero_id: selectedStylist.id,
       servicio_id: selectedService.id,
-      fecha_hora: `${selectedDate} ${selectedTime}:00`
+      fecha_hora: new Date(`${selectedDate}T${selectedTime}:00`).getTime()
     };
 
     const res = await api.createTurno(nuevoTurno);
@@ -262,9 +262,9 @@ const Turnos = () => {
         ) : (
           <div className="turnos-grid-horizontal">
             {[...turnosActivos]
-              .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora))
+              .sort((a, b) => a.fecha_timestamp - b.fecha_timestamp)
               .map((t) => {
-                const fechaHora = new Date(t.fecha_hora);
+                const fechaHora = new Date(t.fecha_timestamp);
                 return (
                   <div key={t.id} className="turno-card-horizontal">
                     <h3 className="card-title">Resumen</h3>
@@ -289,9 +289,9 @@ const Turnos = () => {
                   <div className="historial-cards">
                     {historialTurnos.length > 0 ? (
                       [...historialTurnos]
-                        .sort((a, b) => new Date(b.fecha_hora) - new Date(a.fecha_hora))
+                        .sort((a, b) => b.fecha_timestamp - a.fecha_timestamp)
                         .map((t) => {
-                          const fechaHora = new Date(t.fecha_hora);
+                          const fechaHora = new Date(t.fecha_timestamp);
                           return (
                             <div key={t.id} className={`historial-card ${t.estado}`}>
                               <strong>Hora:</strong> {fechaHora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - <strong>Fecha:</strong> {fechaHora.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })} - <strong>Estilista:</strong> {t.peluquero_nombre} - <strong>Servicio:</strong> {t.servicio_nombre}
@@ -317,7 +317,7 @@ const Turnos = () => {
               <motion.div className="confirm-modal-overlay" onClick={cerrarConfirmModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <motion.div className="confirm-modal" onClick={e => e.stopPropagation()} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
                   <h3>¿Cancelar turno?</h3>
-                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${new Date(confirmModal.turno.fecha_hora).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })} a las ${new Date(confirmModal.turno.fecha_hora).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}?`}</p>
+                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${new Date(confirmModal.turno.fecha_timestamp).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })} a las ${new Date(confirmModal.turno.fecha_timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}?`}</p>
                   <div className="confirm-buttons">
                     <button className="btn-confirmar" onClick={confirmarCancelacion}>Cancelar turno</button>
                     <button className="btn-volver" onClick={cerrarConfirmModal}>Volver</button>

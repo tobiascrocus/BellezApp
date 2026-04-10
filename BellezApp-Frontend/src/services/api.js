@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { API_BASE } from '../config';
 
 /**
  * Obtiene el token guardado en localStorage
