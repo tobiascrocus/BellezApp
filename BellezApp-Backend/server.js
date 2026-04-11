@@ -42,7 +42,22 @@ const failedLoginAttempts = new Map(); // Almacén en memoria para los intentos 
 
 // ---------- INICIALIZACIÓN EXPRESS ----------
 const server = express();
-server.use(cors());
+
+const allowedOrigins = process.env.CORS_ORIGINS 
+  ? process.env.CORS_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+server.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origen no permitido por CORS'));
+    }
+  },
+  credentials: true
+}));
 server.use(express.json());
 
 // ---------- BASE DE DATOS ----------
@@ -264,8 +279,26 @@ async function initDB() {
     const adminPassHash = await hashPassword('admin');
     await db.runAsync(
       'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
-      ['Tobias', 'Tinaro', adminEmail, '123456', USER_ROLES.ADMIN, adminPassHash]
+      ['Tobias', 'Tinaro', adminEmail, '+5493548608805', USER_ROLES.ADMIN, adminPassHash]
     );
+  }
+
+  // Crear peluqueros por defecto si no existen
+  const defaultPeluqueros = [
+    { nombre: 'Damian', apellido: 'Aguirre', email: 'peluquero1@hotmail.com', telefono: '+5493548204512', password: 'peluquero1' },
+    { nombre: 'Gustavo', apellido: 'Perez', email: 'peluquero2@hotmail.com', telefono: '+5493548358465', password: 'peluquero2' },
+    { nombre: 'Franco', apellido: 'Salas', email: 'peluquero3@hotmail.com', telefono: '+5493548120478', password: 'peluquero3' },
+    { nombre: 'Pedro', apellido: 'Gomez', email: 'peluquero4@hotmail.com', telefono: '+5493548334688', password: 'peluquero4' }
+  ];
+
+  for (const p of defaultPeluqueros) {
+    if (!await db.get('SELECT id FROM usuarios WHERE email = ?', [p.email])) {
+      const passHash = await hashPassword(p.password);
+      await db.runAsync(
+        'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
+        [p.nombre, p.apellido, p.email, p.telefono, USER_ROLES.PELUQUERO, passHash]
+      );
+    }
   }
 }
 
