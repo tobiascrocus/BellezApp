@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import './Login.css';
+import "../styles/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ export default function Login() {
                   onChange={e => setRememberMe(e.target.checked)}
                 />
               </div>
-              <label className="remember-label">Mantener sesión iniciada</label>
+              <label htmlFor="rememberMe" className="remember-label">Mantener sesión iniciada</label>
             </div>
             <div className="error-container">
               {error && <p className="login-error">{error}</p>}

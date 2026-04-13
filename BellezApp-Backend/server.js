@@ -182,7 +182,7 @@ const checkConflict = async (peluqueroId, fechaHora, excludeId = null) => {
 };
 
 const checkUserTurnLimit = async (usuarioId, excludeId = null) => {
-  const sql = `SELECT COUNT(*) AS c FROM turnos WHERE usuario_id=? AND estado=?${excludeId ? ' AND id=?' : ''}`;
+  const sql = `SELECT COUNT(*) AS c FROM turnos WHERE usuario_id=? AND estado=?${excludeId ? ' AND id!=?' : ''}`;
   const params = excludeId ? [usuarioId, APPOINTMENT_STATUS.CONFIRMADO, excludeId] : [usuarioId, APPOINTMENT_STATUS.CONFIRMADO];
   const row = await db.get(sql, params);
   return row && row.c >= MAX_TURNOS_CLIENTE ? `Máximo ${MAX_TURNOS_CLIENTE} turnos confirmados permitidos.` : null;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
-import "./Perfil.css";
+import "../styles/Perfil.css";
 
 const avatars = Array.from({ length: 21 }, (_, i) =>
   i === 0

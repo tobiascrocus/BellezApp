@@ -17,6 +17,7 @@ import QuienesSomos from './pages/QuienesSomos'
 import Catalogo from './pages/Catalogo'
 import Turnos from './pages/Turnos'
 import Perfil from './pages/Perfil'
+import NoEncontrada from './pages/NoEncontrada'
 
 import './App.css'
 
@@ -67,6 +68,9 @@ function AppWrapper() {
               <Route element={<ProtectedRoute allowedRoles={['admin', 'peluquero']} />}>
                 <Route path="/administrador-peluquero" element={<AdministradorPeluquero />} />
               </Route>
+
+              {/* Ruta para manejar el error 404 */}
+              <Route path="*" element={<NoEncontrada />} />
             </Routes>
           </motion.div>
         </AnimatePresence>

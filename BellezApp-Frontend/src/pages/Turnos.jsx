@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import ReactDOM from 'react-dom';
-import './Turnos.css';
+import "../styles/Turnos.css";
 import { UserContext } from '../context/UserContext';
 import * as api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';

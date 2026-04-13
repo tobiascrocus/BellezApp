@@ -1,4 +1,4 @@
-import './QuienesSomos.css';
+import "../styles/QuienesSomos.css";
 
 const equipo = [
   {

@@ -1,4 +1,4 @@
-import './Catalogo.css';
+import "../styles/Catalogo.css";
 
 const cortes = [
   { id: 1, titulo: "Buzz Cut con detalles", img: "/assets/images/Catalogo/corte1.jpg", descripcion: "Corte ultra corto con líneas o patrones discretos." },

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import * as api from '../services/api';
 import { motion, AnimatePresence } from "framer-motion";
-import "./Administrador.css";
+import "../styles/Administrador.css";
 
 const roles = ["admin", "peluquero", "cliente"];
 

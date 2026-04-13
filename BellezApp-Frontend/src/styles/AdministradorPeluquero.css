@@ -603,3 +603,40 @@
   color: var(--color-grey) !important;
   cursor: not-allowed;
 }
+
+/* --- VISTA MÓVIL (Solo afecta a dispositivos con ancho <= 768px) --- */
+@media (max-width: 768px) {
+  .admin-modal-content {
+    width: 95%;
+    padding: 1.5rem 1rem;
+    max-height: 90vh;
+    overflow-y: auto; /* Permite scroll interno si el contenido es muy alto */
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 1fr; /* Cambiamos de 2 columnas a 1 sola */
+    gap: 1rem;
+  }
+
+  .modal-form-group label {
+    font-size: 0.85rem;
+  }
+
+  .modal-horarios-section {
+    padding: 0.5rem;
+  }
+
+  .modal-horarios-section .horario-btn {
+    width: 75px; /* Ajuste leve para que quepan mejor en el grid */
+    font-size: 0.9rem;
+  }
+
+  .modal-buttons {
+    flex-direction: column; /* Apilamos los botones de Guardar/Cancelar */
+    gap: 0.8rem;
+  }
+
+  .btn-agregar-turno, .btn-cancel {
+    width: 100%; /* Botones a ancho completo */
+  }
+}

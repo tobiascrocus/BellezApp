@@ -174,9 +174,39 @@
 .navbar-user-trigger.mobile {
   display: none;
 }
+.navbar-hamburger { display: none; }
 
 .navbar-menu {
   display: none;
+}
+
+/* Botón hamburguesa para usuarios no logueados (mobile) */
+@media (max-width: 768px) {
+  .navbar-hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 1500;
+  }
+  .navbar-hamburger span {
+    width: 100%;
+    height: 3px;
+    background: var(--color-text-light);
+    transition: all 0.3s ease;
+    border-radius: 2px;
+  }
+  .navbar-hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .navbar-hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar-hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
 }
 
 /* Responsive */

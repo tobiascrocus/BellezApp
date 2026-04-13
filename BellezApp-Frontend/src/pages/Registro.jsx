@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import './Registro.css';
+import "../styles/Registro.css";
 
 export default function Registro() {
   const [nombre, setNombre] = useState('');
@@ -14,7 +14,6 @@ export default function Registro() {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { API_URL } = useUser();
-  const navigate = useNavigate();
 
   // Función de validación consistente con Perfil.jsx y el backend
   const validateForm = () => {

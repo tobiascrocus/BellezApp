@@ -1,7 +1,7 @@
 // Inicio.jsx
 
 import { useNavigate } from 'react-router-dom';
-import './Inicio.css';
+import "../styles/Inicio.css";
 
 const promociones = [
   { id: 1, titulo: "Descuento Primera Visita", descripcion: "10% OFF en tu primer turno" },

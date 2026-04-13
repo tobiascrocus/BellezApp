@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useUser } from "../context/UserContext";
 import * as api from '../services/api';
-import "./AdministradorPeluquero.css";
+import "../styles/AdministradorPeluquero.css";
 import { motion, AnimatePresence } from "framer-motion";
 import DatePicker, { registerLocale } from 'react-datepicker';
 import es from 'date-fns/locale/es';

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useUser } from "../context/UserContext"
-import "./Navbar.css"
+import "../styles/Navbar.css";
 
 const NAV_BUTTONS = [
   // El rol `null` es para usuarios no logueados
