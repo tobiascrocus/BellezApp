@@ -11,7 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('es', es);
 
 export default function AdministradorPeluquero() {
-  const { user, API_URL } = useUser();
+  const { user } = useUser();
   const [peluqueros, setPeluqueros] = useState([]);
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -113,7 +113,7 @@ export default function AdministradorPeluquero() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedPeluqueroId]);
+  }, [user]);
 
   // Efecto para cargar la disponibilidad en el modal
   useEffect(() => {
@@ -154,10 +154,6 @@ export default function AdministradorPeluquero() {
     setNewTurno({ ...newTurno, usuario_id: '' });
   };
 
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
-  };
-
   const handlePeluqueroSelect = (id) => {
     setSelectedPeluqueroId(id);
     setPeluqueroDropdownOpen(false);
@@ -193,7 +189,8 @@ export default function AdministradorPeluquero() {
         usuario_id: parseInt(newTurno.usuario_id, 10),
         peluquero_id: parseInt(newTurno.peluquero_id, 10),
         servicio_id: parseInt(newTurno.servicio_id, 10),
-        fecha_hora: new Date(`${newTurno.fecha}T${newTurno.hora}:00`).getTime(),
+        fecha: newTurno.fecha,   // ya en YYYY-MM-DD
+        hora: newTurno.hora      // ya en HH:MM
       };
       const data = await api.createTurno(payload);
       if (!data.ok) throw new Error(data.message || "Error al crear el turno.");

@@ -69,6 +69,7 @@ async function del(endpoint) {
 
 // Autenticación
 export const loginUser = (email, password) => post('/login', { email, password });
+export const login = (email, password, rememberMe) => post('/login', { email, password, rememberMe });
 export const registerUser = (data) => post('/register', data);
 
 // Perfil

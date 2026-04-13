@@ -191,7 +191,8 @@ const Turnos = () => {
       usuario_id: user.id,
       peluquero_id: selectedStylist.id,
       servicio_id: selectedService.id,
-      fecha_hora: new Date(`${selectedDate}T${selectedTime}:00`).getTime()
+      fecha: selectedDate,   // ya está en YYYY-MM-DD
+      hora: selectedTime     // ya está en HH:MM
     };
 
     const res = await api.createTurno(nuevoTurno);

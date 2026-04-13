@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
+import * as api from '../services/api';
 import "../styles/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, user, API_URL } = useUser();
+  const { login, user } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,22 +28,8 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, rememberMe }),
-      });
-
-      const data = await response.json();
-
-      if (!data.ok) {
-        // Si el código es 429, es por el límite de intentos.
-        if (response.status === 429) {
-          // El mensaje ya viene formateado desde el backend.
-          throw new Error(data.message);
-        }
-        throw new Error(data.message || 'Error al iniciar sesión.');
-      }
+      const data = await api.login(email, password, rememberMe);
+      if (!data.ok) throw new Error(data.message || 'Error al iniciar sesión.');
 
       // Guardamos el token en el contexto, que se encargará de obtener los datos del usuario
       await login(data.data.token, rememberMe);

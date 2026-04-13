@@ -193,8 +193,41 @@ const validateAppointment = async ({ id, usuarioId, peluqueroId, fechaHora, esta
   if (!usuarioId || !peluqueroId || !timestamp) return { ok: false, message: 'Datos de turno inválidos' };
   if ([0, 6].includes(getLocalDayOfWeek(timestamp))) return { ok: false, message: 'No se pueden reservar turnos en fines de semana' };
   if (!isWithinBusinessHours(timestamp)) return { ok: false, message: 'Turnos solo entre 9-12 y 17-21 con intervalos de 30 min.' };
+
+  // Verificar que el cliente no tenga otro turno a la misma hora (con cualquier peluquero)
+  const mismoHorarioCliente = await db.get(
+    `SELECT id FROM turnos 
+     WHERE usuario_id = ? 
+     AND fecha_hora = ? 
+     AND estado = ? 
+     AND id != ?`,
+    [usuarioId, formatDate(timestamp), APPOINTMENT_STATUS.CONFIRMADO, id || 0]
+  );
+  if (mismoHorarioCliente) {
+    return { ok: false, message: 'Ya tenés un turno confirmado en ese mismo horario con otro peluquero.' };
+  }
+
   const serv = await db.get('SELECT duracion_minutos FROM servicios WHERE id=?', [servicioId]);
   if (!serv) return { ok: false, message: 'Servicio inválido.' };
+
+  // Verificar solapamiento con cualquier otro turno confirmado del cliente (incluso parcial)
+  const fechaStrSql = formatDate(timestamp);
+  const turnosSolapados = await db.all(
+    `SELECT t.id 
+     FROM turnos t
+     JOIN servicios s ON t.servicio_id = s.id
+     WHERE t.usuario_id = ? 
+       AND t.estado = ? 
+       AND t.id != ?
+       AND datetime(t.fecha_hora) < datetime(?, '+' || ? || ' minutes')
+       AND datetime(t.fecha_hora, '+' || s.duracion_minutos || ' minutes') > datetime(?)`,
+    [usuarioId, APPOINTMENT_STATUS.CONFIRMADO, id || 0, fechaStrSql, serv.duracion_minutos, fechaStrSql]
+  );
+
+  if (turnosSolapados.length > 0) {
+    return { ok: false, message: 'El horario seleccionado se solapa con otro turno que ya tenés confirmado.' };
+  }
+
   if (estado === APPOINTMENT_STATUS.CONFIRMADO) {
     if (timestamp < Date.now()) return { ok: false, message: 'No se pueden confirmar turnos en el pasado.' };
     const limite = await checkUserTurnLimit(usuarioId, id);
@@ -453,9 +486,10 @@ server.post('/api/usuarios', authenticateToken, authorizeRoles(USER_ROLES.ADMIN)
   if (existing) return sendResponse(res, false, null, 'El email ya está registrado.', 400);
 
   const passwordHash = await hashPassword(password);
+  const avatarFinal = avatar || '/assets/images/Perfil/Avatar.png';
   const result = await db.runAsync(
-    'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash, avatar) VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, (SELECT avatar FROM usuarios WHERE id = -1)))',
-    [nombre, apellido, email, telefono, rol || USER_ROLES.CLIENTE, passwordHash, avatar || null]
+    'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash, avatar) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [nombre, apellido, email, telefono, rol || USER_ROLES.CLIENTE, passwordHash, avatarFinal]
   );
   const newUser = await getUserById(result.lastID);
   sendResponse(res, true, newUser, 'Usuario creado correctamente', 201);
@@ -542,22 +576,43 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
 
 server.post('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   const { rol, id: userIdFromToken } = req.usuario;
-  let { usuario_id, peluquero_id, servicio_id, fecha_hora } = req.body;
+  let { usuario_id, peluquero_id, servicio_id, fecha, hora } = req.body;
 
   // Un cliente solo puede reservar para sí mismo.
   if (rol === USER_ROLES.CLIENTE) {
     usuario_id = userIdFromToken;
   }
-  const d = parseDate(fecha_hora);
-  if (!d) return sendResponse(res, false, null, 'Fecha inválida', 400);
-  const fechaStr = formatDate(d);
 
-  // Verificamos que los IDs existen antes de crear el turno
-  await ensureExists('usuarios', usuario_id); // Ya no se exige que sea cliente
+  // Validar que llegaron fecha y hora
+  if (!fecha || !hora) {
+    return sendResponse(res, false, null, 'Debes enviar fecha y hora del turno.', 400);
+  }
+
+  // Construir timestamp usando la zona horaria del negocio (BUSINESS_TIMEZONE_OFFSET)
+  const [year, month, day] = fecha.split('-').map(Number);
+  const [hour, minute] = hora.split(':').map(Number);
+  
+  // Creamos un Date en UTC con la fecha y hora LOCAL del negocio
+  const fechaHoraLocalUTC = Date.UTC(year, month - 1, day, hour, minute);
+  // Ajustamos restando el offset del negocio (porque el negocio está adelantado/atrasado respecto a UTC)
+  const timestamp = fechaHoraLocalUTC - BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000;
+  
+  const fechaStr = formatDate(timestamp);
+  if (!fechaStr) return sendResponse(res, false, null, 'Fecha inválida', 400);
+
+  // Verificamos que los IDs existen
+  await ensureExists('usuarios', usuario_id);
   await ensureExists('usuarios', peluquero_id, USER_ROLES.PELUQUERO);
   await ensureExists('servicios', servicio_id);
 
-  const valid = await validateAppointment({ usuarioId: usuario_id, peluqueroId: peluquero_id, fechaHora: fecha_hora, estado: APPOINTMENT_STATUS.CONFIRMADO, servicioId: servicio_id });
+  const valid = await validateAppointment({ 
+    id: null, 
+    usuarioId: usuario_id, 
+    peluqueroId: peluquero_id, 
+    fechaHora: timestamp, 
+    estado: APPOINTMENT_STATUS.CONFIRMADO, 
+    servicioId: servicio_id 
+  });
   if (!valid.ok) return sendResponse(res, false, null, valid.message, 400);
 
   await db.runAsync(

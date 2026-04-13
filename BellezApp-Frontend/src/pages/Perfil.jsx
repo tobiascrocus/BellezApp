@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext.jsx";
+import * as api from '../services/api';
 import { motion, AnimatePresence } from "framer-motion";
 import "../styles/Perfil.css";
 
@@ -10,7 +11,7 @@ const avatars = Array.from({ length: 21 }, (_, i) =>
 );
 
 export default function Perfil() {
-  const { user, updateUser, API_URL } = useUser();
+  const { user, updateUser } = useUser();
 
   // Usamos un estado local para los campos del formulario
   const [formData, setFormData] = useState({ ...user });
@@ -116,25 +117,8 @@ export default function Perfil() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/me`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Si el código es 429, es por el límite de intentos.
-        if (response.status === 429) {
-          // El mensaje ya viene formateado desde el backend.
-          throw new Error(data.message);
-        }
-        throw new Error(data.message || "Error al actualizar el perfil.");
-      }
+      const data = await api.updateMe(payload);
+      if (!data.ok) throw new Error(data.message || "Error al actualizar el perfil.");
 
       await updateUser();
       setSuccess("¡Perfil actualizado con éxito!");
