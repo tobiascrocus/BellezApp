@@ -102,7 +102,7 @@ const hashPassword = async password => bcrypt.hash(password, SALT_ROUNDS);
 // ---------- VALIDACIÓN DE USUARIOS ----------
 const validateUser = (p, isUpdate = false) => {
   const { nombre, apellido, email, telefono, rol, password } = p;
-  const nameRegex = /^[a-zA-Z\s'-]+$/; // Permite letras, espacios, apóstrofes y guiones.
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/; // Permite letras (con acentos, ñ, ü), espacios, apóstrofes y guiones.
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const telRegex = /^\+?\d+$/;
 

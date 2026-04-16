@@ -49,7 +49,7 @@ export default function Perfil() {
   // Función de validación en el frontend
   const validateForm = () => {
     const { nombre, apellido, telefono } = formData;
-    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
 
     if (!nombre || nombre.length < 3 || nombre.length > 15) {
       return 'El nombre debe tener entre 3 y 15 caracteres.';

@@ -6,9 +6,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import DatePicker, { registerLocale } from 'react-datepicker';
 import es from 'date-fns/locale/es';
 import 'react-datepicker/dist/react-datepicker.css';
+import { formatHora, formatFecha } from '../utils/fecha';
 
 // Registramos el idioma español para el calendario
 registerLocale('es', es);
+
+// Contenedor para el portal del DatePicker (fuera del componente principal)
+const AnimatedPopper = ({ children }) => {
+  return (
+    <motion.div
+      style={{ zIndex: 10002 }}
+      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export default function AdministradorPeluquero() {
   const { user } = useUser();
@@ -301,19 +316,6 @@ export default function AdministradorPeluquero() {
   // Función para deshabilitar fines de semana en el calendario
   const isWeekday = (date) => ![0, 6].includes(date.getDay());
 
-  // Contenedor para el portal del DatePicker, para que se renderice fuera del flujo normal
-  // y con animación.
-  const AnimatedPopper = ({ children }) => {
-    return (
-      <motion.div
-        style={{ zIndex: 10002 }}
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.2 }}
-      >{children}</motion.div>
-    );
-  };
-
 
   return (
     <section className="admin-peluquero-container">
@@ -404,7 +406,7 @@ export default function AdministradorPeluquero() {
           ) : turnosFiltrados.length > 0 ? (
             turnosFiltrados.map((turno) => (
               <div key={turno.id} className={`turno-agenda-card estado-${turno.estado}`}>
-                <div className="turno-hora">{new Date(turno.fecha_timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div className="turno-hora">{formatHora(turno.fecha_timestamp)}</div>
                 <div className="turno-detalle">
                   <p><strong>Cliente:</strong> {turno.cliente_nombre || 'No especificado'}</p>
                   <p><strong>Servicio:</strong> {turno.servicio_nombre}</p>

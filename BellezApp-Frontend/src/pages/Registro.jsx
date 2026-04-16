@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from '../context/UserContext';
+import * as api from '../services/api';
 import "../styles/Registro.css";
 
 export default function Registro() {
@@ -13,11 +13,10 @@ export default function Registro() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { API_URL } = useUser();
 
   // Función de validación consistente con Perfil.jsx y el backend
   const validateForm = () => {
-    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
 
     if (nombre.length < 3 || nombre.length > 15) {
       return 'El nombre debe tener entre 3 y 15 caracteres.';
@@ -57,13 +56,7 @@ export default function Registro() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, apellido, email, telefono, password }),
-      });
-
-      const data = await response.json();
+      const data = await api.registerUser({ nombre, apellido, email, telefono, password });
 
       if (!data.ok) {
         throw new Error(data.message || 'Error al registrar el usuario.');

@@ -7,9 +7,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import es from 'date-fns/locale/es';
 import 'react-datepicker/dist/react-datepicker.css';
+import { formatHora, formatFecha, formatFechaHoraCompleta } from '../utils/fecha';
 
 // Registramos el idioma español para el calendario
 registerLocale('es', es);
+
+// Contenedor animado para el DatePicker (fuera del componente principal)
+const AnimatedPopper = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const Turnos = () => {
   const { user } = useContext(UserContext);
@@ -241,18 +255,6 @@ const Turnos = () => {
   // Función para deshabilitar fines de semana en el calendario
   const isWeekday = (date) => ![0, 6].includes(date.getDay());
 
-  // Contenedor animado para el DatePicker
-  const AnimatedPopper = ({ children }) => {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.2 }}
-      >
-        {children}
-      </motion.div>
-    );
-  };
   return (
     <div className="turnos-page">
       {loading && <div className="loading-overlay">Cargando...</div>}
@@ -265,12 +267,11 @@ const Turnos = () => {
             {[...turnosActivos]
               .sort((a, b) => a.fecha_timestamp - b.fecha_timestamp)
               .map((t) => {
-                const fechaHora = new Date(t.fecha_timestamp);
                 return (
                   <div key={t.id} className="turno-card-horizontal">
                     <h3 className="card-title">Resumen</h3>
-                    <p><strong>Hora:</strong> {fechaHora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
-                    <p><strong>Fecha:</strong> {fechaHora.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                    <p><strong>Hora:</strong> {formatHora(t.fecha_timestamp)}</p>
+                    <p><strong>Fecha:</strong> {formatFecha(t.fecha_timestamp)}</p>
                     <p><strong>Estilista:</strong> {t.peluquero_nombre}</p>
                     <p><strong>Servicio:</strong> {t.servicio_nombre}</p>
                     <button className="btn-cancelar" onClick={() => handleCancelarClick(t)}>Cancelar turno</button>
@@ -292,10 +293,9 @@ const Turnos = () => {
                       [...historialTurnos]
                         .sort((a, b) => b.fecha_timestamp - a.fecha_timestamp)
                         .map((t) => {
-                          const fechaHora = new Date(t.fecha_timestamp);
                           return (
                             <div key={t.id} className={`historial-card ${t.estado}`}>
-                              <strong>Hora:</strong> {fechaHora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} - <strong>Fecha:</strong> {fechaHora.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })} - <strong>Estilista:</strong> {t.peluquero_nombre} - <strong>Servicio:</strong> {t.servicio_nombre}
+                              <strong>Hora:</strong> {formatHora(t.fecha_timestamp)} - <strong>Fecha:</strong> {formatFecha(t.fecha_timestamp)} - <strong>Estilista:</strong> {t.peluquero_nombre} - <strong>Servicio:</strong> {t.servicio_nombre}
                               {t.estado === 'cancelado' && ' (Cancelado)'}
                               {t.estado === 'no_asistio' && ' (No se presentó)'}
                             </div>
@@ -318,7 +318,7 @@ const Turnos = () => {
               <motion.div className="confirm-modal-overlay" onClick={cerrarConfirmModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <motion.div className="confirm-modal" onClick={e => e.stopPropagation()} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
                   <h3>¿Cancelar turno?</h3>
-                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${new Date(confirmModal.turno.fecha_timestamp).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })} a las ${new Date(confirmModal.turno.fecha_timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}?`}</p>
+                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${formatFechaHoraCompleta(confirmModal.turno.fecha_timestamp)}?`}</p>
                   <div className="confirm-buttons">
                     <button className="btn-confirmar" onClick={confirmarCancelacion}>Cancelar turno</button>
                     <button className="btn-volver" onClick={cerrarConfirmModal}>Volver</button>
