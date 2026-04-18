@@ -33,7 +33,7 @@ export default function AdministradorPeluquero() {
   const [usuarios, setUsuarios] = useState([]); // Para buscar clientes
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeluqueroId, setSelectedPeluqueroId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('en-CA'));
   const [peluqueroDropdownOpen, setPeluqueroDropdownOpen] = useState(false);
   const peluqueroDropdownRef = useRef(null);
   const peluqueroModalDropdownRef = useRef(null);
@@ -50,7 +50,7 @@ export default function AdministradorPeluquero() {
     usuario_id: "",
     servicio_id: "",
     peluquero_id: "",
-    fecha: new Date().toISOString().split("T")[0],
+    fecha: new Date().toLocaleDateString('en-CA'),
     hora: "",
   });
   const [errorModal, setErrorModal] = useState({ visible: false, message: '' });
@@ -155,6 +155,15 @@ export default function AdministradorPeluquero() {
     const handleClickOutside = (event) => {
       if (peluqueroDropdownRef.current && !peluqueroDropdownRef.current.contains(event.target)) {
         setPeluqueroDropdownOpen(false);
+      }
+      if (peluqueroModalDropdownRef.current && !peluqueroModalDropdownRef.current.contains(event.target)) {
+        setPeluqueroModalDropdownOpen(false);
+      }
+      if (servicioModalDropdownRef.current && !servicioModalDropdownRef.current.contains(event.target)) {
+        setServicioModalDropdownOpen(false);
+      }
+      if (clienteDropdownRef.current && !clienteDropdownRef.current.contains(event.target)) {
+        setClienteDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -268,7 +277,7 @@ export default function AdministradorPeluquero() {
       if (datosIncompletos) return false;
 
       // Lógica de Turnos.jsx: Deshabilitar horarios pasados en el día actual.
-      const hoy = new Date().toISOString().split('T')[0];
+      const hoy = new Date().toLocaleDateString('en-CA');
       if (newTurno.fecha === hoy) {
         const ahora = new Date();
         const fechaTurno = new Date(`${newTurno.fecha}T${hora}:00`);

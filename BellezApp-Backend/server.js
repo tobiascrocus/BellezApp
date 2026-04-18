@@ -160,8 +160,19 @@ const isWithinBusinessHours = timestamp => {
 
 const getLocalDayOfWeek = (timestamp) => {
   const d = new Date(timestamp);
-  const localDate = new Date(d.getTime() + BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
-  return localDate.getUTCDay();
+  if (isNaN(d.getTime())) return null;
+
+  // Calculamos la hora local teórica para ver si el offset nos movió de día
+  const hLocal = d.getUTCHours() + BUSINESS_TIMEZONE_OFFSET;
+  let day = d.getUTCDay(); // Día en UTC (0-6)
+
+  if (hLocal < 0) {
+    day = (day + 6) % 7; // Retrocedemos un día (domingo 0 -> sábado 6)
+  } else if (hLocal >= 24) {
+    day = (day + 1) % 7; // Avanzamos un día (sábado 6 -> domingo 0)
+  }
+
+  return day;
 };
 
 const checkConflict = async (peluqueroId, fechaHora, excludeId = null) => {
@@ -304,35 +315,6 @@ async function initDB() {
 
   await db.runAsync('CREATE INDEX IF NOT EXISTS idx_turnos_peluquero_fecha ON turnos(peluquero_id, fecha_hora);');
   await db.runAsync(`CREATE UNIQUE INDEX IF NOT EXISTS ux_turno_peluquero_fecha_confirmado ON turnos(peluquero_id, fecha_hora) WHERE estado='confirmado';`);
-
-  // Crear usuario administrador por defecto si no existe
-  const adminEmail = 'admin@hotmail.com';
-  const existingAdmin = await db.get('SELECT id FROM usuarios WHERE email = ?', [adminEmail]);
-  if (!existingAdmin) {
-    const adminPassHash = await hashPassword('admin');
-    await db.runAsync(
-      'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
-      ['Tobias', 'Tinaro', adminEmail, '+5493548608805', USER_ROLES.ADMIN, adminPassHash]
-    );
-  }
-
-  // Crear peluqueros por defecto si no existen
-  const defaultPeluqueros = [
-    { nombre: 'Damian', apellido: 'Aguirre', email: 'peluquero1@hotmail.com', telefono: '+5493548204512', password: 'peluquero1' },
-    { nombre: 'Gustavo', apellido: 'Perez', email: 'peluquero2@hotmail.com', telefono: '+5493548358465', password: 'peluquero2' },
-    { nombre: 'Franco', apellido: 'Salas', email: 'peluquero3@hotmail.com', telefono: '+5493548120478', password: 'peluquero3' },
-    { nombre: 'Pedro', apellido: 'Gomez', email: 'peluquero4@hotmail.com', telefono: '+5493548334688', password: 'peluquero4' }
-  ];
-
-  for (const p of defaultPeluqueros) {
-    if (!await db.get('SELECT id FROM usuarios WHERE email = ?', [p.email])) {
-      const passHash = await hashPassword(p.password);
-      await db.runAsync(
-        'INSERT INTO usuarios (nombre, apellido, email, telefono, rol, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
-        [p.nombre, p.apellido, p.email, p.telefono, USER_ROLES.PELUQUERO, passHash]
-      );
-    }
-  }
 }
 
 initDB().catch(e => { console.error('Error inicializando DB:', e); process.exit(1); });
@@ -519,7 +501,29 @@ server.put('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADM
 }));
 
 server.delete('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADMIN), asyncHandler(async (req, res) => {
-  await db.runAsync('DELETE FROM usuarios WHERE id=?', [req.params.id]);
+  const idToDelete = parseInt(req.params.id);
+  const loggedUserId = req.usuario.id;
+
+  // 1. Evitar que el administrador se elimine a sí mismo
+  if (idToDelete === loggedUserId) {
+    return sendResponse(res, false, null, 'No puedes eliminarte a ti mismo', 400);
+  }
+
+  // 2. Verificar si el usuario existe y su rol
+  const userToDelete = await db.get('SELECT rol FROM usuarios WHERE id = ?', [idToDelete]);
+  if (!userToDelete) {
+    return sendResponse(res, false, null, 'Usuario no encontrado', 404);
+  }
+
+  // 3. Evitar eliminar al último administrador
+  if (userToDelete.rol === USER_ROLES.ADMIN) {
+    const admins = await db.get('SELECT COUNT(*) as total FROM usuarios WHERE rol = ?', [USER_ROLES.ADMIN]);
+    if (admins.total <= 1) {
+      return sendResponse(res, false, null, 'No puedes eliminar al último administrador del sistema', 400);
+    }
+  }
+
+  await db.runAsync('DELETE FROM usuarios WHERE id=?', [idToDelete]);
   sendResponse(res, true, null, 'Usuario eliminado');
 }));
 
@@ -684,10 +688,10 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   const startOfDayUTC = Date.UTC(year, month - 1, day, 0, 0, 0) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
   const endOfDayUTC = startOfDayUTC + 86400000 - 1;
 
-  // Validar día (fines de semana) usando el objeto Date UTC
-  const dia = new Date(startOfDayUTC);
-  if (isNaN(dia.getTime())) return sendResponse(res, false, null, 'Fecha inválida', 400);
-  if ([0, 6].includes(getLocalDayOfWeek(startOfDayUTC + 12 * 60 * 60 * 1000))) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
+  // Validar fin de semana de forma directa usando los componentes de la fecha recibida
+  // Esto es más robusto que calcularlo a partir del timestamp desplazado.
+  const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  if ([0, 6].includes(dayOfWeek)) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
 
   const peluqueros = peluquero_id
     ? [await ensureExists('usuarios', peluquero_id, USER_ROLES.PELUQUERO)]
