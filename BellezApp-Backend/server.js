@@ -731,11 +731,11 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   sendResponse(res, true, disponibilidad);
 }));
 
-// ---------- INICIO DEL SERVIDOR ----------
-server.listen(SERVER_PORT, () => console.log(`Servidor corriendo en puerto ${SERVER_PORT}`));
-
 // ---------- MANEJO DE ERRORES ----------
 server.use((err, req, res, next) => {
   console.error('Error interno:', err);
   sendResponse(res, false, null, 'Error interno del servidor', 500);
 });
+
+// ---------- INICIO DEL SERVIDOR ----------
+server.listen(SERVER_PORT, () => console.log(`Servidor corriendo en puerto ${SERVER_PORT}`));

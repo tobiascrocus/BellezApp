@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import * as api from '../services/api';
 import { API_BASE } from '../config';
 
 export const UserContext = createContext(null);
@@ -8,22 +9,16 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
  
   // Función para obtener los datos del usuario desde el backend usando el token
-  const fetchUser = async (token) => {
+  const fetchUser = async () => {
     try {
-      const response = await fetch(`${API_BASE}/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
+      const data = await api.getMe();
       if (data.ok) {
-        setUser(data.data); // Guardamos el objeto de usuario completo
+        setUser(data.data);
       } else {
-        logout(); // Si el token es inválido, cerramos sesión
+        logout();
       }
     } catch (error) {
-      console.error("Error fetching user:", error);
-      logout();
+      console.error("Error de red al obtener usuario:", error);
     }
   };
 
@@ -31,7 +26,7 @@ export const UserProvider = ({ children }) => {
     // Busca el token primero en localStorage, luego en sessionStorage.
     const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (storedToken) {
-      fetchUser(storedToken).finally(() => setLoading(false));
+      fetchUser().finally(() => setLoading(false));
     } else {
       setLoading(false); // Si no hay token, terminamos de cargar
     }
@@ -43,7 +38,7 @@ export const UserProvider = ({ children }) => {
     } else {
       sessionStorage.setItem('token', token);
     }
-    await fetchUser(token); // Obtenemos los datos del usuario después de iniciar sesión
+    await fetchUser(); // Obtenemos los datos del usuario después de iniciar sesión
   };
 
   const logout = () => {
@@ -55,11 +50,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const updateUser = async () => {
-    // Corrección: Buscar el token en ambos almacenamientos.
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (token) {
-      await fetchUser(token);
-    }
+    await fetchUser();
   };
 
   const value = {
