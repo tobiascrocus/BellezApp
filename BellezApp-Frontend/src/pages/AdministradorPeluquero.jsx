@@ -55,7 +55,6 @@ export default function AdministradorPeluquero() {
   });
   const [errorModal, setErrorModal] = useState({ visible: false, message: '' });
   const [clienteSearch, setClienteSearch] = useState('');
-  const [selectedCliente, setSelectedCliente] = useState(null);
   const [cancelConfirmModal, setCancelConfirmModal] = useState({ visible: false, turnoId: null });
   const [disponibilidadModal, setDisponibilidadModal] = useState([]);
   const horariosManana = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
@@ -174,7 +173,6 @@ export default function AdministradorPeluquero() {
 
   const handleClienteSearchChange = (e) => {
     setClienteSearch(e.target.value);
-    setSelectedCliente(null);
     setNewTurno({ ...newTurno, usuario_id: '' });
   };
 
@@ -196,7 +194,6 @@ export default function AdministradorPeluquero() {
   };
 
   const handleSelectCliente = (cliente) => {
-    setSelectedCliente(cliente);
     setNewTurno({ ...newTurno, usuario_id: cliente.id });
     setClienteSearch(`${cliente.nombre} ${cliente.apellido} (${cliente.email})`);
     setClienteDropdownOpen(false);

@@ -78,7 +78,6 @@ db.runAsync = function(sql, params = []) {
     });
   });
 };
-db.run('PRAGMA foreign_keys = ON;');
 
 // ---------- UTILIDADES ----------
 const sendResponse = (res, ok, data = null, message = '', code = 200) =>
@@ -271,6 +270,7 @@ const authorizeRoles = (...roles) => asyncHandler(async (req, res, next) => {
 
 // ---------- INICIALIZACIÓN DB ----------
 async function initDB() {
+  await db.runAsync('PRAGMA foreign_keys = ON;');
   const sqls = [
     `CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

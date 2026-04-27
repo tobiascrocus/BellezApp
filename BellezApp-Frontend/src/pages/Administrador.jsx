@@ -98,6 +98,7 @@ export default function Administrador() {
       setSortField(field);
       setSortOrder("asc");
     }
+    setCurrentPage(1);
   };
 
   const handleEdit = (user) => {
@@ -255,7 +256,7 @@ export default function Administrador() {
       <h1>Administración de Usuarios</h1>
 
       <div className="admin-controls">
-        <input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input placeholder="Buscar..." value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1); }} />
         <div className="custom-dropdown" ref={filterDropdownRef}>
           <button className="dropdown-trigger" onClick={() => setRoleDropdownOpen(prev => !prev)}>
             {filterRole.charAt(0).toUpperCase() + filterRole.slice(1)}
@@ -270,12 +271,12 @@ export default function Administrador() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className={`dropdown-item ${filterRole === 'Todos' ? 'active' : ''}`} onClick={() => { setFilterRole('Todos'); setRoleDropdownOpen(false); }}>Todos</div>
+                <div className={`dropdown-item ${filterRole === 'Todos' ? 'active' : ''}`} onClick={() => { setFilterRole('Todos'); setRoleDropdownOpen(false); setCurrentPage(1); }}>Todos</div>
                 {roles.map(r => (
                   <div
                     key={r}
                     className={`dropdown-item ${filterRole === r ? 'active' : ''}`}
-                    onClick={() => { setFilterRole(r); setRoleDropdownOpen(false); }}>{r.charAt(0).toUpperCase() + r.slice(1)}</div>
+                    onClick={() => { setFilterRole(r); setRoleDropdownOpen(false); setCurrentPage(1); }}>{r.charAt(0).toUpperCase() + r.slice(1)}</div>
                 ))}
               </motion.div>
             )}

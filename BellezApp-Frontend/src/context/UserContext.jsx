@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import * as api from '../services/api';
-import { API_BASE } from '../config';
 
 export const UserContext = createContext(null);
 
@@ -59,7 +58,6 @@ export const UserProvider = ({ children }) => {
     login,
     logout,
     updateUser,
-    API_URL: API_BASE,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

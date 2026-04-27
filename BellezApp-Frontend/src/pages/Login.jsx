@@ -121,7 +121,7 @@ export default function Login() {
             <h3>Recupera tu cuenta</h3>
             <p className="modal-text">
               Si olvidaste tu Email o contraseña, contactate al siguiente correo electrónico: <br />
-              <span className="modal-email">Ejemplo@hotmail.com</span>
+              <span className="modal-email">tobiascrocus@hotmail.com</span>
             </p>
             <button className="btn-modal-entendido" onClick={() => setModalVisible(false)}>
               Entendido

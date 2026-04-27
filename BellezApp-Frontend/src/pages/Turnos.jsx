@@ -129,6 +129,9 @@ const Turnos = () => {
   const isTurnoDisponible = (hora) => {
     if (!selectedDate || !selectedService || !selectedStylist) return false;
 
+    const [h, m] = hora.split(':').map(Number);
+    const minutosTurno = h * 60 + m;
+
     // Obtener la fecha de hoy en formato YYYY-MM-DD, independientemente de la zona horaria.
     const hoyStr = new Date().toLocaleDateString('en-CA');
 
@@ -141,8 +144,6 @@ const Turnos = () => {
     if (selectedDate === hoyStr) {
       const ahora = new Date(); // Hora actual
       const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
-      const [h, m] = hora.split(':').map(Number); // Hora del slot
-      const minutosTurno = h * 60 + m;
       if (minutosAhora >= minutosTurno) return false;
     }
 
@@ -155,11 +156,9 @@ const Turnos = () => {
 
     // Comprobar si hay hueco para la duración del servicio
     const duracionSlots = Math.ceil(selectedService.duracion_minutos / 30);
-    const [h, m] = hora.split(':').map(Number);
-    const minutosInicio = h * 60 + m;
 
     for (let i = 0; i < duracionSlots; i++) {
-      const bloqueMin = minutosInicio + i * 30;
+      const bloqueMin = minutosTurno + i * 30;
       const hr = Math.floor(bloqueMin / 60);
       const min = bloqueMin % 60;
       const bloqueStr = `${hr.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
