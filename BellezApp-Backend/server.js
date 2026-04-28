@@ -8,6 +8,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const util = require('util');
 require('dotenv').config();
+const helmet = require('helmet');
+const compression = require('compression');
 
 // ---------- CONSTANTES ----------
 const SERVER_PORT = process.env.PORT || 3000;
@@ -58,6 +60,8 @@ server.use(cors({
   },
   credentials: true
 }));
+server.use(helmet());
+server.use(compression());
 server.use(express.json());
 
 // ---------- BASE DE DATOS ----------
@@ -123,7 +127,7 @@ const validateUser = (p, isUpdate = false) => {
     if (typeof telefono !== 'string' || !telRegex.test(telefono) || telefono.length < 7 || telefono.length > 15) return 'Teléfono inválido.';
   }
   if (rol !== undefined && !Object.values(USER_ROLES).includes(rol)) return 'Rol inválido.';
-  if ((!isUpdate && (!password || password.length < 6)) || (isUpdate && password !== undefined && password.length < 6)) return 'Password debe tener al menos 6 caracteres.';
+  if ((!isUpdate && (!password || password.length < 6)) || (isUpdate && password != null && password.length < 6)) return 'Password debe tener al menos 6 caracteres.';
 
   return null;
 };

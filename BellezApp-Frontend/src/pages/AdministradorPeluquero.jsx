@@ -127,7 +127,7 @@ export default function AdministradorPeluquero() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, selectedPeluqueroId]);
 
   // Efecto para cargar la disponibilidad en el modal
   useEffect(() => {

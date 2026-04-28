@@ -10,7 +10,7 @@ const USER_ROLES = { ADMIN: 'admin', PELUQUERO: 'peluquero', CLIENTE: 'cliente' 
 
 // Datos predefinidos
 const admins = [
-  { nombre: 'Tobias', apellido: 'Tinaro', email: 'tobiascrocus@hotmail.com', telefono: '+5493548608805', rol: USER_ROLES.ADMIN, password: '123456' },
+  { nombre: 'Tobias', apellido: 'Tinaro', email: 'tobiascrocus@hotmail.com', telefono: '+1234567890', rol: USER_ROLES.ADMIN, password: '123456' },
   { nombre: 'Admin', apellido: 'Admin', email: 'admin@hotmail.com', telefono: '+5493548304875', rol: USER_ROLES.ADMIN, password: 'admin' }
 ];
 
