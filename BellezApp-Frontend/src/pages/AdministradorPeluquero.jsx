@@ -114,20 +114,18 @@ export default function AdministradorPeluquero() {
       setServicios(serviciosData.data);
       setUsuarios(usuariosData ? usuariosData.data : []); // Si usuariosData existe, usa su data, si no, un array vacío.
 
-      // Si el usuario es un peluquero, se autoselecciona.
-      // Si es admin, no se selecciona ninguno por defecto.
-      if (user && user.rol === 'peluquero') {
-        setSelectedPeluqueroId(user.id);
-      } else if (user && user.rol === 'admin' && !selectedPeluqueroId) {
-        // No hacer nada, mantener selectedPeluqueroId como null
-      }
-
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedPeluqueroId]);
+  }, [user]);
+
+  useEffect(() => {
+    if (user && user.rol === 'peluquero') {
+      setSelectedPeluqueroId(user.id);
+    }
+  }, [user]);
 
   // Efecto para cargar la disponibilidad en el modal
   useEffect(() => {
