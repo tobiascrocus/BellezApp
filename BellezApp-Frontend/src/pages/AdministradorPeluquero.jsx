@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useUser } from "../context/UserContext";
+import { useConfig } from '../context/ConfigContext';
 import * as api from '../services/api';
 import "../styles/AdministradorPeluquero.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,10 @@ const AnimatedPopper = ({ children }) => {
 
 export default function AdministradorPeluquero() {
   const { user } = useUser();
+  const config = useConfig();
+
+  if (!config) return null;
+
   const [peluqueros, setPeluqueros] = useState([]);
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -58,8 +63,23 @@ export default function AdministradorPeluquero() {
   const [clienteSearch, setClienteSearch] = useState('');
   const [cancelConfirmModal, setCancelConfirmModal] = useState({ visible: false, turnoId: null });
   const [disponibilidadModal, setDisponibilidadModal] = useState([]);
-  const horariosManana = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
-  const horariosTarde = ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
+
+  const { morningSlots, eveningSlots } = useMemo(() => {
+    if (!config) return { morningSlots: [], eveningSlots: [] };
+    const slots = [];
+    for (const bloque of config.businessHours) {
+      for (let hour = bloque.start; hour < bloque.end; hour++) {
+        for (let minute = 0; minute < 60; minute += config.slotInterval) {
+          const horaStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+          slots.push(horaStr);
+        }
+      }
+    }
+    return {
+      morningSlots: slots.filter(h => parseInt(h.split(':')[0]) < 12),
+      eveningSlots: slots.filter(h => parseInt(h.split(':')[0]) >= 12)
+    };
+  }, [config]);
 
 
   const selectedPeluquero = useMemo(() => {
@@ -277,7 +297,7 @@ export default function AdministradorPeluquero() {
 
       // Obtener fecha/hora actual en Argentina de forma confiable
       const ahora = new Date();
-      const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+      const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: config.timeZone }));
       const hoyStr = ahoraArg.toISOString().split('T')[0];
       const minutosAhora = ahoraArg.getHours() * 60 + ahoraArg.getMinutes();
 
@@ -411,7 +431,7 @@ export default function AdministradorPeluquero() {
           ) : turnosFiltrados.length > 0 ? (
             turnosFiltrados.map((turno) => (
               <div key={turno.id} className={`turno-agenda-card estado-${turno.estado}`}>
-                <div className="turno-hora">{formatHora(turno.fecha_timestamp)}</div>
+                <div className="turno-hora">{formatHora(turno.fecha_timestamp, config.timeZone)}</div>
                 <div className="turno-detalle">
                   <p><strong>Cliente:</strong> {turno.cliente_nombre || 'No especificado'}</p>
                   <p><strong>Servicio:</strong> {turno.servicio_nombre}</p>
@@ -571,8 +591,8 @@ export default function AdministradorPeluquero() {
               </div>
 
               <div className="modal-horarios-section">
-                <div className="horarios-container"><h4>Mañana</h4><div className="horarios-grid">{horariosManana.map(renderHorarioButtonModal)}</div></div>
-                <div className="horarios-container"><h4>Tarde</h4><div className="horarios-grid">{horariosTarde.map(renderHorarioButtonModal)}</div></div>
+                <div className="horarios-container"><h4>Mañana</h4><div className="horarios-grid">{morningSlots.map(renderHorarioButtonModal)}</div></div>
+                <div className="horarios-container"><h4>Tarde</h4><div className="horarios-grid">{eveningSlots.map(renderHorarioButtonModal)}</div></div>
               </div>
 
               <div className="modal-buttons">

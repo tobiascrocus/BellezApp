@@ -4,6 +4,7 @@ import { useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { UserProvider } from './context/UserContext.jsx'
+import { ConfigProvider } from './context/ConfigContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 
@@ -82,11 +83,13 @@ function AppWrapper() {
 
 function App() {
   return (
-    <UserProvider>
-      <Router>
-        <AppWrapper />
-      </Router>
-    </UserProvider>
+    <ConfigProvider>
+      <UserProvider>
+        <Router>
+          <AppWrapper />
+        </Router>
+      </UserProvider>
+    </ConfigProvider>
   )
 }
 

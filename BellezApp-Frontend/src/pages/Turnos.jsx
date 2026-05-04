@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import "../styles/Turnos.css";
 import { useUser } from '../context/UserContext';
+import { useConfig } from '../context/ConfigContext';
 import * as api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker, { registerLocale } from 'react-datepicker';
@@ -27,6 +28,10 @@ const AnimatedPopper = ({ children }) => {
 
 const Turnos = () => {
   const { user } = useUser();
+  const config = useConfig();
+
+  if (!config) return null;
+
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [peluqueros, setPeluqueros] = useState([]);
@@ -47,8 +52,22 @@ const Turnos = () => {
   const [stylistDropdownOpen, setStylistDropdownOpen] = useState(false);
   const stylistDropdownRef = useRef(null);
 
-  const horariosManana = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
-  const horariosTarde = ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
+  const { morningSlots, eveningSlots } = useMemo(() => {
+    if (!config) return { morningSlots: [], eveningSlots: [] };
+    const slots = [];
+    for (const bloque of config.businessHours) {
+      for (let hour = bloque.start; hour < bloque.end; hour++) {
+        for (let minute = 0; minute < 60; minute += config.slotInterval) {
+          const horaStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+          slots.push(horaStr);
+        }
+      }
+    }
+    return {
+      morningSlots: slots.filter(h => parseInt(h.split(':')[0]) < 12),
+      eveningSlots: slots.filter(h => parseInt(h.split(':')[0]) >= 12)
+    };
+  }, [config]);
 
   const fetchTurnos = useCallback(async () => {
     try {
@@ -136,7 +155,7 @@ const Turnos = () => {
     const minutosTurno = hour * 60 + minute;
 
     const ahora = new Date();
-    const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+    const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: config.timeZone }));
     const hoyStr = ahoraArg.toISOString().split('T')[0];
     const minutosAhora = ahoraArg.getHours() * 60 + ahoraArg.getMinutes();
 
@@ -271,8 +290,8 @@ const Turnos = () => {
                 return (
                   <div key={t.id} className="turno-card-horizontal">
                     <h3 className="card-title">Resumen</h3>
-                    <p><strong>Hora:</strong> {formatHora(t.fecha_timestamp)}</p>
-                    <p><strong>Fecha:</strong> {formatFecha(t.fecha_timestamp)}</p>
+                    <p><strong>Hora:</strong> {formatHora(t.fecha_timestamp, config.timeZone)}</p>
+                    <p><strong>Fecha:</strong> {formatFecha(t.fecha_timestamp, config.timeZone)}</p>
                     <p><strong>Estilista:</strong> {t.peluquero_nombre}</p>
                     <p><strong>Servicio:</strong> {t.servicio_nombre}</p>
                     <button className="btn-cancelar" onClick={() => handleCancelarClick(t)}>Cancelar turno</button>
@@ -296,7 +315,7 @@ const Turnos = () => {
                         .map((t) => {
                           return (
                             <div key={t.id} className={`historial-card ${t.estado}`}>
-                              <strong>Hora:</strong> {formatHora(t.fecha_timestamp)} - <strong>Fecha:</strong> {formatFecha(t.fecha_timestamp)} - <strong>Estilista:</strong> {t.peluquero_nombre} - <strong>Servicio:</strong> {t.servicio_nombre}
+                              <strong>Hora:</strong> {formatHora(t.fecha_timestamp, config.timeZone)} - <strong>Fecha:</strong> {formatFecha(t.fecha_timestamp, config.timeZone)} - <strong>Estilista:</strong> {t.peluquero_nombre} - <strong>Servicio:</strong> {t.servicio_nombre}
                               {t.estado === 'cancelado' && ' (Cancelado)'}
                               {t.estado === 'no_asistio' && ' (No se presentó)'}
                             </div>
@@ -319,7 +338,7 @@ const Turnos = () => {
               <motion.div className="confirm-modal-overlay" onClick={cerrarConfirmModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <motion.div className="confirm-modal" onClick={e => e.stopPropagation()} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
                   <h3>¿Cancelar turno?</h3>
-                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${formatFechaHoraCompleta(confirmModal.turno.fecha_timestamp)}?`}</p>
+                  <p>{confirmModal.turno && `¿Seguro que quieres cancelar el turno del ${formatFechaHoraCompleta(confirmModal.turno.fecha_timestamp, config.timeZone)}?`}</p>
                   <div className="confirm-buttons">
                     <button className="btn-confirmar" onClick={confirmarCancelacion}>Cancelar turno</button>
                     <button className="btn-volver" onClick={cerrarConfirmModal}>Volver</button>
@@ -451,11 +470,11 @@ const Turnos = () => {
         <div className="horarios-section">
           <div className="horarios-container">
             <h4>Por la mañana</h4>
-            <div className="horarios-grid">{horariosManana.map(renderHorarioButton)}</div>
+            <div className="horarios-grid">{morningSlots.map(renderHorarioButton)}</div>
           </div>
           <div className="horarios-container">
             <h4>Por la tarde</h4>
-            <div className="horarios-grid">{horariosTarde.map(renderHorarioButton)}</div>
+            <div className="horarios-grid">{eveningSlots.map(renderHorarioButton)}</div>
           </div>
         </div>
 

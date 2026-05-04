@@ -318,6 +318,15 @@ async function initDB() {
 
 initDB().catch(e => { console.error('Error inicializando DB:', e); process.exit(1); });
 
+// ---------- RUTA CONFIGURACIÓN ----------
+server.get('/api/config', (req, res) => {
+  res.json({
+    timeZone: BUSINESS_TIMEZONE,
+    businessHours: BUSINESS_HOURS,
+    slotInterval: SLOT_INTERVAL
+  });
+});
+
 // ---------- RUTAS AUTENTICACIÓN ----------
 
 // Registro de cliente
