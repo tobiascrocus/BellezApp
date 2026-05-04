@@ -1,5 +1,8 @@
 // seedTurnos.js - Generar turnos dinámicamente alrededor de la fecha actual
+require('dotenv').config(); // Cargar variables de entorno
 const sqlite3 = require('sqlite3').verbose();
+const { zonedTimeToUtc } = require('date-fns-tz');
+
 const DB_PATH = './bellezapp.db';
 
 // Constantes (deben coincidir con backend)
@@ -7,7 +10,8 @@ const USER_ROLES = { PELUQUERO: 'peluquero' };
 const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado', ASISTIO: 'asistio', NO_ASISTIO: 'no_asistio' };
 const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
 const SLOT_INTERVAL = 30; // minutos
-const BUSINESS_TIMEZONE_OFFSET = -3; // Mismo valor que en .env (Argentina)
+// Zona horaria del negocio desde .env (por defecto Argentina)
+const BUSINESS_TIMEZONE = process.env.BUSINESS_TIMEZONE || 'America/Argentina/Buenos_Aires';
 
 // Función para obtener días hábiles entre dos fechas
 function getWeekdaysInRange(startDate, endDate) {
@@ -94,7 +98,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
     for (const dia of weekdays) {
       // Fecha local en YYYY-MM-DD (sin conversión UTC)
       const fechaLocal = `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, '0')}-${String(dia.getDate()).padStart(2, '0')}`;
-      const [year, month, day] = fechaLocal.split('-').map(Number);
       const esPasado = dia < today;
       
       for (const peluquero of peluqueros) {
@@ -124,10 +127,13 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
             estado = rand < 0.9 ? APPOINTMENT_STATUS.CONFIRMADO : APPOINTMENT_STATUS.CANCELADO;
           }
           
-          // Calcular timestamp UTC a partir de la hora local (Argentina UTC-3)
-          const fechaHoraLocalUTC = Date.UTC(year, month - 1, day, slot.hour, slot.minute);
-          const timestampUTC = fechaHoraLocalUTC - BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000;
-          const fechaHora = new Date(timestampUTC).toISOString().replace('T', ' ').slice(0, 19);
+          // Construir fecha/hora local en string (ej. "2026-05-18 09:30:00")
+          const horaStr = `${String(slot.hour).padStart(2, '0')}:${String(slot.minute).padStart(2, '0')}:00`;
+          const fechaHoraLocalStr = `${fechaLocal} ${horaStr}`;
+          
+          // Convertir a UTC usando la zona horaria del negocio
+          const utcDate = zonedTimeToUtc(fechaHoraLocalStr, BUSINESS_TIMEZONE);
+          const fechaHora = utcDate.toISOString().replace('T', ' ').slice(0, 19);
           
           try {
             await new Promise((resolve, reject) => {

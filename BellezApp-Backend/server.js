@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const util = require('util');
 require('dotenv').config();
+const { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } = require('date-fns-tz');
 const helmet = require('helmet');
 const compression = require('compression');
 
@@ -28,7 +29,7 @@ const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
 const SLOT_INTERVAL = 30; // minutos
 const MAX_TURNOS_CLIENTE = 3;
 
-const BUSINESS_TIMEZONE_OFFSET = parseInt(process.env.BUSINESS_TIMEZONE_OFFSET || '-3'); // Offset del negocio (ej. Argentina = -3)
+const BUSINESS_TIMEZONE = process.env.BUSINESS_TIMEZONE || 'America/Argentina/Buenos_Aires';
 
 // --- Constantes para el Límite de Intentos de Contraseña ---
 const PASSWORD_ATTEMPT_LIMIT = 5; // Máximo de intentos fallidos
@@ -159,28 +160,17 @@ const updateTable = async (table, id, fields) => {
 const isWithinBusinessHours = timestamp => {
   const d = new Date(timestamp);
   if (isNaN(d.getTime())) return false;
-  // Convertir hora UTC a la hora local del negocio usando el offset
-  const hUTC = d.getUTCHours();
-  const hLocal = (hUTC + BUSINESS_TIMEZONE_OFFSET + 24) % 24;
-  const m = d.getUTCMinutes();
-  return BUSINESS_HOURS.some(b => (hLocal >= b.start && hLocal < b.end)) && (m % SLOT_INTERVAL === 0);
+  const zonedDate = utcToZonedTime(d, BUSINESS_TIMEZONE);
+  const h = zonedDate.getHours();
+  const m = zonedDate.getMinutes();
+  return BUSINESS_HOURS.some(b => (h >= b.start && h < b.end)) && (m % SLOT_INTERVAL === 0);
 };
 
 const getLocalDayOfWeek = (timestamp) => {
   const d = new Date(timestamp);
   if (isNaN(d.getTime())) return null;
-
-  // Calculamos la hora local teórica para ver si el offset nos movió de día
-  const hLocal = d.getUTCHours() + BUSINESS_TIMEZONE_OFFSET;
-  let day = d.getUTCDay(); // Día en UTC (0-6)
-
-  if (hLocal < 0) {
-    day = (day + 6) % 7; // Retrocedemos un día (domingo 0 -> sábado 6)
-  } else if (hLocal >= 24) {
-    day = (day + 1) % 7; // Avanzamos un día (sábado 6 -> domingo 0)
-  }
-
-  return day;
+  const zonedDate = utcToZonedTime(d, BUSINESS_TIMEZONE);
+  return zonedDate.getDay();
 };
 
 const checkConflict = async (peluqueroId, fechaHora, excludeId = null) => {
@@ -615,15 +605,12 @@ server.post('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
     return sendResponse(res, false, null, 'Debes enviar fecha y hora del turno.', 400);
   }
 
-  // Construir timestamp usando la zona horaria del negocio (BUSINESS_TIMEZONE_OFFSET)
-  const [year, month, day] = fecha.split('-').map(Number);
-  const [hour, minute] = hora.split(':').map(Number);
+  // Construir timestamp usando la zona horaria del negocio
+  const fechaHoraStr = `${fecha} ${hora}:00`;
+  const utcDate = zonedTimeToUtc(fechaHoraStr, BUSINESS_TIMEZONE);
+  const timestamp = utcDate.getTime();
   
-  // Creamos un Date en UTC con la fecha y hora LOCAL del negocio
-  const fechaHoraLocalUTC = Date.UTC(year, month - 1, day, hour, minute);
-  // Ajustamos restando el offset del negocio (porque el negocio está adelantado/atrasado respecto a UTC)
-  const timestamp = fechaHoraLocalUTC - BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000;
-  
+
   const fechaStr = formatDate(timestamp);
   if (!fechaStr) return sendResponse(res, false, null, 'Fecha inválida', 400);
 
@@ -720,13 +707,15 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   if (!fecha) return sendResponse(res, false, null, 'Fecha requerida (YYYY-MM-DD)', 400);
 
   const [year, month, day] = fecha.split('-').map(Number);
-  // Definimos el inicio y fin del día ajustados a la zona horaria del negocio
-  const startOfDayUTC = Date.UTC(year, month - 1, day, 0, 0, 0) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
-  const endOfDayUTC = startOfDayUTC + 86400000 - 1;
+  // Definimos el inicio y fin del día en la zona horaria del negocio
+  const startDateTime = zonedTimeToUtc(`${fecha} 00:00:00`, BUSINESS_TIMEZONE);
+  const endDateTime = zonedTimeToUtc(`${fecha} 23:59:59`, BUSINESS_TIMEZONE);
+  const startOfDayUTC = startDateTime.getTime();
+  const endOfDayUTC = endDateTime.getTime();
 
-  // Validar fin de semana de forma directa usando los componentes de la fecha recibida
-  // Esto es más robusto que calcularlo a partir del timestamp desplazado.
-  const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  // Validar fin de semana usando la zona horaria del negocio
+  const zonedDate = utcToZonedTime(new Date(startDateTime), BUSINESS_TIMEZONE);
+  const dayOfWeek = zonedDate.getDay();
   if ([0, 6].includes(dayOfWeek)) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
 
   const peluqueros = peluquero_id
@@ -749,8 +738,8 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
     for (const bloque of BUSINESS_HOURS) {
       for (let h = bloque.start; h < bloque.end; h++) {
         for (let m = 0; m < 60; m += SLOT_INTERVAL) {
-          // Generamos el timestamp UTC exacto que corresponde a la hora local del negocio
-          const slotTime = Date.UTC(year, month - 1, day, h, m) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
+          const slotDateTime = zonedTimeToUtc(`${fecha} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`, BUSINESS_TIMEZONE);
+          const slotTime = slotDateTime.getTime();
           
           const ocupado = turnosPeluquero.some(turno => {
             const turnoStart = turno.start_ts; // Usamos el timestamp directamente de la DB
