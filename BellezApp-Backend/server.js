@@ -163,7 +163,7 @@ const isWithinBusinessHours = timestamp => {
   const hUTC = d.getUTCHours();
   const hLocal = (hUTC + BUSINESS_TIMEZONE_OFFSET + 24) % 24;
   const m = d.getUTCMinutes();
-  return BUSINESS_HOURS.some(b => (hLocal >= b.start && hLocal < b.end)) && (m === 0 || m === 30);
+  return BUSINESS_HOURS.some(b => (hLocal >= b.start && hLocal < b.end)) && (m % SLOT_INTERVAL === 0);
 };
 
 const getLocalDayOfWeek = (timestamp) => {
@@ -748,7 +748,7 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
     disponibilidad[p.id] = [];
     for (const bloque of BUSINESS_HOURS) {
       for (let h = bloque.start; h < bloque.end; h++) {
-        for (let m of [0, 30]) {
+        for (let m = 0; m < 60; m += SLOT_INTERVAL) {
           // Generamos el timestamp UTC exacto que corresponde a la hora local del negocio
           const slotTime = Date.UTC(year, month - 1, day, h, m) - (BUSINESS_TIMEZONE_OFFSET * 60 * 60 * 1000);
           

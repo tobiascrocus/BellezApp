@@ -132,36 +132,24 @@ const Turnos = () => {
   const isTurnoDisponible = (hora) => {
     if (!selectedDate || !selectedService || !selectedStylist) return false;
 
-    const [h, m] = hora.split(':').map(Number);
-    const minutosTurno = h * 60 + m;
+    const [hour, minute] = hora.split(':').map(Number);
+    const minutosTurno = hour * 60 + minute;
 
-    // Obtener fecha actual en zona Argentina
-    const ahoraArg = new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
-    const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
-    const [fechaArg, horaArg] = ahoraArg.split(', ');
-    const [horaActual, minutoActual] = horaArg.split(':');
-    const minutosAhora = parseInt(horaActual) * 60 + parseInt(minutoActual);
+    const ahora = new Date();
+    const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+    const hoyStr = ahoraArg.toISOString().split('T')[0];
+    const minutosAhora = ahoraArg.getHours() * 60 + ahoraArg.getMinutes();
 
-    // 1. Si la fecha seleccionada es anterior a hoy, no hay nada disponible.
-    if (selectedDate < hoyStr) {
-      return false;
-    }
-
-    // 2. Si la fecha seleccionada es hoy, comprobar si la hora ya pasó.
-    if (selectedDate === hoyStr) {
-      if (minutosAhora >= minutosTurno) return false;
-    }
+    if (selectedDate < hoyStr) return false;
+    if (selectedDate === hoyStr && minutosAhora >= minutosTurno) return false;
 
     const diaSeleccionado = new Date(`${selectedDate}T00:00:00`);
-    // Si la fecha es un fin de semana, deshabilitar.
-    if ([6, 0].includes(diaSeleccionado.getDay())) return false; // 6 = Sábado, 0 = Domingo
+    if ([0, 6].includes(diaSeleccionado.getDay())) return false;
 
     const slot = disponibilidad.find(d => d.hora === hora);
     if (!slot || !slot.disponible) return false;
 
-    // Comprobar si hay hueco para la duración del servicio
     const duracionSlots = Math.ceil(selectedService.duracion_minutos / 30);
-
     for (let i = 0; i < duracionSlots; i++) {
       const bloqueMin = minutosTurno + i * 30;
       const hr = Math.floor(bloqueMin / 60);

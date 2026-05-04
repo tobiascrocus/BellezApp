@@ -275,28 +275,25 @@ export default function AdministradorPeluquero() {
     const isDisponible = () => {
       if (datosIncompletos) return false;
 
-      // Lógica de Turnos.jsx: Deshabilitar horarios pasados en el día actual (Zona Argentina).
-      const hoyArg = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
-      if (newTurno.fecha === hoyArg) {
-        const ahoraArg = new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
-        const fechaTurnoArg = new Date(`${newTurno.fecha}T${hora}:00`).toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
-        // Se deshabilita si la hora actual es posterior a 10 minutos antes del turno.
-        if (new Date(ahoraArg).getTime() > new Date(fechaTurnoArg).getTime() - 10 * 60 * 1000) return false;
-      }
+      // Obtener fecha/hora actual en Argentina de forma confiable
+      const ahora = new Date();
+      const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+      const hoyStr = ahoraArg.toISOString().split('T')[0];
+      const minutosAhora = ahoraArg.getHours() * 60 + ahoraArg.getMinutes();
 
-      // Lógica de Turnos.jsx: Deshabilitar fines de semana visualmente.
+      const [hour, minute] = hora.split(':').map(Number);
+      const minutosTurno = hour * 60 + minute;
+
+      // Deshabilitar si la fecha es hoy y la hora ya pasó (con 10 min de margen)
+      if (newTurno.fecha === hoyStr && minutosAhora > minutosTurno - 10) return false;
+
+      // Deshabilitar fines de semana
       const diaSeleccionado = new Date(`${newTurno.fecha}T00:00:00`);
-      if ([6, 0].includes(diaSeleccionado.getDay())) {
-        return false; // 6 = Sábado, 0 = Domingo
-      }
+      if ([0, 6].includes(diaSeleccionado.getDay())) return false;
 
-      // Lógica de Turnos.jsx: Comprobar si hay hueco para la duración del servicio.
-      const duracionSlots = Math.ceil(servicioSeleccionado.duracion_minutos / 30);
-      const [h, m] = hora.split(':').map(Number);
-      const minutosInicio = h * 60 + m;
-
+      // Verificar que haya slots continuos para la duración del servicio
       for (let i = 0; i < duracionSlots; i++) {
-        const bloqueMin = minutosInicio + i * 30;
+        const bloqueMin = minutosTurno + i * 30;
         const hr = Math.floor(bloqueMin / 60);
         const min = bloqueMin % 60;
         const bloqueStr = `${hr.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;

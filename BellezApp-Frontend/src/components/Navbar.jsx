@@ -1,6 +1,6 @@
 // Navbar.jsx
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useUser } from "../context/UserContext"
 import "../styles/Navbar.css";
@@ -28,10 +28,10 @@ const Navbar = () => {
   // Filtra los botones visibles según el rol del usuario.
   const visibleButtons = NAV_BUTTONS.filter((btn) => btn.roles.includes(user ? user.rol : null));
 
-  const closeMenus = () => {
-    setMenuOpen(false)
-    setUserMenuOpen(false)
-  }
+  const closeMenus = useCallback(() => {
+    setMenuOpen(false);
+    setUserMenuOpen(false);
+  }, []);
 
   const handleLogout = () => {
     logout()
