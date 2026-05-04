@@ -9,7 +9,6 @@ const DB_PATH = './bellezapp.db';
 const USER_ROLES = { PELUQUERO: 'peluquero' };
 const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado', ASISTIO: 'asistio', NO_ASISTIO: 'no_asistio' };
 const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
-const SLOT_INTERVAL = 30; // minutos
 // Zona horaria del negocio desde .env (por defecto Argentina)
 const BUSINESS_TIMEZONE = process.env.BUSINESS_TIMEZONE || 'America/Argentina/Buenos_Aires';
 

@@ -30,8 +30,6 @@ export default function AdministradorPeluquero() {
   const { user } = useUser();
   const config = useConfig();
 
-  if (!config) return null;
-
   const [peluqueros, setPeluqueros] = useState([]);
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -189,6 +187,8 @@ export default function AdministradorPeluquero() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  if (!config) return null;
 
   const handleClienteSearchChange = (e) => {
     setClienteSearch(e.target.value);

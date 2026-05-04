@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const util = require('util');
 require('dotenv').config();
-const { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } = require('date-fns-tz');
+const { zonedTimeToUtc, utcToZonedTime } = require('date-fns-tz');
 const helmet = require('helmet');
 const compression = require('compression');
 
@@ -715,7 +715,6 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   const { fecha, peluquero_id } = req.query;
   if (!fecha) return sendResponse(res, false, null, 'Fecha requerida (YYYY-MM-DD)', 400);
 
-  const [year, month, day] = fecha.split('-').map(Number);
   // Definimos el inicio y fin del día en la zona horaria del negocio
   const startDateTime = zonedTimeToUtc(`${fecha} 00:00:00`, BUSINESS_TIMEZONE);
   const endDateTime = zonedTimeToUtc(`${fecha} 23:59:59`, BUSINESS_TIMEZONE);

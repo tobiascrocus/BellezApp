@@ -30,8 +30,6 @@ const Turnos = () => {
   const { user } = useUser();
   const config = useConfig();
 
-  if (!config) return null;
-
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [peluqueros, setPeluqueros] = useState([]);
@@ -122,8 +120,6 @@ const Turnos = () => {
     fetchDisponibilidad();
   }, [selectedDate, selectedStylist]);
 
-  const toggleMockHistory = () => setMockHistoryVisible(!mockHistoryVisible);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (serviceDropdownRef.current && !serviceDropdownRef.current.contains(event.target)) {
@@ -138,6 +134,10 @@ const Turnos = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  if (!config) return null;
+
+  const toggleMockHistory = () => setMockHistoryVisible(!mockHistoryVisible);
 
   const handleSelect = (setter, value, closeDropdown) => {
     setter(value);
