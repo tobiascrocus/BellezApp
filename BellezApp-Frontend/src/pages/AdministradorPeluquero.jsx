@@ -32,6 +32,7 @@ export default function AdministradorPeluquero() {
   const [servicios, setServicios] = useState([]);
   const [usuarios, setUsuarios] = useState([]); // Para buscar clientes
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [selectedPeluqueroId, setSelectedPeluqueroId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('en-CA'));
   const [peluqueroDropdownOpen, setPeluqueroDropdownOpen] = useState(false);
@@ -223,6 +224,7 @@ export default function AdministradorPeluquero() {
   };
 
   const handleEstadoChange = async (turnoId, nuevoEstado) => {
+    setIsUpdating(true);
     try {
       const data = await api.updateTurno(turnoId, { estado: nuevoEstado });
       if (!data.ok) throw new Error(data.message || "Error al actualizar el estado del turno.");
@@ -234,6 +236,8 @@ export default function AdministradorPeluquero() {
 
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -271,13 +275,13 @@ export default function AdministradorPeluquero() {
     const isDisponible = () => {
       if (datosIncompletos) return false;
 
-      // Lógica de Turnos.jsx: Deshabilitar horarios pasados en el día actual.
-      const hoy = new Date().toLocaleDateString('en-CA');
-      if (newTurno.fecha === hoy) {
-        const ahora = new Date();
-        const fechaTurno = new Date(`${newTurno.fecha}T${hora}:00`);
+      // Lógica de Turnos.jsx: Deshabilitar horarios pasados en el día actual (Zona Argentina).
+      const hoyArg = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+      if (newTurno.fecha === hoyArg) {
+        const ahoraArg = new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
+        const fechaTurnoArg = new Date(`${newTurno.fecha}T${hora}:00`).toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
         // Se deshabilita si la hora actual es posterior a 10 minutos antes del turno.
-        if (ahora.getTime() > fechaTurno.getTime() - 10 * 60 * 1000) return false;
+        if (new Date(ahoraArg).getTime() > new Date(fechaTurnoArg).getTime() - 10 * 60 * 1000) return false;
       }
 
       // Lógica de Turnos.jsx: Deshabilitar fines de semana visualmente.
@@ -431,16 +435,16 @@ export default function AdministradorPeluquero() {
                         {turno.fecha_timestamp > Date.now() ? (
                           <>
                             {turno.estado === 'confirmado' && (
-                              <button className="accion-btn accion-cancelar" onClick={() => handleCancelClick(turno.id)}>Cancelar</button>
+                              <button className="accion-btn accion-cancelar" onClick={() => handleCancelClick(turno.id)} disabled={isUpdating}>Cancelar</button>
                             )}
                           </>
                         ) : ( // Turno pasado
                           <>
                             {turno.estado === 'asistio' && (
-                              <button className="accion-btn accion-no-asistio" onClick={() => handleEstadoChange(turno.id, 'no_asistio')}>No Asistió</button>
+                              <button className="accion-btn accion-no-asistio" onClick={() => handleEstadoChange(turno.id, 'no_asistio')} disabled={isUpdating}>No Asistió</button>
                             )}
                             {turno.estado === 'no_asistio' && (
-                              <button className="accion-btn accion-asistio" onClick={() => handleEstadoChange(turno.id, 'asistio')}>Sí Asistió</button>
+                              <button className="accion-btn accion-asistio" onClick={() => handleEstadoChange(turno.id, 'asistio')} disabled={isUpdating}>Sí Asistió</button>
                             )}
                           </>
                         )}

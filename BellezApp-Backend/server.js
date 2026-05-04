@@ -105,12 +105,17 @@ const hashPassword = async password => bcrypt.hash(password, SALT_ROUNDS);
 // ---------- VALIDACIÓN DE USUARIOS ----------
 const validateUser = (p, isUpdate = false) => {
   const { nombre, apellido, email, telefono, rol, password } = p;
+
+  // Validación de campos obligatorios para la creación
+  if (!isUpdate) {
+    if (!nombre || !apellido || !email || !password) {
+      return 'Faltan campos requeridos: nombre, apellido, email y contraseña.';
+    }
+  }
+
   const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/; // Permite letras (con acentos, ñ, ü), espacios, apóstrofes y guiones.
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const telRegex = /^\+?\d+$/;
-
-  // Para creación (isUpdate=false), todos los campos requeridos deben estar.
-  // Para actualización (isUpdate=true), solo validamos los campos que se envían (no son undefined).
 
   if (nombre !== undefined) {
     if (typeof nombre !== 'string' || nombre.length < 3 || nombre.length > 15) return 'Nombre debe tener entre 3 y 15 caracteres.';
@@ -492,10 +497,22 @@ server.put('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADM
   const current = await getUserById(id);
   if (!current) return sendResponse(res, false, null, 'Usuario no encontrado', 404);
 
+  // Impedir que un administrador cambie su propio rol
+  if (parseInt(id) === req.usuario.id && req.body.rol !== undefined && req.body.rol !== current.rol) {
+    return sendResponse(res, false, null, 'No puedes cambiar tu propio rol de administrador.', 400);
+  }
+
   const error = validateUser(req.body, true);
   if (error) return sendResponse(res, false, null, error, 400);
 
   const { nombre, apellido, email, telefono, rol, password, avatar } = req.body;
+
+  // Verificar si el nuevo email ya está en uso por otro usuario
+  if (email && email !== current.email) {
+    const existing = await db.get('SELECT id FROM usuarios WHERE email = ? AND id != ?', [email, id]);
+    if (existing) return sendResponse(res, false, null, 'El email ya está registrado por otro usuario.', 400);
+  }
+
   const fields = { nombre, apellido, email, telefono, rol, avatar };
   if (password) fields.password_hash = await hashPassword(password);
 
@@ -555,14 +572,16 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   `;
   const params = [];
 
-  // Si es la vista de agenda, el peluquero ve sus turnos asignados y el admin ve todos.
-  if (view === 'agenda') {
+  // Solo admin y peluquero pueden acceder a la vista de agenda. 
+  // Si un cliente intenta acceder, se trata como su vista personal de "Mis Turnos".
+  if (view === 'agenda' && (rol === USER_ROLES.ADMIN || rol === USER_ROLES.PELUQUERO)) {
     if (rol === USER_ROLES.PELUQUERO) {
       query += ' WHERE t.peluquero_id=?';
       params.push(id);
     }
-    // Si es admin, no se añade filtro, lo cual es correcto.
-  } else { // Si no, es la vista "Mis Turnos" (personal)
+    // El admin no filtra (ve todos los turnos).
+  } else {
+    // Vista "Mis Turnos": el usuario solo ve los turnos donde él es el cliente.
     query += ' WHERE t.usuario_id=?';
     params.push(id);
   }
@@ -676,6 +695,19 @@ server.delete('/api/turnos/:id', authenticateToken, asyncHandler(async (req, res
   // Solo el admin, el cliente dueño del turno o el peluquero asignado pueden cancelarlo.
   if (rol !== USER_ROLES.ADMIN && turno.usuario_id !== userIdFromToken && turno.peluquero_id !== userIdFromToken) {
     return sendResponse(res, false, null, 'No tienes permiso para cancelar este turno.', 403);
+  }
+
+  // Validación de tiempo para la cancelación (aplica a clientes y peluqueros)
+  if (rol !== USER_ROLES.ADMIN) {
+    const turnoTimestamp = parseDate(turno.fecha_hora);
+    const diffHours = (turnoTimestamp - Date.now()) / (1000 * 60 * 60);
+
+    if (diffHours <= 0) {
+      return sendResponse(res, false, null, 'No puedes cancelar un turno que ya pasó.', 400);
+    }
+    if (diffHours < 3) {
+      return sendResponse(res, false, null, 'Debes cancelar el turno con al menos 3 horas de anticipación.', 400);
+    }
   }
 
   await updateTable('turnos', id, { estado: APPOINTMENT_STATUS.CANCELADO });

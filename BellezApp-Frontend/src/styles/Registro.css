@@ -105,6 +105,29 @@
   outline: none;
 }
 
+.password-input-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.password-input-container input {
+  padding-right: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  filter: invert(1);
+}
+
 .registro-card button {
   padding: 1.1rem;
   font-size: 1.2rem;

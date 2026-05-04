@@ -50,7 +50,7 @@ const Navbar = () => {
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  }, [closeMenus])
 
   return (
     <header>
@@ -65,7 +65,7 @@ const Navbar = () => {
         <div className="navbar-right">
           <ul className="navbar-buttons">
             {visibleButtons.map(btn => (
-              <li key={btn.ruta} className={btn.isLogin ? 'navbar-login-item' : (btn.isRegister ? 'navbar-register-item' : '')}>
+              <li key={btn.ruta}>
                 <Link
                   to={btn.ruta}
                   className={location.pathname === btn.ruta ? "active" : ""}

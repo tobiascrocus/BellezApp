@@ -13,10 +13,14 @@ export default function Registro() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Función de validación consistente con Perfil.jsx y el backend
   const validateForm = () => {
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const telRegex = /^\+?\d+$/;
 
     if (nombre.length < 3 || nombre.length > 15) {
       return 'El nombre debe tener entre 3 y 15 caracteres.';
@@ -29,6 +33,12 @@ export default function Registro() {
     }
     if (!nameRegex.test(apellido)) {
       return 'El apellido contiene caracteres inválidos.';
+    }
+    if (!emailRegex.test(email)) {
+      return 'Email inválido.';
+    }
+    if (telefono && (!telRegex.test(telefono) || telefono.length < 7 || telefono.length > 15)) {
+      return 'Teléfono inválido. Debe contener solo números y tener entre 7 y 15 dígitos.';
     }
     if (password.length < 6) {
       return 'La contraseña debe tener al menos 6 caracteres.';
@@ -114,20 +124,36 @@ export default function Registro() {
               value={telefono}
               onChange={e => setTelefono(e.target.value)}
             />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirmar contraseña"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+              <img
+                src={showPassword ? '/assets/images/Contraseña/NoVisible.png' : '/assets/images/Contraseña/Visible.png'}
+                alt={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="password-toggle-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </div>
+            <div className="password-input-container">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                required
+              />
+              <img
+                src={showConfirmPassword ? '/assets/images/Contraseña/NoVisible.png' : '/assets/images/Contraseña/Visible.png'}
+                alt={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="password-toggle-icon"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            </div>
             <div className="error-container">
               {error && <p className="registro-error">{error}</p>}
               {success && <p className="registro-success">{success}</p>}

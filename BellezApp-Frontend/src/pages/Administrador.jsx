@@ -31,6 +31,8 @@ export default function Administrador() {
   const [saveConfirmModal, setSaveConfirmModal] = useState({ visible: false });
   const [showNewUserPassword, setShowNewUserPassword] = useState(false);
   const [showEditUserPassword, setShowEditUserPassword] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const filteredUsers = users
     .filter(u => filterRole === "Todos" || u.rol === filterRole)
@@ -104,6 +106,7 @@ export default function Administrador() {
   const handleEdit = (user) => {
     setEditUserId(user.id);
     setTempUser({ ...user, password: "" }); // Inicializamos la contraseña vacía al editar
+    setShowEditUserPassword(false);
   };
 
   const handleSave = () => {
@@ -111,6 +114,7 @@ export default function Administrador() {
   };
 
   const confirmSave = async () => {
+    setIsSaving(true);
     // La contraseña solo se envía si se ha modificado.
     const payload = { ...tempUser };
     if (!payload.password || payload.password.trim() === "") {
@@ -126,6 +130,7 @@ export default function Administrador() {
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     } finally {
+      setIsSaving(false);
       setSaveConfirmModal({ visible: false });
     }
   };
@@ -137,6 +142,7 @@ export default function Administrador() {
   const handleDelete = (id) => setDeleteUserId(id);
 
   const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
       const data = await api.deleteUsuario(deleteUserId);
       if (!data.ok) throw new Error(data.message || "Error al eliminar el usuario.");
@@ -146,6 +152,8 @@ export default function Administrador() {
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
       setDeleteUserId(null);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -153,6 +161,7 @@ export default function Administrador() {
 
   const handleOpenModal = () => {
     setNewUser({ nombre: "", apellido: "", email: "", telefono: "", rol: "cliente", password: "", avatar: "/assets/images/Perfil/Avatar.png" });
+    setShowNewUserPassword(false);
     setModalOpen(true);
   };
 
@@ -401,7 +410,7 @@ export default function Administrador() {
               <h3>¿Eliminar usuario?</h3>
               <p>Esta acción no se puede deshacer.</p>
               <div className="modal-buttons">
-                <button className="btn-delete" onClick={confirmDelete}>Eliminar</button>
+                <button className="btn-delete" onClick={confirmDelete} disabled={isDeleting}>Eliminar</button>
                 <button className="btn-modal-volver" onClick={cancelDelete}>Volver</button>
               </div>
             </motion.div>
@@ -416,7 +425,7 @@ export default function Administrador() {
               <h3>¿Guardar Cambios?</h3>
               <p>¿Estás seguro de que quieres guardar los cambios realizados en este usuario?</p>
               <div className="modal-buttons">
-                <button className="btn-save" onClick={confirmSave}>Guardar</button>
+                <button className="btn-save" onClick={confirmSave} disabled={isSaving}>Guardar</button>
                 <button className="btn-cancel" onClick={cancelSave}>Cancelar</button>
               </div>
             </motion.div>

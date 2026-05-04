@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import "../styles/Turnos.css";
-import { UserContext } from '../context/UserContext';
+import { useUser } from '../context/UserContext';
 import * as api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import DatePicker, { registerLocale } from 'react-datepicker';
@@ -26,7 +26,7 @@ const AnimatedPopper = ({ children }) => {
 };
 
 const Turnos = () => {
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [peluqueros, setPeluqueros] = useState([]);
@@ -50,7 +50,7 @@ const Turnos = () => {
   const horariosManana = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
   const horariosTarde = ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
 
-  const fetchTurnos = async () => {
+  const fetchTurnos = useCallback(async () => {
     try {
       const res = await api.getTurnos();
       if (res.ok) {
@@ -61,7 +61,7 @@ const Turnos = () => {
     } catch (error) {
       setInfoModal({ visible: true, message: 'Error de conexión al cargar turnos.' });
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,19 +79,22 @@ const Turnos = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [fetchTurnos]);
 
   useEffect(() => {
     const fetchDisponibilidad = async () => {
       if (selectedDate && selectedStylist) {
-        // Corrección: El backend espera la fecha en formato 'YYYY-MM-DD'.
-        // La API de disponibilidad en el backend ya maneja la lógica de fines de semana,
-        // pero es importante enviar la fecha sin información de hora/zona para evitar desajustes.
-        const res = await api.getDisponibilidad(selectedDate, selectedStylist.id);
-        if (res.ok) {
-          setDisponibilidad(res.data[selectedStylist.id] || []);
-        } else {
+        try {
+          const res = await api.getDisponibilidad(selectedDate, selectedStylist.id);
+          if (res.ok) {
+            setDisponibilidad(res.data[selectedStylist.id] || []);
+          } else {
+            setDisponibilidad([]);
+            setInfoModal({ visible: true, message: res.message || 'No se pudo obtener la disponibilidad.' });
+          }
+        } catch (error) {
           setDisponibilidad([]);
+          setInfoModal({ visible: true, message: 'Error de conexión al cargar la disponibilidad.' });
         }
       } else {
         setDisponibilidad([]);
@@ -132,8 +135,12 @@ const Turnos = () => {
     const [h, m] = hora.split(':').map(Number);
     const minutosTurno = h * 60 + m;
 
-    // Obtener la fecha de hoy en formato YYYY-MM-DD, independientemente de la zona horaria.
-    const hoyStr = new Date().toLocaleDateString('en-CA');
+    // Obtener fecha actual en zona Argentina
+    const ahoraArg = new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+    const [fechaArg, horaArg] = ahoraArg.split(', ');
+    const [horaActual, minutoActual] = horaArg.split(':');
+    const minutosAhora = parseInt(horaActual) * 60 + parseInt(minutoActual);
 
     // 1. Si la fecha seleccionada es anterior a hoy, no hay nada disponible.
     if (selectedDate < hoyStr) {
@@ -142,8 +149,6 @@ const Turnos = () => {
 
     // 2. Si la fecha seleccionada es hoy, comprobar si la hora ya pasó.
     if (selectedDate === hoyStr) {
-      const ahora = new Date(); // Hora actual
-      const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
       if (minutosAhora >= minutosTurno) return false;
     }
 
@@ -172,15 +177,20 @@ const Turnos = () => {
   const handleCancelarClick = (turno) => setConfirmModal({ visible: true, turno });
 
   const confirmarCancelacion = async () => {
-    const turno = confirmModal.turno;
-    const res = await api.cancelTurno(turno.id);
-    if (res.ok) {
-      await fetchTurnos(); // Recargar turnos
-      setInfoModal({ visible: true, message: 'Turno cancelado correctamente.' });
-    } else {
-      setInfoModal({ visible: true, message: res.message || 'Error al cancelar el turno.' });
+    try {
+      const turno = confirmModal.turno;
+      const res = await api.cancelTurno(turno.id);
+      if (res.ok) {
+        await fetchTurnos(); // Recargar turnos
+        setInfoModal({ visible: true, message: 'Turno cancelado correctamente.' });
+      } else {
+        setInfoModal({ visible: true, message: res.message || 'Error al cancelar el turno.' });
+      }
+    } catch (error) {
+      setInfoModal({ visible: true, message: 'Error de conexión. No se pudo cancelar el turno.' });
+    } finally {
+      setConfirmModal({ visible: false, turno: null });
     }
-    setConfirmModal({ visible: false, turno: null });
   };
 
   const cerrarConfirmModal = () => setConfirmModal({ visible: false, turno: null });
@@ -208,16 +218,20 @@ const Turnos = () => {
       hora: selectedTime     // ya está en HH:MM
     };
 
-    const res = await api.createTurno(nuevoTurno);
-    if (res.ok) {
-      await fetchTurnos();
-      setInfoModal({ visible: true, message: '¡Turno reservado con éxito!' });
-      setSelectedDate('');
-      setSelectedTime('');
-      setSelectedService('');
-      setSelectedStylist('');
-    } else {
-      setInfoModal({ visible: true, message: res.message || 'Error al reservar el turno.' });
+    try {
+      const res = await api.createTurno(nuevoTurno);
+      if (res.ok) {
+        await fetchTurnos();
+        setInfoModal({ visible: true, message: '¡Turno reservado con éxito!' });
+        setSelectedDate('');
+        setSelectedTime('');
+        setSelectedService('');
+        setSelectedStylist('');
+      } else {
+        setInfoModal({ visible: true, message: res.message || 'Error al reservar el turno.' });
+      }
+    } catch (error) {
+      setInfoModal({ visible: true, message: 'Error de conexión. No se pudo reservar el turno.' });
     }
   };
 
