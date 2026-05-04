@@ -143,6 +143,12 @@ const getUserById = async id =>
   db.get('SELECT id, nombre, apellido, email, telefono, rol, avatar, creado_en FROM usuarios WHERE id = ?', [id]);
 
 const ensureExists = async (table, id, roleCheck) => {
+  // Esta validación previene SQL injection en caso de que `table` provenga de entrada del usuario (aunque actualmente se usa solo con valores internos).
+  const allowedTables = ['usuarios', 'servicios', 'turnos'];
+  if (!allowedTables.includes(table)) {
+    throw new Error('Tabla no permitida');
+  }
+
   const row = await db.get(`SELECT * FROM ${table} WHERE id=?`, [id]);
   if (!row) throw new Error(`${table} id inválido`);
   if (roleCheck && row.rol !== roleCheck) throw new Error(`${table} rol inválido`);

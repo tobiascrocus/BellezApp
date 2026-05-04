@@ -93,17 +93,24 @@ export default function AdministradorPeluquero() {
   }, [clienteSearch, usuarios]);
 
   const turnosFiltrados = useMemo(() => {
-    if (!selectedPeluqueroId) return [];
-    const [y, m, d] = selectedDate.split('-').map(Number);
-    const fechaRef = new Date(Date.UTC(y, m - 1, d)).toISOString().split('T')[0];
+    if (!selectedPeluqueroId || !config) return [];
+
     return turnos
-      .filter(
-        (turno) =>
-          turno.peluquero_id === selectedPeluqueroId &&
-          new Date(turno.fecha_timestamp).toISOString().startsWith(fechaRef)
-      )
+      .filter((turno) => {
+        if (turno.peluquero_id !== selectedPeluqueroId) return false;
+
+        // Formateamos la fecha del turno en la zona horaria del negocio para comparar (YYYY-MM-DD)
+        const turnoFechaStr = new Intl.DateTimeFormat('en-CA', {
+          timeZone: config.timeZone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(new Date(turno.fecha_timestamp));
+
+        return turnoFechaStr === selectedDate;
+      })
       .sort((a, b) => a.fecha_timestamp - b.fecha_timestamp);
-  }, [turnos, selectedPeluqueroId, selectedDate]);
+  }, [turnos, selectedPeluqueroId, selectedDate, config]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
