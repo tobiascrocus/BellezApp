@@ -1,20 +1,18 @@
-// Navbar.jsx
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useUser } from "../context/UserContext"
 import "../styles/Navbar.css";
 
 const NAV_BUTTONS = [
-  // El rol `null` es para usuarios no logueados
+  // El rol null representa a usuarios no logueados
   { nombre: "Inicio", ruta: "/", roles: ["admin", "peluquero", "cliente", null] },
   { nombre: "Quienes Somos", ruta: "/quienes-somos", roles: ["admin", "peluquero", "cliente", null] },
   { nombre: "Catálogo", ruta: "/catalogo", roles: ["admin", "peluquero", "cliente", null] },
   { nombre: "Turnos", ruta: "/turnos", roles: ["cliente", "admin", "peluquero"] },
   { nombre: "Admin Turnos", ruta: "/administrador-peluquero", roles: ["peluquero", "admin"] },
   { nombre: "Administrador", ruta: "/administrador", roles: ["admin"] },
-  { nombre: "Iniciar Sesión", ruta: "/login", roles: [null], isLogin: true }, // Botón de login para no logueados
-  { nombre: "Registro", ruta: "/registro", roles: [null], isRegister: true }, // Botón de registro para no logueados
+  { nombre: "Iniciar Sesión", ruta: "/login", roles: [null], isLogin: true },
+  { nombre: "Registro", ruta: "/registro", roles: [null], isRegister: true },
 ]
 
 const Navbar = () => {
@@ -25,7 +23,6 @@ const Navbar = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const navbarRef = useRef(null)
 
-  // Filtra los botones visibles según el rol del usuario.
   const visibleButtons = NAV_BUTTONS.filter((btn) => btn.roles.includes(user ? user.rol : null));
 
   const closeMenus = useCallback(() => {
@@ -94,8 +91,7 @@ const Navbar = () => {
                 )}
               </div>
             ) : (
-              // Este espacio ahora se maneja con el botón de Iniciar Sesión en NAV_BUTTONS
-              // para mantener la consistencia. Dejamos el contenedor para mantener la estructura.
+              // El contenedor se mantiene para preservar la estructura visual
               null
             )
           )}
@@ -113,7 +109,7 @@ const Navbar = () => {
               <span className="user-name">{user.nombre}</span>
               <img src={user.avatar} alt="avatar" className="user-avatar" />
             </div>
-          ) : ( // Botón de hamburguesa para usuarios no logueados
+          ) : (
             <div
               className={`navbar-hamburger ${menuOpen ? "active" : ""}`}
               onClick={() => setMenuOpen(!menuOpen)}
@@ -128,7 +124,6 @@ const Navbar = () => {
           ) 
         )}
 
-        {/* Menú móvil para usuario LOGUEADO */}
         {user && menuOpen && (
           <ul className={`navbar-menu ${menuOpen ? "open" : ""}`}>
             <li className="menu-user-info" onClick={handlePerfil}>
@@ -158,7 +153,6 @@ const Navbar = () => {
           </ul>
         )}
 
-        {/* Menú móvil para usuario NO LOGUEADO */}
         {!user && menuOpen && (
           <ul className={`navbar-menu ${menuOpen ? "open" : ""}`}>
             {visibleButtons.map(btn => (

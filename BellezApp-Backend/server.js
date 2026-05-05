@@ -1,6 +1,4 @@
-// server.js
-
-// ---------- IMPORTS ----------
+// ---------- DEPENDENCIAS ----------
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -12,7 +10,6 @@ const { zonedTimeToUtc, utcToZonedTime } = require('date-fns-tz');
 const helmet = require('helmet');
 const compression = require('compression');
 
-// ---------- CONSTANTES ----------
 const SERVER_PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -21,19 +18,17 @@ if (!JWT_SECRET) {
   process.exit(1);
 }
 
+// ---------- CONFIGURACIÓN DE NEGOCIO ----------
 const SALT_ROUNDS = 10;
-
 const USER_ROLES = { ADMIN: 'admin', PELUQUERO: 'peluquero', CLIENTE: 'cliente' };
 const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado', ASISTIO: 'asistio', NO_ASISTIO: 'no_asistio' };
 const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
-const SLOT_INTERVAL = 30; // minutos
+const SLOT_INTERVAL = 30;
 const MAX_TURNOS_CLIENTE = 3;
-
 const BUSINESS_TIMEZONE = process.env.BUSINESS_TIMEZONE || 'America/Argentina/Buenos_Aires';
 
-// --- Constantes para el Límite de Intentos de Contraseña ---
-const PASSWORD_ATTEMPT_LIMIT = 5; // Máximo de intentos fallidos
-const PASSWORD_ATTEMPT_WINDOW = 15 * 60 * 1000; // 15 minutos en milisegundos
+const PASSWORD_ATTEMPT_LIMIT = 5;
+const PASSWORD_ATTEMPT_WINDOW = 15 * 60 * 1000;
 const PASSWORD_LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos de bloqueo
 const failedPasswordAttempts = new Map(); // Almacén en memoria para los intentos
 
@@ -43,7 +38,7 @@ const LOGIN_ATTEMPT_WINDOW = 15 * 60 * 1000;
 const LOGIN_LOCKOUT_DURATION = 15 * 60 * 1000;
 const failedLoginAttempts = new Map(); // Almacén en memoria para los intentos de login
 
-// ---------- INICIALIZACIÓN EXPRESS ----------
+// ---------- INICIALIZACIÓN DEL SERVIDOR ----------
 const server = express();
 
 const allowedOrigins = process.env.CORS_ORIGINS 
@@ -73,7 +68,6 @@ const db = new sqlite3.Database('./bellezapp.db', err => {
   }
 });
 
-// Promisify para async/await
 db.get = util.promisify(db.get);
 db.all = util.promisify(db.all);
 db.runAsync = function(sql, params = []) {
@@ -107,14 +101,13 @@ const hashPassword = async password => bcrypt.hash(password, SALT_ROUNDS);
 const validateUser = (p, isUpdate = false) => {
   const { nombre, apellido, email, telefono, rol, password } = p;
 
-  // Validación de campos obligatorios para la creación
   if (!isUpdate) {
     if (!nombre || !apellido || !email || !password) {
       return 'Faltan campos requeridos: nombre, apellido, email y contraseña.';
     }
   }
 
-  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/; // Permite letras (con acentos, ñ, ü), espacios, apóstrofes y guiones.
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/; // Permite letras, acentos, espacios, apóstrofes y guiones
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const telRegex = /^\+?\d+$/;
 
@@ -143,7 +136,7 @@ const getUserById = async id =>
   db.get('SELECT id, nombre, apellido, email, telefono, rol, avatar, creado_en FROM usuarios WHERE id = ?', [id]);
 
 const ensureExists = async (table, id, roleCheck) => {
-  // Esta validación previene SQL injection en caso de que `table` provenga de entrada del usuario (aunque actualmente se usa solo con valores internos).
+  // Previene inyección SQL si el nombre de tabla es dinámico
   const allowedTables = ['usuarios', 'servicios', 'turnos'];
   if (!allowedTables.includes(table)) {
     throw new Error('Tabla no permitida');
@@ -181,7 +174,7 @@ const getLocalDayOfWeek = (timestamp) => {
 
 const checkConflict = async (peluqueroId, fechaHora, excludeId = null) => {
   const timestampMs = parseDate(fechaHora);
-  const ts = Math.floor(timestampMs / 1000); // SQLite unixepoch usa segundos
+  const ts = Math.floor(timestampMs / 1000); // SQLite unixepoch utiliza segundos
 
   let sql = `
     SELECT t.id FROM turnos t
@@ -209,7 +202,7 @@ const validateAppointment = async ({ id, usuarioId, peluqueroId, fechaHora, esta
   if ([0, 6].includes(getLocalDayOfWeek(timestamp))) return { ok: false, message: 'No se pueden reservar turnos en fines de semana' };
   if (!isWithinBusinessHours(timestamp)) return { ok: false, message: 'Turnos solo entre 9-12 y 17-21 con intervalos de 30 min.' };
 
-  // Verificar que el cliente no tenga otro turno a la misma hora (con cualquier peluquero)
+  // Evita que el cliente tenga otro turno simultáneo con distinto peluquero
   const mismoHorarioCliente = await db.get(
     `SELECT id FROM turnos 
      WHERE usuario_id = ? 
@@ -225,7 +218,7 @@ const validateAppointment = async ({ id, usuarioId, peluqueroId, fechaHora, esta
   const serv = await db.get('SELECT duracion_minutos FROM servicios WHERE id=?', [servicioId]);
   if (!serv) return { ok: false, message: 'Servicio inválido.' };
 
-  // Verificar solapamiento con cualquier otro turno confirmado del cliente (incluso parcial)
+  // Verifica solapamientos parciales con otros turnos confirmados del cliente
   const fechaStrSql = formatDate(timestamp);
   const turnosSolapados = await db.all(
     `SELECT t.id 
@@ -324,7 +317,6 @@ async function initDB() {
 
 initDB().catch(e => { console.error('Error inicializando DB:', e); process.exit(1); });
 
-// ---------- RUTA CONFIGURACIÓN ----------
 server.get('/api/config', (req, res) => {
   res.json({
     timeZone: BUSINESS_TIMEZONE,
@@ -333,9 +325,7 @@ server.get('/api/config', (req, res) => {
   });
 });
 
-// ---------- RUTAS AUTENTICACIÓN ----------
-
-// Registro de cliente
+// ---------- AUTENTICACIÓN ----------
 server.post('/api/register', asyncHandler(async (req, res) => {
   const error = validateUser(req.body);
   if (error) return sendResponse(res, false, null, error, 400);
@@ -353,12 +343,10 @@ server.post('/api/register', asyncHandler(async (req, res) => {
   sendResponse(res, true, null, '¡Te registraste correctamente! Inicia sesión para continuar.');
 }));
 
-// Login
 server.post('/api/login', asyncHandler(async (req, res) => {
   const { email, password, rememberMe } = req.body;
   if (!email || !password) return sendResponse(res, false, null, 'Email y contraseña requeridos', 400);
 
-  // --- NUEVO: Lógica de Rate Limiting para Login ---
   const now = Date.now();
   const attemptInfo = failedLoginAttempts.get(email.toLowerCase());
 
@@ -391,34 +379,27 @@ server.post('/api/login', asyncHandler(async (req, res) => {
     return sendResponse(res, false, null, 'El email o la contraseña no coinciden', 401);
   }
 
-  failedLoginAttempts.delete(email.toLowerCase()); // Limpiamos los intentos si el login es exitoso
+  failedLoginAttempts.delete(email.toLowerCase());
   const expiresIn = rememberMe ? '30d' : '8h';
   const token = jwt.sign({ id: user.id, rol: user.rol }, JWT_SECRET, { expiresIn });
   sendResponse(res, true, { token, rol: user.rol, id: user.id }, 'Login exitoso');
 }));
 
-// Obtener perfil propio
 server.get('/api/me', authenticateToken, asyncHandler(async (req, res) => {
   const user = await getUserById(req.usuario.id);
   if (!user) return sendResponse(res, false, null, 'Usuario no encontrado', 404);
   sendResponse(res, true, user);
 }));
 
-// Actualizar perfil propio
 server.put('/api/me', authenticateToken, asyncHandler(async (req, res) => {
   const userId = req.usuario.id;
   const { nombre, apellido, telefono, oldPassword, newPassword, avatar } = req.body;
 
-  // Validamos los campos, pasando newPassword como 'password' para la validación de longitud.
-  // El email se ignora intencionadamente para no permitir su modificación desde este endpoint.
+  // Se valida newPassword como password para verificar longitud mínima
   const error = validateUser({ nombre, apellido, telefono, password: newPassword || undefined }, true);
   if (error) return sendResponse(res, false, null, error, 400);
 
-  // --- Lógica de Contraseña ---
-  // Si se está intentando cambiar la contraseña (o se ha introducido la contraseña vieja por error),
-  // la validación es lo primero que debe ocurrir.
   if (oldPassword) {
-    // --- NUEVO: Lógica de Rate Limiting ---
     const now = Date.now();
     const attemptInfo = failedPasswordAttempts.get(userId);
 
@@ -433,10 +414,8 @@ server.put('/api/me', authenticateToken, asyncHandler(async (req, res) => {
     const validOldPassword = await bcrypt.compare(oldPassword, user.password_hash);
 
     if (!validOldPassword) {
-      // --- NUEVO: Registrar intento fallido ---
       let newAttemptInfo = attemptInfo || { count: 0, firstAttempt: now };
       
-      // Si el primer intento fue hace más de 15 minutos, reseteamos el contador.
       if (now - newAttemptInfo.firstAttempt > PASSWORD_ATTEMPT_WINDOW) {
         newAttemptInfo = { count: 0, firstAttempt: now };
       }
@@ -445,28 +424,23 @@ server.put('/api/me', authenticateToken, asyncHandler(async (req, res) => {
         newAttemptInfo.lockoutUntil = now + PASSWORD_LOCKOUT_DURATION;
       }
       failedPasswordAttempts.set(userId, newAttemptInfo);
-      // Si la contraseña anterior es incorrecta, detenemos TODO. No se actualiza nada.
       return sendResponse(res, false, null, 'La contraseña anterior es incorrecta.', 403);
     }
   }
 
-  // --- Lógica de Actualización de Campos ---
-  // El email no se incluye en los campos a actualizar directamente aquí.
   const fields = { nombre, apellido, telefono, avatar };
-  // Si la contraseña anterior fue válida Y se proporcionó una nueva, la hasheamos y la añadimos para actualizarla.
   if (oldPassword && newPassword) {
-    // --- NUEVO: Limpiar intentos fallidos si el cambio es exitoso ---
     failedPasswordAttempts.delete(userId);
     fields.password_hash = await hashPassword(newPassword);
   }
 
   await updateTable('usuarios', userId, fields);
 
-  const actualizado = await getUserById(userId); // Obtenemos el usuario actualizado sin el hash
+  const actualizado = await getUserById(userId);
   sendResponse(res, true, actualizado, 'Perfil actualizado correctamente');
 }));
 
-// ---------- RUTAS USUARIOS (solo admin) ----------
+// ---------- ADMINISTRACIÓN DE USUARIOS ----------
 server.get('/api/usuarios', authenticateToken, authorizeRoles(USER_ROLES.ADMIN), asyncHandler(async (req, res) => {
   const usuarios = await db.all('SELECT id, nombre, apellido, email, telefono, rol, avatar, creado_en FROM usuarios');
   sendResponse(res, true, usuarios);
@@ -502,7 +476,7 @@ server.put('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADM
   const current = await getUserById(id);
   if (!current) return sendResponse(res, false, null, 'Usuario no encontrado', 404);
 
-  // Impedir que un administrador cambie su propio rol
+  // Impide que un administrador degrade su propio rol
   if (parseInt(id) === req.usuario.id && req.body.rol !== undefined && req.body.rol !== current.rol) {
     return sendResponse(res, false, null, 'No puedes cambiar tu propio rol de administrador.', 400);
   }
@@ -512,7 +486,6 @@ server.put('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.ADM
 
   const { nombre, apellido, email, telefono, rol, password, avatar } = req.body;
 
-  // Verificar si el nuevo email ya está en uso por otro usuario
   if (email && email !== current.email) {
     const existing = await db.get('SELECT id FROM usuarios WHERE email = ? AND id != ?', [email, id]);
     if (existing) return sendResponse(res, false, null, 'El email ya está registrado por otro usuario.', 400);
@@ -530,18 +503,15 @@ server.delete('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.
   const idToDelete = parseInt(req.params.id);
   const loggedUserId = req.usuario.id;
 
-  // 1. Evitar que el administrador se elimine a sí mismo
   if (idToDelete === loggedUserId) {
     return sendResponse(res, false, null, 'No puedes eliminarte a ti mismo', 400);
   }
 
-  // 2. Verificar si el usuario existe y su rol
   const userToDelete = await db.get('SELECT rol FROM usuarios WHERE id = ?', [idToDelete]);
   if (!userToDelete) {
     return sendResponse(res, false, null, 'Usuario no encontrado', 404);
   }
 
-  // 3. Evitar eliminar al último administrador
   if (userToDelete.rol === USER_ROLES.ADMIN) {
     const admins = await db.get('SELECT COUNT(*) as total FROM usuarios WHERE rol = ?', [USER_ROLES.ADMIN]);
     if (admins.total <= 1) {
@@ -553,21 +523,20 @@ server.delete('/api/usuarios/:id', authenticateToken, authorizeRoles(USER_ROLES.
   sendResponse(res, true, null, 'Usuario eliminado');
 }));
 
-// ---------- RUTA PELUQUEROS ----------
 server.get('/api/peluqueros', authenticateToken, asyncHandler(async (req, res) => {
   const peluqueros = await db.all("SELECT id, nombre, apellido FROM usuarios WHERE rol = ?", [USER_ROLES.PELUQUERO]);
   sendResponse(res, true, peluqueros);
 }));
-// ---------- RUTAS SERVICIOS ----------
+
 server.get('/api/servicios', authenticateToken, asyncHandler(async (req, res) => {
   const servicios = await db.all('SELECT * FROM servicios');
   sendResponse(res, true, servicios);
 }));
 
-// ---------- RUTAS TURNOS ----------
+// ---------- GESTIÓN DE TURNOS ----------
 server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   const { rol, id } = req.usuario;
-  const { view } = req.query; // Leemos el parámetro 'view'
+  const { view } = req.query;
   let query = `
     SELECT t.*, unixepoch(t.fecha_hora) * 1000 as fecha_timestamp, (u.nombre || ' ' || u.apellido) AS cliente_nombre, (p.nombre || ' ' || p.apellido) AS peluquero_nombre, s.nombre AS servicio_nombre
     FROM turnos t
@@ -577,16 +546,12 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   `;
   const params = [];
 
-  // Solo admin y peluquero pueden acceder a la vista de agenda. 
-  // Si un cliente intenta acceder, se trata como su vista personal de "Mis Turnos".
   if (view === 'agenda' && (rol === USER_ROLES.ADMIN || rol === USER_ROLES.PELUQUERO)) {
     if (rol === USER_ROLES.PELUQUERO) {
       query += ' WHERE t.peluquero_id=?';
       params.push(id);
     }
-    // El admin no filtra (ve todos los turnos).
   } else {
-    // Vista "Mis Turnos": el usuario solo ve los turnos donde él es el cliente.
     query += ' WHERE t.usuario_id=?';
     params.push(id);
   }
@@ -594,7 +559,7 @@ server.get('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
 
   const turnos = await db.all(query, params);
 
-  // Lógica para tratar turnos pasados como "asistio" si siguen "confirmado"
+  // Marca turnos pasados como asistidos si permanecen confirmados
   const ahora = new Date();
   const turnosProcesados = turnos.map(turno => {
     const fechaTurno = turno.fecha_timestamp;
@@ -610,22 +575,18 @@ server.post('/api/turnos', authenticateToken, asyncHandler(async (req, res) => {
   const { rol, id: userIdFromToken } = req.usuario;
   let { usuario_id, peluquero_id, servicio_id, fecha, hora } = req.body;
 
-  // Un cliente solo puede reservar para sí mismo.
   if (rol === USER_ROLES.CLIENTE) {
     usuario_id = userIdFromToken;
   }
 
-  // Validar que llegaron fecha y hora
   if (!fecha || !hora) {
     return sendResponse(res, false, null, 'Debes enviar fecha y hora del turno.', 400);
   }
 
-  // Construir timestamp usando la zona horaria del negocio
   const fechaHoraStr = `${fecha} ${hora}:00`;
   const utcDate = zonedTimeToUtc(fechaHoraStr, BUSINESS_TIMEZONE);
   const timestamp = utcDate.getTime();
   
-
   const fechaStr = formatDate(timestamp);
   if (!fechaStr) return sendResponse(res, false, null, 'Fecha inválida', 400);
 
@@ -657,14 +618,13 @@ server.put('/api/turnos/:id', authenticateToken, asyncHandler(async (req, res) =
   if (!turno) return sendResponse(res, false, null, 'Turno no encontrado', 404);
   
   const { rol, id: userIdFromToken } = req.usuario;
-  // Solo el admin, el cliente dueño del turno o el peluquero asignado pueden modificarlo.
+
   if (rol !== USER_ROLES.ADMIN && turno.usuario_id !== userIdFromToken && turno.peluquero_id !== userIdFromToken) {
     return sendResponse(res, false, null, 'No tienes permiso para modificar este turno.', 403);
   }
 
   let { fecha_hora, estado, servicio_id, peluquero_id, usuario_id } = { ...turno, ...req.body };
 
-  // Un cliente no puede reasignar el turno a otro usuario.
   if (rol === USER_ROLES.CLIENTE) {
     usuario_id = turno.usuario_id;
   }
@@ -677,7 +637,7 @@ server.put('/api/turnos/:id', authenticateToken, asyncHandler(async (req, res) =
     fieldsToUpdate.servicio_id = servicio_id;
   }
 
-  // Solo validamos conflictos si se cambian datos que afectan la agenda y el turno está confirmado.
+  // Valida conflictos si el cambio afecta la agenda y el turno está confirmado
   if (rol === USER_ROLES.ADMIN && estado === APPOINTMENT_STATUS.CONFIRMADO) {
     const valid = await validateAppointment({ id, usuarioId: usuario_id, peluqueroId: peluquero_id, fechaHora: fecha_hora, estado, servicioId: servicio_id });
     if (!valid.ok) return sendResponse(res, false, null, valid.message, 400);
@@ -694,12 +654,11 @@ server.delete('/api/turnos/:id', authenticateToken, asyncHandler(async (req, res
   if (!turno) return sendResponse(res, false, null, 'Turno no encontrado', 404);
 
   const { rol, id: userIdFromToken } = req.usuario;
-  // Solo el admin, el cliente dueño del turno o el peluquero asignado pueden cancelarlo.
+
   if (rol !== USER_ROLES.ADMIN && turno.usuario_id !== userIdFromToken && turno.peluquero_id !== userIdFromToken) {
     return sendResponse(res, false, null, 'No tienes permiso para cancelar este turno.', 403);
   }
 
-  // Validación de tiempo para la cancelación (aplica a clientes y peluqueros)
   if (rol !== USER_ROLES.ADMIN) {
     const turnoTimestamp = parseDate(turno.fecha_hora);
     const diffHours = (turnoTimestamp - Date.now()) / (1000 * 60 * 60);
@@ -721,13 +680,11 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
   const { fecha, peluquero_id } = req.query;
   if (!fecha) return sendResponse(res, false, null, 'Fecha requerida (YYYY-MM-DD)', 400);
 
-  // Definimos el inicio y fin del día en la zona horaria del negocio
   const startDateTime = zonedTimeToUtc(`${fecha} 00:00:00`, BUSINESS_TIMEZONE);
   const endDateTime = zonedTimeToUtc(`${fecha} 23:59:59`, BUSINESS_TIMEZONE);
   const startOfDayUTC = startDateTime.getTime();
   const endOfDayUTC = endDateTime.getTime();
 
-  // Validar fin de semana usando la zona horaria del negocio
   const zonedDate = utcToZonedTime(new Date(startDateTime), BUSINESS_TIMEZONE);
   const dayOfWeek = zonedDate.getDay();
   if ([0, 6].includes(dayOfWeek)) return sendResponse(res, false, null, 'No se pueden reservar turnos en fines de semana', 400);
@@ -736,7 +693,6 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
     ? [await ensureExists('usuarios', peluquero_id, USER_ROLES.PELUQUERO)]
     : await db.all('SELECT id, nombre, apellido FROM usuarios WHERE rol=?', [USER_ROLES.PELUQUERO]);
 
-  // Obtener todos los turnos confirmados para la fecha y peluqueros seleccionados
   const turnosDelDia = await db.all(`
     SELECT t.peluquero_id, unixepoch(t.fecha_hora) * 1000 as start_ts, s.duracion_minutos
     FROM turnos t
@@ -756,7 +712,7 @@ server.get('/api/disponibilidad', authenticateToken, asyncHandler(async (req, re
           const slotTime = slotDateTime.getTime();
           
           const ocupado = turnosPeluquero.some(turno => {
-            const turnoStart = turno.start_ts; // Usamos el timestamp directamente de la DB
+            const turnoStart = turno.start_ts;
             const turnoEnd = turnoStart + turno.duracion_minutos * 60 * 1000;
             return slotTime >= turnoStart && slotTime < turnoEnd;
           });
@@ -776,5 +732,4 @@ server.use((err, req, res, next) => {
   sendResponse(res, false, null, 'Error interno del servidor', 500);
 });
 
-// ---------- INICIO DEL SERVIDOR ----------
 server.listen(SERVER_PORT, () => console.log(`Servidor corriendo en puerto ${SERVER_PORT}`));

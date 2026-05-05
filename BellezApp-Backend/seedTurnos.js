@@ -1,18 +1,14 @@
-// seedTurnos.js - Generar turnos dinámicamente alrededor de la fecha actual
-require('dotenv').config(); // Cargar variables de entorno
+require('dotenv').config();
 const sqlite3 = require('sqlite3').verbose();
 const { zonedTimeToUtc } = require('date-fns-tz');
 
 const DB_PATH = './bellezapp.db';
 
-// Constantes (deben coincidir con backend)
 const USER_ROLES = { PELUQUERO: 'peluquero' };
 const APPOINTMENT_STATUS = { CONFIRMADO: 'confirmado', CANCELADO: 'cancelado', ASISTIO: 'asistio', NO_ASISTIO: 'no_asistio' };
 const BUSINESS_HOURS = [{ start: 9, end: 12 }, { start: 17, end: 21 }];
-// Zona horaria del negocio desde .env (por defecto Argentina)
 const BUSINESS_TIMEZONE = process.env.BUSINESS_TIMEZONE || 'America/Argentina/Buenos_Aires';
 
-// Función para obtener días hábiles entre dos fechas
 function getWeekdaysInRange(startDate, endDate) {
   const weekdays = [];
   let current = new Date(startDate);
@@ -26,7 +22,6 @@ function getWeekdaysInRange(startDate, endDate) {
   return weekdays;
 }
 
-// Generar todos los slots de un día (horas disponibles)
 function getSlotsForDay() {
   const slots = [];
   for (const block of BUSINESS_HOURS) {
@@ -46,7 +41,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
   console.log('Conectado a la base de datos.');
 
   try {
-    // Obtener peluqueros
     const peluqueros = await new Promise((resolve, reject) => {
       db.all('SELECT id FROM usuarios WHERE rol = ?', [USER_ROLES.PELUQUERO], (err, rows) => {
         if (err) reject(err);
@@ -55,7 +49,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
     });
     if (peluqueros.length === 0) throw new Error('No hay peluqueros. Ejecuta seedUsuarios.js primero.');
 
-    // Obtener clientes
     const clientes = await new Promise((resolve, reject) => {
       db.all('SELECT id FROM usuarios WHERE rol = ?', ['cliente'], (err, rows) => {
         if (err) reject(err);
@@ -64,7 +57,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
     });
     if (clientes.length === 0) throw new Error('No hay clientes. Ejecuta seedUsuarios.js primero.');
 
-    // Obtener servicios
     const servicios = await new Promise((resolve, reject) => {
       db.all('SELECT id, duracion_minutos FROM servicios', (err, rows) => {
         if (err) reject(err);
@@ -73,7 +65,7 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
     });
     if (servicios.length === 0) throw new Error('No hay servicios. Verifica initDB.');
 
-    // Fechas dinámicas: desde hoy -15 días hasta hoy +15 días (rango de 31 días)
+    // Genera turnos en un rango de 31 días (actual +/- 15)
     const today = new Date();
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - 15);
@@ -88,14 +80,14 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
     const slotsPorDia = getSlotsForDay();
     console.log(`Slots por día: ${slotsPorDia.length}`);
     
-    // Probabilidad de crear un turno en un slot dado (por peluquero)
+    // Probabilidad de asignación de turno por slot para cada peluquero
     const PROB_TURNO = 0.25;
     
     let turnosCreados = 0;
     let turnosFallidos = 0;
     
     for (const dia of weekdays) {
-      // Fecha local en YYYY-MM-DD (sin conversión UTC)
+      // Evita conversiones UTC prematuras para mantener la fecha local correcta
       const fechaLocal = `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, '0')}-${String(dia.getDate()).padStart(2, '0')}`;
       const esPasado = dia < today;
       
@@ -103,18 +95,17 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
         for (const slot of slotsPorDia) {
           if (Math.random() > PROB_TURNO) continue;
           
-          // Elegir servicio aleatorio
           const servicio = servicios[Math.floor(Math.random() * servicios.length)];
           const duracionHoras = servicio.duracion_minutos / 60;
           let horaFin = slot.hour + duracionHoras;
-          // Verificar que no exceda el bloque horario
+
+          // Asegura que el turno finalice dentro del bloque horario correspondiente
           const bloque = (slot.hour < 12) ? BUSINESS_HOURS[0] : BUSINESS_HOURS[1];
           if (horaFin > bloque.end) continue;
           
-          // Elegir cliente aleatorio
           const cliente = clientes[Math.floor(Math.random() * clientes.length)];
           
-          // Determinar estado según fecha
+          // Define el estado del turno según si la fecha es pasada
           let estado;
           if (esPasado) {
             const rand = Math.random();
@@ -126,11 +117,10 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
             estado = rand < 0.9 ? APPOINTMENT_STATUS.CONFIRMADO : APPOINTMENT_STATUS.CANCELADO;
           }
           
-          // Construir fecha/hora local en string (ej. "2026-05-18 09:30:00")
           const horaStr = `${String(slot.hour).padStart(2, '0')}:${String(slot.minute).padStart(2, '0')}:00`;
           const fechaHoraLocalStr = `${fechaLocal} ${horaStr}`;
           
-          // Convertir a UTC usando la zona horaria del negocio
+          // Convierte a UTC utilizando la zona horaria configurada para el negocio
           const utcDate = zonedTimeToUtc(fechaHoraLocalStr, BUSINESS_TIMEZONE);
           const fechaHora = utcDate.toISOString().replace('T', ' ').slice(0, 19);
           

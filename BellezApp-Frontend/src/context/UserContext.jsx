@@ -7,17 +7,14 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
  
-  // Memorizamos logout para que sea una dependencia estable
+  // Memoriza logout para mantener una dependencia estable
   const logout = useCallback(() => {
-    localStorage.removeItem('token'); // Limpiamos ambos almacenamientos
+    localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setUser(null);
-    // Opcional: redirigir al login
-    // window.location.href = '/login';
   }, []);
 
-  // Función para obtener los datos del usuario desde el backend usando el token
-  // Usamos useCallback para que fetchUser sea estable y no dispare el useEffect innecesariamente
+  // Evita disparos innecesarios de useEffect mediante useCallback
   const fetchUser = useCallback(async () => {
     try {
       const data = await api.getMe();
@@ -32,14 +29,14 @@ export const UserProvider = ({ children }) => {
   }, [logout]);
 
   useEffect(() => {
-    // Busca el token primero en localStorage, luego en sessionStorage.
+    // Busca el token en ambos almacenamientos para persistir la sesión
     const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (storedToken) {
       fetchUser().finally(() => setLoading(false));
     } else {
-      setLoading(false); // Si no hay token, terminamos de cargar
+      setLoading(false);
     }
-  }, [fetchUser]); // Ahora podemos incluir fetchUser sin warnings ni bucles infinitos
+  }, [fetchUser]);
   
   const login = async (token, rememberMe) => {
     if (rememberMe) {
@@ -47,7 +44,7 @@ export const UserProvider = ({ children }) => {
     } else {
       sessionStorage.setItem('token', token);
     }
-    await fetchUser(); // Obtenemos los datos del usuario después de iniciar sesión
+    await fetchUser();
   };
 
   const updateUser = async () => {

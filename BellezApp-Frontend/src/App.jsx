@@ -1,5 +1,3 @@
-// App.jsx
-
 import { useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
@@ -26,7 +24,7 @@ function AppWrapper() {
   const location = useLocation()
   const hideNavFooter = ['/login', '/registro'].includes(location.pathname)
 
-  // Mueve la lógica de ScrollToTop aquí
+  // Asegura el desplazamiento al inicio en cada cambio de ruta
   useLayoutEffect(() => {
     window.scrollTo({
       top: 0,
@@ -49,20 +47,20 @@ function AppWrapper() {
             className="page-transition-wrapper"
           >
             <Routes location={location}>
-              {/* Rutas Públicas */}
+              {/* // Rutas públicas */}
               <Route path="/" element={<Inicio />} />
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Registro />} />
               <Route path="/quienes-somos" element={<QuienesSomos />} />
               <Route path="/catalogo" element={<Catalogo />} />
 
-              {/* Rutas Protegidas para cualquier usuario logueado */}
+              {/* // Rutas con autenticación obligatoria */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/turnos" element={<Turnos />} />
                 <Route path="/perfil" element={<Perfil />} />
               </Route>
 
-              {/* Rutas Protegidas por Rol */}
+              {/* // Rutas restringidas por rol */}
               <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                 <Route path="/administrador" element={<Administrador />} />
               </Route>
@@ -70,7 +68,7 @@ function AppWrapper() {
                 <Route path="/administrador-peluquero" element={<AdministradorPeluquero />} />
               </Route>
 
-              {/* Ruta para manejar el error 404 */}
+              {/* // Manejo de rutas inexistentes */}
               <Route path="*" element={<NoEncontrada />} />
             </Routes>
           </motion.div>

@@ -1,14 +1,11 @@
-// seedUsuarios.js - Poblar la base de datos con datos de prueba
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 
 const DB_PATH = './bellezapp.db';
 const SALT_ROUNDS = 10;
 
-// Roles
 const USER_ROLES = { ADMIN: 'admin', PELUQUERO: 'peluquero', CLIENTE: 'cliente' };
 
-// Datos predefinidos
 const admins = [
   { nombre: 'Tobias', apellido: 'Tinaro', email: 'tobiascrocus@hotmail.com', telefono: '+1234567890', rol: USER_ROLES.ADMIN, password: '123456' },
   { nombre: 'Admin', apellido: 'Admin', email: 'admin@hotmail.com', telefono: '+5493548304875', rol: USER_ROLES.ADMIN, password: 'admin' }
@@ -21,7 +18,7 @@ const peluqueros = [
   { nombre: 'Pedro', apellido: 'Gomez', email: 'peluquero4@hotmail.com', telefono: '+5493548334688', rol: USER_ROLES.PELUQUERO, password: 'peluquero4' }
 ];
 
-// Función para barajar un array (Fisher-Yates)
+// Algoritmo Fisher-Yates para barajar arrays
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -30,7 +27,7 @@ function shuffleArray(arr) {
   return arr;
 }
 
-// Generar 44 clientes realistas (hombres argentinos)
+// Genera datos de clientes realistas para pruebas
 const generarClientes = () => {
   const nombres = [
     'Juan', 'Carlos', 'Luis', 'Martín', 'Diego', 'Javier', 'Fernando', 'Pablo', 'Sergio', 'Alejandro',
@@ -49,13 +46,13 @@ const generarClientes = () => {
     '2211234567', '2212345678', '2213456789', '2214567890', '2231234567', '2232345678', '2233456789', '2234567890'
   ];
 
-  // Barajar nombres y apellidos para que no aparezcan siempre en el mismo orden
+  // Asegura aleatoriedad en la combinación de nombres y apellidos
   const shuffledNombres = shuffleArray([...nombres]);
   const shuffledApellidos = shuffleArray([...apellidos]);
 
   const clientes = [];
   for (let i = 0; i < 44; i++) {
-    // Índices con pasos primos para dispersar uniformemente
+    // Utiliza pasos primos para una dispersión uniforme de datos
     const nombreIdx = (i * 13) % shuffledNombres.length;
     const apellidoIdx = (i * 7) % shuffledApellidos.length;
     const telefonoIdx = i % telefonos.length;
@@ -71,7 +68,7 @@ const generarClientes = () => {
       email,
       telefono,
       rol: USER_ROLES.CLIENTE,
-      password: 'cliente'  // contraseña más robusta
+      password: 'cliente'
     });
   }
   return clientes;
@@ -80,7 +77,6 @@ const generarClientes = () => {
 const clientes = generarClientes();
 const todosUsuarios = [...admins, ...peluqueros, ...clientes];
 
-// Conectar a la DB
 const db = new sqlite3.Database(DB_PATH, async (err) => {
   if (err) {
     console.error('Error conectando a la DB para seed:', err.message);
@@ -89,7 +85,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
   console.log('Conectado a la base de datos para seed.');
 
   try {
-    // Verificar si ya hay usuarios
     const count = await new Promise((resolve, reject) => {
       db.get('SELECT COUNT(*) as total FROM usuarios', (err, row) => {
         if (err) reject(err);
@@ -105,7 +100,6 @@ const db = new sqlite3.Database(DB_PATH, async (err) => {
 
     console.log('Tabla usuarios vacía. Insertando datos de prueba...');
 
-    // Hashear contraseñas e insertar
     let insertados = { admin: 0, peluquero: 0, cliente: 0 };
     for (const user of todosUsuarios) {
       const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
