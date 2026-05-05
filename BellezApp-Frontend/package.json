@@ -1,6 +1,7 @@
 {
   "name": "bellezapp-frontend",
   "private": true,
+  "author": "Tobias Tinaro",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

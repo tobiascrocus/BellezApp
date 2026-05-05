@@ -9,7 +9,7 @@
     "seedTurnos": "node seedTurnos.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tobias Tinaro",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
