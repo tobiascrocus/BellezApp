@@ -5,6 +5,8 @@ import "../styles/Administrador.css";
 
 const roles = ["admin", "peluquero", "cliente"];
 
+// ---------- ESTADO DEL COMPONENTE ----------
+
 export default function Administrador() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +36,8 @@ export default function Administrador() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // ---------- LÓGICA DE FILTRADO, ORDENAMIENTO Y PAGINACIÓN ----------
+
   const filteredUsers = users
     .filter(u => filterRole === "Todos" || u.rol === filterRole)
     .filter(u =>
@@ -49,6 +53,8 @@ export default function Administrador() {
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // ---------- EFECTOS Y CARGA DE DATOS ----------
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -86,6 +92,8 @@ export default function Administrador() {
     };
   }, []);
 
+  // ---------- MANEJADORES DE EVENTOS ----------
+
   const handleClearFilters = () => {
     setSearch("");
     setFilterRole("Todos");
@@ -105,14 +113,13 @@ export default function Administrador() {
 
   const handleEdit = (user) => {
     setEditUserId(user.id);
-    setTempUser({ ...user, password: "" }); // Inicializamos la contraseña vacía al editar
+    setTempUser({ ...user, password: "" });
     setShowEditUserPassword(false);
   };
 
   const handleSave = () => {
     setSaveConfirmModal({ visible: true });
   };
-
   const confirmSave = async () => {
     setIsSaving(true);
     // La contraseña solo se envía si se ha modificado.
@@ -127,7 +134,7 @@ export default function Administrador() {
 
       setUsers(users.map(u => u.id === editUserId ? data.data : u));
       setEditUserId(null);
-    } catch (err) {
+    } catch (err) { // Captura y muestra errores de la API
       setErrorModal({ visible: true, message: err.message });
     } finally {
       setIsSaving(false);
@@ -149,7 +156,7 @@ export default function Administrador() {
 
       setUsers(users.filter(u => u.id !== deleteUserId));
       setDeleteUserId(null);
-    } catch (err) {
+    } catch (err) { // Captura y muestra errores de la API
       setErrorModal({ visible: true, message: err.message });
       setDeleteUserId(null);
     } finally {
@@ -175,8 +182,8 @@ export default function Administrador() {
       setModalOpen(false);
       setCurrentPage(1);
 
-    } catch (err) {
-      // El modal de error ya está en el componente, solo necesitamos actualizar su estado
+    } catch (err) { // Captura y muestra errores de la API
+      // El modal de error ya está en el componente, solo actualiza su estado.
       setErrorModal({ visible: true, message: err.message });
     }
   };
@@ -259,6 +266,8 @@ export default function Administrador() {
       </motion.tr>
     );
   };
+
+  // ---------- RENDERIZADO DEL COMPONENTE ----------
 
   return (
     <section className="admin-container">
