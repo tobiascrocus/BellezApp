@@ -16,7 +16,7 @@ export default function Registro() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Función de validación consistente con Perfil.jsx y el backend
+  // Validación consistente con el perfil y el servidor
   const validateForm = () => {
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,12 +43,12 @@ export default function Registro() {
     if (password.length < 6) {
       return 'La contraseña debe tener al menos 6 caracteres.';
     }
-    return null; // Sin errores
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Limpiamos el error anterior
+    setError('');
     setSuccess('');
     setIsLoading(true);
 
@@ -73,7 +73,6 @@ export default function Registro() {
       }
 
       setSuccess(data.message || '¡Usuario registrado correctamente!');
-      // Limpiamos el formulario
       setNombre(''); setApellido(''); setEmail(''); setTelefono(''); setPassword(''); setConfirmPassword('');
 
     } catch (err) {

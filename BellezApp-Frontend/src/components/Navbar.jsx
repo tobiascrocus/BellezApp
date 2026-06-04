@@ -91,7 +91,6 @@ const Navbar = () => {
                 )}
               </div>
             ) : (
-              // El contenedor se mantiene para preservar la estructura visual
               null
             )
           )}

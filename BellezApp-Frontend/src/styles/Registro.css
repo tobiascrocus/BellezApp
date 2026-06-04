@@ -151,23 +151,21 @@
   min-height: 1.2rem;
   display: flex;
   align-items: center;
-  /* Se ajusta el espacio con el gap y el margin-top del botón */
 }
 
 .registro-error {
   color: var(--color-accent2);
   font-size: 0.9rem;
   margin: 0;
-  padding-left: 0.2rem; /* Pequeño padding para alinear con el texto del input */
+  padding-left: 0.2rem;
 }
 
 .registro-success {
-  color: #4CAF50; /* Verde para mensajes de éxito */
+  color: #4CAF50;
   font-size: 0.9rem;
   margin: 0;
   padding-left: 0.2rem;
 }
-
 
 .registro-card .login-link {
   text-align: center;
@@ -196,7 +194,7 @@
     align-items: center;
     height: 100vh;
     overflow-y: auto;
-    padding: 0.5rem 1rem; /* Reducimos el padding superior */
+    padding: 0.5rem 1rem;
     gap: 0;
   }
 
@@ -204,18 +202,18 @@
   .registro-right {
     flex: unset;
     width: 100%;
-    padding: 0 1rem; /* Eliminamos padding vertical del contenedor del título */
+    padding: 0 1rem;
     text-align: center;
     align-items: center;
   }
 
   .registro-left {
-    margin-bottom: 1.5rem; /* Aumentamos el margen para separar el título de la tarjeta */
+    margin-bottom: 1.5rem;
   }
 
   .registro-left h1 {
     padding-left: 0;
-    margin-top: 0; /* Eliminamos el margen superior del título */
+    margin-top: 0;
   }
 
   .nombre-apellido {

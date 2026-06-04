@@ -13,7 +13,6 @@ const avatars = Array.from({ length: 21 }, (_, i) =>
 export default function Perfil() {
   const { user, updateUser } = useUser();
 
-  // Usamos un estado local para los campos del formulario
   const [formData, setFormData] = useState({ ...user });
   const [editMode, setEditMode] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,28 +24,24 @@ export default function Perfil() {
   const [errorModal, setErrorModal] = useState({ isOpen: false, message: "" });
   const [success, setSuccess] = useState("");
 
-  // Sincronizamos el estado del formulario si el usuario del contexto cambia
   useEffect(() => {
     if (user) {
       setFormData({ ...user });
     }
   }, [user]);
 
-  // Maneja cambios en los inputs del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEditMode = () => {
-    // Al entrar en modo edición, reseteamos los estados a los del usuario actual
     setFormData({ ...user });
     setEditMode(true);
     setErrorModal({ isOpen: false, message: "" });
     setSuccess("");
   };
 
-  // Función de validación en el frontend
   const validateForm = () => {
     const { nombre, apellido, telefono } = formData;
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
@@ -69,7 +64,7 @@ export default function Perfil() {
         return 'El teléfono es inválido. Debe contener solo números y tener entre 7 y 15 dígitos.';
       }
     }
-    return null; // Sin errores
+    return null;
   };
 
   const handleSave = async () => {
@@ -77,16 +72,15 @@ export default function Perfil() {
     setErrorModal({ isOpen: false, message: "" });
     setSuccess("");
 
-    // Buscamos el token en ambos almacenamientos para asegurar la autenticación.
+    // Búsqueda del token en ambos almacenamientos para asegurar la autenticación
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    if (!token) { // Verificamos si el token existe
+    if (!token) {
       setErrorModal({ isOpen: true, message: "No estás autenticado." });
       setIsLoading(false);
       return;
     }
 
-    // 1. Validar en el frontend ANTES de enviar
     const validationError = validateForm();
     if (validationError) {
       setErrorModal({ isOpen: true, message: validationError });
@@ -94,7 +88,6 @@ export default function Perfil() {
       return;
     }
 
-    // Construimos el payload con los campos del formulario
     const payload = {
       nombre: formData.nombre,
       apellido: formData.apellido,
@@ -102,7 +95,7 @@ export default function Perfil() {
       avatar: formData.avatar,
     };
 
-    // Si se introduce una nueva contraseña, la anterior es obligatoria.
+    // La contraseña anterior es obligatoria si se introduce una nueva
     if (newPassword.trim()) {
       payload.newPassword = newPassword;
       if (!oldPassword.trim()) {
@@ -111,7 +104,6 @@ export default function Perfil() {
         return;
       }
     }
-    // Si se introduce la contraseña anterior (para cambiarla o por error), la incluimos.
     if (oldPassword.trim()) {
       payload.oldPassword = oldPassword;
     }
@@ -128,14 +120,13 @@ export default function Perfil() {
 
     } catch (err) {
       setErrorModal({ isOpen: true, message: err.message || "Error desconocido." });
-      setOldPassword(""); // Limpiamos la contraseña anterior en caso de error
+      setOldPassword("");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Al cancelar, simplemente volvemos al modo de vista
     setEditMode(false);
     setNewPassword("");
     setOldPassword("");
@@ -147,11 +138,11 @@ export default function Perfil() {
     setFormData(prev => ({ ...prev, avatar: img }));
   };
 
-  // Si el usuario no ha cargado, no mostramos nada para evitar errores
   if (!user) {
     return <div className="perfil-container"><p>Cargando perfil...</p></div>;
   }
 
+  // ---------- VISTA ----------
   return (
     <section className={`perfil-container ${editMode ? "edit-mode" : ""}`}>
       <h1 className="perfil-titulo">Mi Perfil</h1>
@@ -182,7 +173,6 @@ export default function Perfil() {
                 <input type="text" name="apellido" value={formData.apellido} onChange={handleInputChange} placeholder="Apellido" autoComplete="off"/>
                 <input type="email" name="email" value={formData.email} placeholder="Correo electrónico" readOnly />
                 <input type="tel" name="telefono" value={formData.telefono || ''} onChange={handleInputChange} placeholder="Teléfono" autoComplete="off"/>
-                {/* --- Contraseña Anterior con Ojito --- */}
                 <div className="perfil-password-container">
                   <input type={showOldPassword ? 'text' : 'password'} name="oldPassword" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} placeholder="Contraseña anterior" autoComplete="new-password"/>
                   <img
@@ -192,7 +182,6 @@ export default function Perfil() {
                     onClick={() => setShowOldPassword(!showOldPassword)}
                   />
                 </div>
-                {/* --- Nueva Contraseña con Ojito --- */}
                 <div className="perfil-password-container">
                   <input type={showNewPassword ? 'text' : 'password'} name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Nueva contraseña" autoComplete="new-password"/>
                   <img

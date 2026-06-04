@@ -2,14 +2,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const ConfigContext = createContext(null);
 
-// Valores de respaldo para asegurar el funcionamiento sin conexión
+// Asegura el funcionamiento sin conexión
 const DEFAULT_CONFIG = {
   timeZone: 'America/Argentina/Buenos_Aires',
   businessHours: [{ start: 9, end: 12 }, { start: 17, end: 21 }],
   slotInterval: 30
 };
 
-// Reintenta la petición para mitigar fallos temporales de red
+// Mitiga fallos temporales de red
 const fetchWithRetry = async (url, retries = 3, interval = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {

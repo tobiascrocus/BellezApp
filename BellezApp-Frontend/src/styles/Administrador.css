@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1; /* <-- ¡Y esta es la otra clave! Se estira para llenar .main-content */
+  flex: 1;
 }
 
 .admin-container h1 {
@@ -86,7 +86,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Custom Dropdown Styles */
 .custom-dropdown {
   position: relative;
   display: inline-block;
@@ -106,7 +105,7 @@
   min-width: 150px;
   transition: all 0.2s ease;
   width: 100%;
-  font-size: 1rem; /* Añadido para consistencia */
+  font-size: 1rem;
 }
 
 .dropdown-trigger:hover {
@@ -139,7 +138,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-weight: 600;
-  font-size: 1rem; /* Añadido para consistencia */
+  font-size: 1rem;
 }
 
 .dropdown-item:hover {
@@ -155,13 +154,12 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 10px;
-  table-layout: fixed; /* columnas con ancho fijo */
+  table-layout: fixed;
 }
 
 .admin-table th,
 .admin-table td {
-  padding: 1rem; /* Aumentamos el padding para dar más altura a las filas */
-  padding: 0.5rem 1rem; /* Reducimos el padding para filas más delgadas */
+  padding: 0.5rem 1rem;
   text-align: left;
   box-sizing: border-box;
   overflow: hidden;
@@ -170,21 +168,20 @@
   cursor: pointer;
 }
 
-/* Anchos fijos por columna */
 .admin-table th:nth-child(1),
-.admin-table td:nth-child(1) { width: 120px; } /* Nombre */
+.admin-table td:nth-child(1) { width: 120px; }
 .admin-table th:nth-child(2),
-.admin-table td:nth-child(2) { width: 120px; } /* Apellido */
+.admin-table td:nth-child(2) { width: 120px; }
 .admin-table th:nth-child(3),
-.admin-table td:nth-child(3) { width: 200px; } /* Email */
+.admin-table td:nth-child(3) { width: 200px; }
 .admin-table th:nth-child(4),
-.admin-table td:nth-child(4) { width: 130px; } /* Teléfono */
+.admin-table td:nth-child(4) { width: 130px; }
 .admin-table th:nth-child(5),
-.admin-table td:nth-child(5) { width: 120px; } /* Rol */
-.admin-table th:nth-child(6), /* Contraseña */
-.admin-table td:nth-child(6) { width: 200px; } /* Aumentamos el ancho para que el input sea más largo */
+.admin-table td:nth-child(5) { width: 120px; }
+.admin-table th:nth-child(6),
+.admin-table td:nth-child(6) { width: 200px; }
 .admin-table th:nth-child(7),
-.admin-table td:nth-child(7) { width: 220px; } /* Acciones */
+.admin-table td:nth-child(7) { width: 220px; }
 
 .admin-table tbody tr {
   background: var(--color-bg-card);
@@ -198,31 +195,28 @@
 }
 
 .admin-table th:last-child {
-  text-align: right; /* Alinea el texto con los botones */
+  text-align: right;
 }
 
 .admin-table th.sorted {
   color: var(--color-accent2);
 }
 
-
-
 .admin-table td input,
 .admin-table td select {
-  width: 90%; /* Hacemos el input más angosto que la celda */
-  padding: 0.5rem 0.8rem; /* Reducimos el padding horizontal para más espacio */
+  width: 90%;
+  padding: 0.5rem 0.8rem;
   border-radius: var(--radius);
-  border: none; /* Sin borde para una apariencia más limpia */
-  background: var(--color-bg-dark); /* Un fondo más oscuro para que se distinga */
+  border: none;
+  background: var(--color-bg-dark);
   color: var(--color-text-light);
   box-sizing: border-box;
-  font-size: inherit; /* Hereda el tamaño de fuente de la celda */
-  font-family: inherit; /* Hereda la fuente de la celda */
-  display: block; /* Necesario para que el margen automático funcione */
-  margin: 0 auto; /* Centra el input dentro de la celda */
+  font-size: inherit;
+  font-family: inherit;
+  display: block;
+  margin: 0 auto;
 }
 
-/* Table Dropdown Styles */
 .table-dropdown {
   position: relative;
   width: 90%;
@@ -284,10 +278,9 @@
 }
 
 .admin-table td.editing-cell {
-  padding: 0; /* Elimina el padding de la celda en modo edición */
+  padding: 0;
 }
 
-/* Permite que el dropdown se vea por encima de otras filas */
 .admin-table td.dropdown-open {
   overflow: visible;
 }
@@ -296,29 +289,24 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%; /* Hacemos que ocupe todo el ancho de la celda */
-  margin: 0; /* Eliminamos el margen para que se alinee a la izquierda */
+  width: 100%;
+  margin: 0;
 }
 
 .admin-password-container input {
-  padding-right: 2.5rem; /* Espacio para el ícono */
+  padding-right: 2.5rem;
   width: 100%;
 }
 
 .admin-password-toggle-icon {
   position: absolute;
-  right: 1.2rem; /* Aumentamos la distancia desde el borde derecho */
+  right: 1.2rem;
   cursor: pointer;
   width: 20px;
   height: 20px;
-  filter: invert(1); /* Cambia el color del ícono de negro a blanco */
-  /* El centrado vertical lo hereda del flex container */
+  filter: invert(1);
 }
 
-
-.admin-table td.editing-cell {
-  padding: 0; /* Elimina el padding de la celda en modo edición */
-}
 .admin-table td:last-child {
   text-align: right;
 }
@@ -336,7 +324,7 @@
   transition: all 0.2s ease;
   display: inline-block;
   text-align: center;
-  width: 105px; /* Ancho fijo para todos los botones */
+  width: 105px;
 }
 
 .btn-edit,
@@ -378,21 +366,20 @@
 }
 
 .no-users-found {
-  text-align: center !important; /* Asegura el centrado */
+  text-align: center !important;
   padding: 3rem 1rem;
   color: var(--color-text-muted);
   font-style: italic;
   font-size: 1.1rem;
 }
 
-/* --- Skeleton Loader --- */
 .skeleton-row td {
   padding: 0.5rem 1rem;
 }
 
 .skeleton-bar {
   width: 100%;
-  height: 24px; /* Altura similar a la del texto */
+  height: 24px;
   background: linear-gradient(
     90deg,
     var(--color-bg-card) 25%,
@@ -464,7 +451,6 @@
   border: 3px solid var(--color-accent);
 }
 
-/* Estilo específico para el modal de agregar usuario para evitar conflictos */
 .admin-user-modal-content {
   background: var(--color-bg-dark);
   padding: 2rem;
@@ -483,33 +469,30 @@
 
 .modal-inputs input,
 .modal-inputs select {
-  width: 80%;            /* antes 100% */
-  max-width: 300px;      /* limita el tamaño máximo */
-  margin: 0 auto 0.75rem auto; /* centra y mantiene margen inferior */
+  width: 80%;
+  max-width: 300px;
+  margin: 0 auto 0.75rem auto;
   padding: 0.7rem;
   border-radius: var(--radius);
   border: 1px solid var(--color-bg-dark);
   background: var(--color-bg-card);
   color: var(--color-text-light);
-  display: block;        /* necesario para centrar con margin auto */
+  display: block;
 }
 
-/* Ajuste para el contenedor de contraseña en el modal */
 .modal-inputs .admin-password-container {
   width: 80%;
   max-width: 300px;
-  margin: 0 auto 0.75rem auto; /* Lo centramos y le damos margen inferior, igual que a los otros inputs */
+  margin: 0 auto 0.75rem auto;
 }
 
-/* Hacemos que el input de contraseña DENTRO del modal tenga el mismo tamaño y estilo que los otros */
 .modal-inputs .admin-password-container input {
-  /* 1. Hereda los estilos de .modal-inputs input, pero los ajustamos */
-  width: 100%; /* Ocupa todo el ancho de su contenedor */
-  padding: 0.7rem; /* Padding igual a los otros inputs */
-  padding-right: 3.5rem; /* Sobrescribimos el padding derecho para el ojo */
-  box-sizing: border-box; /* Asegura que el padding no aumente el tamaño total */
-  margin: 0; /* El margen lo controla el div contenedor */
-  display: block; /* Asegura que se comporte como un bloque */
+  width: 100%;
+  padding: 0.7rem;
+  padding-right: 3.5rem;
+  box-sizing: border-box;
+  margin: 0;
+  display: block;
 }
 
 .modal-dropdown {
@@ -525,7 +508,6 @@
   gap: 1rem;
   margin-top: 1.5rem;
 }
-
 
 .modal-buttons button {
   padding: 0.6rem 1.2rem;
@@ -548,12 +530,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilo para modales de confirmación (más angostos) */
 .admin-confirm-modal {
   background: var(--color-bg-dark);
   padding: 2rem;
   border-radius: var(--radius);
-  max-width: 450px; /* Ancho más adecuado para confirmaciones */
+  max-width: 450px;
   width: 90%;
   text-align: center;
   border: 3px solid var(--color-accent);

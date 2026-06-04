@@ -1,3 +1,4 @@
+// Formateo de fecha y hora basado en la zona horaria del negocio
 export const formatHora = (timestamp, timeZone = 'America/Argentina/Buenos_Aires') => {
   return new Date(timestamp).toLocaleTimeString('es-AR', {
     hour: '2-digit',

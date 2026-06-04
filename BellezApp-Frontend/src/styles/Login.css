@@ -1,4 +1,3 @@
-/* Wrapper principal */
 .login-wrapper {
   display: flex;
   height: 100vh;
@@ -11,7 +10,6 @@
   overflow: hidden;
 }
 
-/* Lado izquierdo */
 .login-left {
   flex: 1;
   display: flex;
@@ -53,7 +51,6 @@
   white-space: pre-line;
 }
 
-/* Lado derecho */
 .login-right {
   flex: 1;
   display: flex;
@@ -64,7 +61,6 @@
   max-height: 100%;
 }
 
-/* Card de login */
 .login-card {
   background: linear-gradient(145deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 100%);
   padding: 4rem;
@@ -97,7 +93,7 @@
   border-radius: var(--radius);
   background: var(--color-bg-card);
   color: var(--color-text-light);
-  width: 100%; /* Aseguramos que ocupe todo el ancho */
+  width: 100%;
   transition: border 0.3s, box-shadow 0.3s;
 }
 
@@ -107,33 +103,27 @@
   outline: none;
 }
 
-/* --- Contenedor para el input de contraseña y el ícono --- */
 .password-input-container {
-  /* 1. Creamos un contexto de posicionamiento para el ícono. */
   position: relative;
-  /* 2. El contenedor en sí no necesita margen, se lo daremos a los inputs. */
 }
 
-/* 3. Devolvemos el margen inferior al input de email para separarlo del de contraseña. */
 .login-card input[type="email"] {
   margin-bottom: 1.5rem;
 }
 
 .password-input-container input {
-  /* 3. Añadimos padding al input para que el texto no quede debajo del ícono. */
   padding-right: 4rem;
 }
 
 .password-toggle-icon {
-  /* 4. Posicionamiento absoluto RELATIVO AL CONTENEDOR. */
   position: absolute;
   top: 50%;
   right: 1.5rem;
-  transform: translateY(-50%); /* 5. Este es el truco para un centrado vertical perfecto. */
+  transform: translateY(-50%);
   cursor: pointer;
   width: 24px;
   height: 24px;
-  filter: invert(1); /* Cambia el color del ícono de negro a blanco */
+  filter: invert(1);
   transition: transform 0.2s ease;
 }
 
@@ -147,7 +137,7 @@
   background: var(--color-accent);
   color: var(--color-bg-dark);
   transition: all 0.3s ease;
-  margin-top: 0; /* Eliminamos el margen superior para acercarlo al contenido de arriba */
+  margin-top: 0;
 }
 
 .login-card button:hover {
@@ -156,37 +146,34 @@
   transform: scale(1.05);
 }
 
-/* --- NUEVO ENFOQUE PARA "MANTENER SESIÓN INICIADA" --- */
 .form-group-remember {
-  display: flex; /* Usamos flexbox para alinear los elementos */
-  margin-top: 1rem; /* 4. Le damos un margen superior para separarlo del input de contraseña. */
+  display: flex;
+  margin-top: 1rem;
   gap: 0.5rem;
-  margin-bottom: 0.5rem; /* Y un pequeño margen inferior para separarlo del botón/error. */
-  align-items: flex-start; /* Alineamos los elementos por su parte superior */
+  margin-bottom: 0.5rem;
+  align-items: flex-start;
 }
 
 .checkbox-wrapper {
-  /* Este contenedor no necesita estilos, pero es útil para la estructura */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px; /* Ajuste fino para bajar el checkbox y alinearlo con el texto */
+  margin-top: 1px;
 }
 
 .form-group-remember input[type="checkbox"] {
-  appearance: none; /* Reseteamos la apariencia del checkbox */
+  appearance: none;
   width: 18px;
   height: 18px;
   border: 2px solid var(--color-text-muted);
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  overflow: hidden; /* Oculta el círculo cuando está fuera de la caja */
+  overflow: hidden;
   background-color: var(--color-bg-card);
-  transition: border-color 0.3s ease; /* Transición suave para el borde */
+  transition: border-color 0.3s ease;
 }
 
-/* Círculo dorado animado (inicialmente invisible) */
 .form-group-remember input[type="checkbox"]::before {
   content: '';
   position: absolute;
@@ -202,40 +189,35 @@
 
 .form-group-remember input[type="checkbox"]:checked {
   border-color: var(--color-accent);
-  /* Efecto de resplandor dorado */
   box-shadow: 0 0 8px rgba(255, 193, 7, 0.7), 0 0 12px rgba(255, 152, 0, 0.5);
 }
 
 .form-group-remember input[type="checkbox"]:checked::before {
-  width: 200%; /* Hacemos el círculo más grande que la caja para llenarla por completo */
+  width: 200%;
   height: 200%;
 }
 
 .remember-label {
   color: var(--color-text-muted);
   font-size: 0.9rem;
-  user-select: none; /* Evita que el texto se pueda seleccionar */
+  user-select: none;
 }
 
-/* Contenedor del mensaje de error para reservar espacio */
 .error-container {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem; /* Reducimos el espacio para acercar el botón */
-  /* Eliminamos la altura mínima para que no ocupe espacio cuando está vacío */
+  margin-bottom: 0.5rem;
 }
 
-/* Mensaje de error */
 .login-error {
   color: var(--color-accent2);
   font-size: 0.9rem;
-  margin: 0; /* Eliminamos los márgenes */
+  margin: 0;
 }
 
-/* Link de olvidaste contraseña */
 .forgot-password-link {
   text-align: center;
-  margin-top: 1rem; /* Añade espacio sobre este enlace */
+  margin-top: 1rem;
   font-size: 0.9rem;
 }
 
@@ -245,9 +227,9 @@
   transition: color 0.3s;
 }
 .forgot-password-link a:hover {
-  color: #ff4d4d; /* Un rojo más brillante al pasar el mouse */
+  color: #ff4d4d;
 }
-/* Link de registro */
+
 .login-card .register-link {
   text-align: center;
   margin-top: 1.5rem;
@@ -268,7 +250,6 @@
   text-decoration: underline;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .login-wrapper {
     flex-direction: column;
@@ -343,7 +324,6 @@
   }
 }
 
-/* Clase para ocultar elementos visualmente pero mantenerlos accesibles */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -356,7 +336,6 @@
   border-width: 0;
 }
 
-/* Modal de "Olvidaste Contraseña" */
 .login-modal-overlay {
   position: fixed;
   top: 0;
@@ -396,8 +375,8 @@
 }
 
 .login-modal-content .modal-email {
-  display: inline-block; /* Para que el margen funcione */
-  margin-top: 0.5rem; /* Espacio sobre el email */
+  display: inline-block;
+  margin-top: 0.5rem;
   font-weight: bold;
   color: var(--color-accent2);
 }

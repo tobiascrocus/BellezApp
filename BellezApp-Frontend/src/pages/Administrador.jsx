@@ -5,7 +5,7 @@ import "../styles/Administrador.css";
 
 const roles = ["admin", "peluquero", "cliente"];
 
-// ---------- ESTADO DEL COMPONENTE ----------
+// ---------- ESTADO Y LÓGICA ----------
 
 export default function Administrador() {
   const [users, setUsers] = useState([]);
@@ -36,8 +36,6 @@ export default function Administrador() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // ---------- LÓGICA DE FILTRADO, ORDENAMIENTO Y PAGINACIÓN ----------
-
   const filteredUsers = users
     .filter(u => filterRole === "Todos" || u.rol === filterRole)
     .filter(u =>
@@ -53,8 +51,6 @@ export default function Administrador() {
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  // ---------- EFECTOS Y CARGA DE DATOS ----------
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -122,10 +118,10 @@ export default function Administrador() {
   };
   const confirmSave = async () => {
     setIsSaving(true);
-    // La contraseña solo se envía si se ha modificado.
+    // La contraseña solo se envía si se ha modificado
     const payload = { ...tempUser };
     if (!payload.password || payload.password.trim() === "") {
-      delete payload.password; // No enviar la contraseña si el campo está vacío
+      delete payload.password;
     }
 
     try {
@@ -134,7 +130,7 @@ export default function Administrador() {
 
       setUsers(users.map(u => u.id === editUserId ? data.data : u));
       setEditUserId(null);
-    } catch (err) { // Captura y muestra errores de la API
+    } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     } finally {
       setIsSaving(false);
@@ -156,7 +152,7 @@ export default function Administrador() {
 
       setUsers(users.filter(u => u.id !== deleteUserId));
       setDeleteUserId(null);
-    } catch (err) { // Captura y muestra errores de la API
+    } catch (err) {
       setErrorModal({ visible: true, message: err.message });
       setDeleteUserId(null);
     } finally {
@@ -177,13 +173,11 @@ export default function Administrador() {
       const data = await api.createUsuario(newUser);
       if (!data.ok) throw new Error(data.message || "Error al crear el usuario.");
 
-      // Añadimos el nuevo usuario al principio de la lista
+      // Añade el nuevo usuario al principio de la lista
       setUsers([data.data, ...users]);
       setModalOpen(false);
       setCurrentPage(1);
-
-    } catch (err) { // Captura y muestra errores de la API
-      // El modal de error ya está en el componente, solo actualiza su estado.
+    } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     }
   };
@@ -267,7 +261,7 @@ export default function Administrador() {
     );
   };
 
-  // ---------- RENDERIZADO DEL COMPONENTE ----------
+// ---------- RENDERIZADO ----------
 
   return (
     <section className="admin-container">

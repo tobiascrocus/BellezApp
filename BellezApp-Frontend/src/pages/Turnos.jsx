@@ -10,13 +10,12 @@ import es from 'date-fns/locale/es';
 import 'react-datepicker/dist/react-datepicker.css';
 import { formatHora, formatFecha, formatFechaHoraCompleta } from '../utils/fecha';
 
-// Registramos el idioma español para el calendario
 registerLocale('es', es);
 
-// Contenedor animado para el DatePicker (fuera del componente principal)
 const AnimatedPopper = ({ children }) => {
   return (
     <motion.div
+      // Contenedor animado para el DatePicker fuera del componente principal
       initial={{ opacity: 0, y: -10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.2 }}
@@ -27,6 +26,8 @@ const AnimatedPopper = ({ children }) => {
 };
 
 const Turnos = () => {
+  // ---------- COMPONENTE Y ESTADO ----------
+
   const { user } = useUser();
   const config = useConfig();
 
@@ -66,6 +67,8 @@ const Turnos = () => {
       eveningSlots: slots.filter(h => parseInt(h.split(':')[0]) >= 12)
     };
   }, [config]);
+
+  // ---------- CARGA DE DATOS ----------
 
   const fetchTurnos = useCallback(async () => {
     try {
@@ -141,12 +144,14 @@ const Turnos = () => {
 
   const handleSelect = (setter, value, closeDropdown) => {
     setter(value);
-    setSelectedTime(''); // Deselecciona el horario al cambiar cualquier opción
+    setSelectedTime(''); // Deselecciona el horario al cambiar cualquier opción para evitar errores
     closeDropdown(false);
   };
 
   const turnosActivos = turnos.filter(t => t.estado === 'confirmado');
   const historialTurnos = turnos.filter(t => t.estado !== 'confirmado');
+
+  // ---------- VALIDACIONES Y LÓGICA ----------
 
   const isTurnoDisponible = (hora) => {
     if (!selectedDate || !selectedService || !selectedStylist) return false;
@@ -188,7 +193,6 @@ const Turnos = () => {
       const turno = confirmModal.turno;
       const res = await api.cancelTurno(turno.id);
       if (res.ok) {
-        await fetchTurnos(); // Recargar turnos
         setInfoModal({ visible: true, message: 'Turno cancelado correctamente.' });
       } else {
         setInfoModal({ visible: true, message: res.message || 'Error al cancelar el turno.' });
@@ -221,8 +225,6 @@ const Turnos = () => {
       usuario_id: user.id,
       peluquero_id: selectedStylist.id,
       servicio_id: selectedService.id,
-      fecha: selectedDate,   // ya está en YYYY-MM-DD
-      hora: selectedTime     // ya está en HH:MM
     };
 
     try {
@@ -241,6 +243,8 @@ const Turnos = () => {
       setInfoModal({ visible: true, message: 'Error de conexión. No se pudo reservar el turno.' });
     }
   };
+
+  // ---------- RENDERIZADO DE COMPONENTES ----------
 
   const renderHorarioButton = (hora) => {
     const datosIncompletos = !selectedDate || !selectedService || !selectedStylist;
@@ -272,7 +276,6 @@ const Turnos = () => {
     );
   };
 
-  // Función para deshabilitar fines de semana en el calendario
   const isWeekday = (date) => ![0, 6].includes(date.getDay());
 
   return (
@@ -378,6 +381,8 @@ const Turnos = () => {
         <p><strong>Cancelar un turno:</strong> Hacerlo con al menos 3 horas de anticipación para evitar inconvenientes.</p>
       </section>
 
+      // ---------- FORMULARIO DE RESERVA ----------
+
       <section className="reservador-turnos">
         <h3>Reservar un turno</h3>
 
@@ -387,7 +392,7 @@ const Turnos = () => {
             <DatePicker
               selected={selectedDate ? new Date(`${selectedDate}T00:00:00`) : null}
               onChange={(date) => {
-                // Formateamos la fecha a YYYY-MM-DD para mantener la consistencia con el backend
+                // Formateo de fecha para mantener consistencia con el backend
                 const pad = (n) => String(n).padStart(2, '0');
                 const formattedDate = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
                 setSelectedDate(formattedDate);
@@ -397,11 +402,11 @@ const Turnos = () => {
               filterDate={isWeekday}
               dateFormat="dd/MM/yyyy"
               placeholderText="Seleccionar fecha"
-              className="custom-datepicker-input" // Clase para el input
-              calendarClassName="custom-datepicker-calendar" // Clase para el calendario
+              className="custom-datepicker-input"
+              calendarClassName="custom-datepicker-calendar"
               wrapperClassName="datepicker-wrapper"
-              locale="es" // ¡Aquí establecemos el idioma!
-              disabledKeyboardNavigation // Evita el foco automático al cambiar de mes
+              locale="es"
+              disabledKeyboardNavigation // Evita el foco automático al cambiar de mes para accesibilidad
               popperContainer={AnimatedPopper}
             />
           </div>

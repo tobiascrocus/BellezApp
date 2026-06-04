@@ -16,7 +16,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Si el usuario ya está logueado, lo redirigimos a la página de inicio
+    // Redirige al inicio si la sesión ya está activa
     if (user) {
       navigate('/');
     }
@@ -31,10 +31,8 @@ export default function Login() {
       const data = await api.login(email, password, rememberMe);
       if (!data.ok) throw new Error(data.message || 'Error al iniciar sesión.');
 
-      // Guardamos el token en el contexto, que se encargará de obtener los datos del usuario
       await login(data.data.token, rememberMe);
 
-      // Redirección basada en el rol
       if (data.data.rol === 'admin') navigate('/administrador');
       else if (data.data.rol === 'peluquero') navigate('/administrador-peluquero');
       else navigate('/turnos');
@@ -70,7 +68,6 @@ export default function Login() {
               onChange={e => setEmail(e.target.value)}
               required
             />
-            {/* Volvemos a agrupar el input y el ícono en su propio contenedor */}
             <div className="password-input-container">
               <input
                 type={showPassword ? 'text' : 'password'}

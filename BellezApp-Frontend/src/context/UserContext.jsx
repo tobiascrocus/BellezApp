@@ -7,14 +7,13 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
  
-  // Memoriza logout para mantener una dependencia estable
+  // Mantiene una dependencia estable para el cierre de sesión
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setUser(null);
   }, []);
 
-  // Evita disparos innecesarios de useEffect mediante useCallback
   const fetchUser = useCallback(async () => {
     try {
       const data = await api.getMe();
@@ -29,7 +28,7 @@ export const UserProvider = ({ children }) => {
   }, [logout]);
 
   useEffect(() => {
-    // Busca el token en ambos almacenamientos para persistir la sesión
+    // Persiste la sesión buscando el token en ambos almacenamientos
     const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (storedToken) {
       fetchUser().finally(() => setLoading(false));

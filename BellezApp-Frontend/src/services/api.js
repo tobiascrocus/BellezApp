@@ -1,16 +1,11 @@
 import { API_BASE } from '../config';
 
-/**
- * Obtiene el token guardado en localStorage
- * Corrección: Busca el token primero en localStorage y luego en sessionStorage.
- */
+// Busca el token en localStorage y sessionStorage
 function getToken() {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
 }
 
-/**
- * Encabezados por defecto
- */
+// Configuración de encabezados con autorización
 function getHeaders(isJson = true) {
   const headers = {};
   if (isJson) headers['Content-Type'] = 'application/json';
@@ -19,9 +14,6 @@ function getHeaders(isJson = true) {
   return headers;
 }
 
-/**
- * Helper para peticiones GET
- */
 async function get(endpoint) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method: 'GET',
@@ -30,9 +22,6 @@ async function get(endpoint) {
   return res.json();
 }
 
-/**
- * Helper para peticiones POST
- */
 async function post(endpoint, data) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method: 'POST',
@@ -42,9 +31,6 @@ async function post(endpoint, data) {
   return res.json();
 }
 
-/**
- * Helper para peticiones PUT
- */
 async function put(endpoint, data) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method: 'PUT',
@@ -54,9 +40,6 @@ async function put(endpoint, data) {
   return res.json();
 }
 
-/**
- * Helper para peticiones DELETE
- */
 async function del(endpoint) {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method: 'DELETE',
@@ -65,7 +48,7 @@ async function del(endpoint) {
   return res.json();
 }
 
-/** --- ENDPOINTS --- */
+// ENDPOINTS
 
 // Autenticación
 export const login = (email, password, rememberMe) => post('/login', { email, password, rememberMe });
@@ -75,7 +58,7 @@ export const registerUser = (data) => post('/register', data);
 export const getMe = () => get('/me');
 export const updateMe = (data) => put('/me', data);
 
-// Usuarios (solo admin)
+// Usuarios para administración
 export const getUsuarios = () => get('/usuarios');
 export const getUsuarioById = (id) => get(`/usuarios/${id}`);
 export const createUsuario = (data) => post('/usuarios', data);

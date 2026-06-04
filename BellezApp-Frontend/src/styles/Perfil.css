@@ -1,3 +1,4 @@
+/* ---------- PERFIL PRINCIPAL ---------- */
 .perfil-container {
   background: var(--color-bg-dark);
   color: var(--color-text-light);
@@ -18,6 +19,7 @@
   text-align: center;
 }
 
+/* ---------- TARJETA Y AVATAR ---------- */
 .perfil-card {
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(200, 161, 93, 0.8);
@@ -53,7 +55,6 @@
   text-align: center;
 }
 
-/* Contenedor para el contenido animado dentro de perfil-info */
 .perfil-info-content {
   display: flex;
   flex-direction: column;
@@ -89,8 +90,9 @@
   font-weight: 400;
 }
 
+/* ---------- FORMULARIOS Y BOTONES ---------- */
 .perfil-info input {
-  width: 100%;  
+  width: 100%;
   margin-bottom: 0.75rem;
   padding: 0.7rem;
   font-size: 1rem;
@@ -124,16 +126,15 @@
   outline: none;
 }
 
-/* --- NUEVO: Estilos para el contenedor de contraseña y el ojito --- */
 .perfil-password-container {
   position: relative;
   width: 100%;
-  margin-bottom: 0.75rem; /* Mantenemos el espacio entre inputs */
+  margin-bottom: 0.75rem;
 }
 
 .perfil-password-container input {
-  margin-bottom: 0; /* El margen ahora lo controla el contenedor */
-  padding-right: 3rem; /* Espacio para el ícono */
+  margin-bottom: 0;
+  padding-right: 3rem;
 }
 
 .perfil-password-toggle-icon {
@@ -142,12 +143,11 @@
   right: 0.8rem;
   transform: translateY(-50%);
   cursor: pointer;
-  width: 20px; /* Tamaño más adecuado para estos inputs */
+  width: 20px;
   height: 20px;
-  filter: invert(1); /* Cambia el color del ícono de negro a blanco */
+  filter: invert(1);
 }
 
-/* Botón Editar Perfil (modo lectura) */
 .perfil-info .btn-editar {
   display: block;
   margin: 1.5rem auto 0 auto;
@@ -170,17 +170,15 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* CONTENEDOR DE BOTONES - CORREGIDO */
 .perfil-botones {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 15px;
-  margin-top: 1.5rem; /* Aumentamos el espacio para compensar la falta de errores en línea */
+  margin-top: 1.5rem;
   width: 100%;
 }
 
-/* BOTONES DENTRO DEL PERFIL - ESTILOS ESPECÍFICOS */
 .perfil-botones .btn-guardar,
 .perfil-botones .btn-cancelar {
   padding: 0.7rem 1.5rem;
@@ -222,12 +220,12 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* MODAL STYLES */
+/* ---------- MODALES ---------- */
 .modal-overlay {
   position: fixed;
-  top: 0; 
+  top: 0;
   left: 0;
-  width: 100%; 
+  width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.7);
   display: flex;
@@ -282,7 +280,6 @@
   transform: scale(1.15);
 }
 
-/* Botón cerrar del modal */
 .btn-cerrar {
   padding: 0.7rem 1.5rem;
   font-size: 1rem;
@@ -305,7 +302,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Mensajes de error y éxito */
 .perfil-error, .perfil-success {
   width: 100%;
   padding: 0.75rem;
@@ -325,7 +321,6 @@
   color: #4dff96;
 }
 
-/* --- Modal de Error --- */
 .perfil-modal-overlay {
   position: fixed;
   top: 0;
@@ -336,7 +331,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10001; /* Un z-index alto para estar sobre el modal de avatares */
+  z-index: 10001; /* Por encima del modal de avatares */
 }
 
 .perfil-modal-content {
@@ -346,13 +341,13 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
-  border: 2px solid var(--color-accent); /* Borde dorado para consistencia */
+  border: 2px solid var(--color-accent);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
 .perfil-modal-content h3 {
   font-family: var(--font-title);
-  color: var(--color-accent2); /* Título en rojo */
+  color: var(--color-accent2);
   font-size: 1.5rem;
   margin-top: 0;
   margin-bottom: 1rem;
@@ -362,7 +357,7 @@
   color: var(--color-text-light);
   line-height: 1.5;
   margin-bottom: 1.5rem;
-  white-space: pre-line; /* Permite que los saltos de línea (\n) funcionen */
+  white-space: pre-line; /* Permite saltos de línea en el mensaje */
 }
 
 .perfil-modal-buttons {
@@ -387,29 +382,27 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* --- Media Queries para Responsividad --- */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
-  /* Ajusta el modal de avatares para móviles */
   .avatar-selector {
-    grid-template-columns: repeat(3, 1fr); /* Cambia a 3 columnas */
-    gap: 15px; /* Aumenta un poco el espacio para que sea más fácil de tocar */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
 
   .avatar-option {
-    width: 70px; /* Hacemos los avatares un poco más grandes */
+    width: 70px;
     height: 70px;
   }
 
-  /* Ajusta el contenedor principal para eliminar espacio muerto */
   .perfil-container {
-    min-height: auto; /* Quitamos la altura mínima para que se ajuste al contenido */
-    justify-content: flex-start; /* Alineamos la tarjeta al inicio (arriba) */
-    padding-top: 3rem; /* Aumentamos el espacio superior para separarlo del navbar */
-    padding-bottom: 2rem; /* Añadimos espacio inferior para que no quede pegado al footer */
+    min-height: auto;
+    justify-content: flex-start;
+    padding-top: 3rem;
+    padding-bottom: 2rem;
   }
 
   .perfil-titulo {
-    font-size: 1.8rem; /* Hacemos el título un poco más pequeño */
-    margin-bottom: 0.8rem; /* Reducimos el margen inferior del título */
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
   }
 }

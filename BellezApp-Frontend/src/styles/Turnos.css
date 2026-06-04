@@ -6,7 +6,7 @@
   color: var(--color-text-light);
 }
 
-/* ===== MIS TURNOS ===== */
+/* Mis turnos */
 .mis-turnos-box {
   background-color: var(--color-bg-medium);
   border-radius: var(--radius);
@@ -99,7 +99,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* ===== MODAL HISTORIAL ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -181,18 +180,15 @@
 
 @media (max-width: 768px) {
   .modal-content {
-    min-width: 0; /* Eliminamos el ancho mínimo */
-    width: 100%; /* Ocupa todo el ancho disponible */
+    min-width: 0;
+    width: 100%;
   }
   .historial-card {
-    white-space: normal; /* Permitimos que el texto se divida en varias líneas */
+    white-space: normal;
   }
 }
-.modal-content .btn-cancelar:hover {
-  background: #ff4d4d;
-}
 
-/* ===== CÓMO RESERVAR ===== */
+/* Cómo reservar */
 .turnos-info {
   background: linear-gradient(135deg, var(--color-bg-medium) 0%, var(--color-bg-card) 100%);
   border-radius: var(--radius);
@@ -220,7 +216,6 @@
   padding-left: 1.5rem;
 }
 
-/* ===== RESERVADOR ===== */
 .reservador-turnos {
   background: linear-gradient(135deg, var(--color-bg-medium) 0%, #2A2A2A 100%);
   border-radius: var(--radius);
@@ -292,7 +287,6 @@
   box-shadow: 0 0 8px rgba(200, 161, 93, 0.4);
 }
 
-/* Turnos Custom Dropdown Styles */
 .turnos-dropdown {
   position: relative;
   display: inline-block;
@@ -377,7 +371,6 @@
   justify-content: center;
 }
 
-/* HORARIOS */
 .horario-btn {
   position: relative;
   padding: 0.6rem 1.2rem;
@@ -387,15 +380,14 @@
   background: var(--color-accent);
   color: #000;
   transition: all 0.2s ease;
-  width: 80px;       
-  height: 40px;       
+  width: 80px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;     
+  flex-shrink: 0;
   box-sizing: border-box;
 }
-
 
 .horario-btn:hover:not(.reservado) {
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
@@ -417,7 +409,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
-/* ===== BOTÓN RESERVAR ===== */
 .reservar-btn {
   margin-top: 1.5rem;
   padding: 0.9rem 2.5rem;
@@ -443,7 +434,6 @@
   cursor: not-allowed;
 }
 
-/* ===== SIN TURNOS MENSAJE ===== */
 .sin-turnos-msg {
   color: var(--color-text-muted);
   font-size: 1.1rem;
@@ -451,7 +441,6 @@
   margin-bottom: 2rem;
 }
 
-/* ===== MODAL CONFIRMACIÓN CANCELACIÓN ===== */
 .confirm-modal-overlay {
   position: fixed;
   top: 0;
@@ -532,7 +521,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* ===== LOADING OVERLAY ===== */
 .loading-overlay {
   position: fixed;
   top: 0;

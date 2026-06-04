@@ -20,14 +20,13 @@
 
 .agenda-controls {
   display: flex;
-  gap: 1rem; /* Espacio uniforme entre los dos primeros elementos */
+  gap: 1rem;
   flex-wrap: wrap;
-  justify-content: center; /* Mantenemos la justificación */
-  margin-bottom: 3rem; /* Mantenemos el margen */
-  /* Eliminamos estilos de caja para que se parezca a la sección de filtros de Turnos */
+  justify-content: center;
+  margin-bottom: 3rem;
   background-color: transparent;
   padding: 0;
-  align-items: baseline; /* Alinea los items por su línea base, ideal para controles de formulario */
+  align-items: baseline;
   box-shadow: none;
 }
 
@@ -35,24 +34,22 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: 220px; /* Reducimos un poco el ancho para mejor ajuste */
-  align-items: stretch; /* Estiramos los elementos para que ocupen el ancho */
+  width: 220px;
+  align-items: stretch;
 }
 
-/* Hacemos que el contenedor del botón no se estire y tenga su propio margen */
 .agenda-control-group:last-child {
-  width: auto; /* Permite que el ancho se ajuste al botón */
-  margin-left: 1rem; /* Espacio entre la fecha y el botón */
+  width: auto;
+  margin-left: 1rem;
 }
 
 .agenda-control-group label {
   font-weight: 600;
   color: var(--color-text-light);
   font-size: 1rem;
-  text-align: center; /* Centramos el texto de la etiqueta */
+  text-align: center;
 }
 
-/* Etiqueta invisible para mantener la alineación */
 .label-placeholder {
   visibility: hidden;
 }
@@ -60,10 +57,10 @@
 .agenda-controls input[type="date"] {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.7rem 1.2rem; /* Ajustamos el padding para que coincida */
+  padding: 0.7rem 1.2rem;
   border-radius: var(--radius);
   border: 1px solid rgba(200, 161, 93, 0.7);
-  background: var(--color-bg-card); /* Usamos el mismo fondo que en Turnos.jsx */
+  background: var(--color-bg-card);
   color: var(--color-text-light);
   font-weight: 600;
   cursor: pointer;
@@ -83,7 +80,6 @@
   outline: none;
 }
 
-/* --- Estilos de Dropdown copiados de Turnos.css --- */
 .agenda-dropdown {
   position: relative;
   display: inline-block;
@@ -156,12 +152,12 @@
 
 .agenda-view h2 {
   font-family: var(--font-title);
-  color: var(--color-text-light); /* Volvemos al blanco para legibilidad */
+  color: var(--color-text-light);
   margin-bottom: 2rem;
   font-size: 1.8rem;
-  padding-bottom: 0.75rem; /* Espacio entre el texto y la línea */
-  border-bottom: 2px solid var(--color-accent); /* Línea dorada inferior */
-  display: inline-block; /* Para que el borde se ajuste al texto */
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-accent);
+  display: inline-block;
 }
 
 .turnos-list {
@@ -169,48 +165,47 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  max-width: 600px; /* Ancho máximo para las tarjetas */
-  margin: 0 auto; /* Centra la lista de tarjetas */
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .turno-agenda-card {
   display: flex;
   align-items: center;
   background: var(--color-bg-card);
-  padding: 0.8rem 1.5rem; /* Reducimos el padding vertical */
+  padding: 0.8rem 1.5rem;
   border-radius: var(--radius);
   border-left: 5px solid var(--color-accent);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: left;
-  gap: 1rem; /* Espacio entre elementos */
+  gap: 1rem;
 }
 
 .turno-hora {
-  font-size: 1.4rem; /* Hacemos la hora un poco más pequeña */
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--color-accent);
-  margin-right: 1.5rem; /* Reducimos el margen derecho */
+  margin-right: 1.5rem;
   min-width: 80px;
 }
 
 .turno-detalle {
-  flex-grow: 1; /* Ocupa el espacio disponible */
+  flex-grow: 1;
 }
 
 .turno-detalle p {
-  margin: 0.2rem 0; /* Menos espacio entre líneas */
-  font-size: 0.95rem; /* Reducimos un poco el texto */
+  margin: 0.2rem 0;
+  font-size: 0.95rem;
 }
 
 .estado-label {
   font-weight: 700;
 }
 
-/* --- Estilos por estado --- */
 .turno-agenda-card.estado-confirmado { border-left-color: var(--color-accent); }
-.turno-agenda-card.estado-asistio { border-left-color: #28a745; } /* Verde */
-.turno-agenda-card.estado-cancelado { border-left-color: #dc3545; background-color: rgba(220, 53, 69, 0.1); } /* Rojo */
-.turno-agenda-card.estado-no_asistio { border-left-color: #ffc107; background-color: rgba(255, 193, 7, 0.1); } /* Amarillo */
+.turno-agenda-card.estado-asistio { border-left-color: #28a745; }
+.turno-agenda-card.estado-cancelado { border-left-color: #dc3545; background-color: rgba(220, 53, 69, 0.1); }
+.turno-agenda-card.estado-no_asistio { border-left-color: #ffc107; background-color: rgba(255, 193, 7, 0.1); }
 
 .turno-agenda-card.estado-cancelado .turno-hora,
 .turno-agenda-card.estado-cancelado .turno-detalle,
@@ -263,18 +258,16 @@
   border-radius: var(--radius);
 }
 
-/* Estilo para el nuevo botón "Agregar Turno" */
 .btn-add-turno {
   background: var(--color-accent);
   color: var(--color-bg-dark);
   border: none;
-  padding: 0.7rem 1.2rem; /* Padding consistente con los otros controles */
+  padding: 0.7rem 1.2rem;
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s ease;
   font-size: 1rem;
-  /* El ancho se ajusta automáticamente al contenido y padding */
 }
 
 .btn-add-turno:hover {
@@ -283,7 +276,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Estilos de Modal (copiados/adaptados de Administrador.css) --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -366,7 +358,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
-  background: var(--color-accent2); color: var(--color-text-light);
+  background: var(--color-accent2);
+  color: var(--color-text-light);
 }
 .modal-buttons .btn-confirmar:hover { background: #ff4d4d; }
 
@@ -385,7 +378,6 @@
   background: #d4a017;
 }
 
-/* Estilos para el nuevo botón de agregar turno, consistentes con Turnos.jsx */
 .btn-agregar-turno {
   padding: 0.9rem 2.5rem;
   font-size: 1.1rem;
@@ -400,8 +392,8 @@
 }
 
 .btn-agregar-turno:hover:not(:disabled) {
-  background: #d4a017; /* Tono dorado más oscuro para el hover */
-  color: var(--color-bg-dark); /* Texto oscuro para contraste */
+  background: #d4a017;
+  color: var(--color-bg-dark);
   transform: scale(1.05);
 }
 
@@ -412,7 +404,6 @@
   transform: none;
 }
 
-/* --- Estilos para el nuevo modal de agregar turno --- */
 .modal-form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -458,10 +449,10 @@
 .modal-horarios-section .horario-btn {
   padding: 0.6rem 1.2rem;
   border-radius: var(--radius);
-  border: 2px solid transparent; /* Coincide con Turnos.css */
+  border: 2px solid transparent;
   cursor: pointer;
-  background: var(--color-accent); /* Fondo dorado por defecto */
-  color: #000; /* Texto negro para contraste */
+  background: var(--color-accent);
+  color: #000;
   transition: all 0.2s ease;
   width: 80px;
   height: 40px;
@@ -479,7 +470,6 @@
 }
 .modal-horarios-section .horario-btn:hover:not(.reservado):not(.selected-multi) { box-shadow: 0 6px 14px rgba(0,0,0,0.4); }
 
-/* Estilos para el buscador de clientes */
 .search-container {
   position: relative;
   width: 100%;
@@ -511,17 +501,16 @@
 .search-item { padding: 0.7rem; cursor: pointer; }
 .search-item:hover { background-color: var(--color-accent); color: var(--color-bg-dark); }
 
-/* --- VISTA MÓVIL (Solo afecta a dispositivos con ancho <= 768px) --- */
 @media (max-width: 768px) {
   .admin-modal-content {
     width: 95%;
     padding: 1.5rem 1rem;
     max-height: 90vh;
-    overflow-y: auto; /* Permite scroll interno si el contenido es muy alto */
+    overflow-y: auto;
   }
 
   .modal-form-grid {
-    grid-template-columns: 1fr; /* Cambiamos de 2 columnas a 1 sola */
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
 
@@ -534,16 +523,16 @@
   }
 
   .modal-horarios-section .horario-btn {
-    width: 75px; /* Ajuste leve para que quepan mejor en el grid */
+    width: 75px;
     font-size: 0.9rem;
   }
 
   .modal-buttons {
-    flex-direction: column; /* Apilamos los botones de Guardar/Cancelar */
+    flex-direction: column;
     gap: 0.8rem;
   }
 
   .btn-agregar-turno, .btn-cancel {
-    width: 100%; /* Botones a ancho completo */
+    width: 100%;
   }
 }

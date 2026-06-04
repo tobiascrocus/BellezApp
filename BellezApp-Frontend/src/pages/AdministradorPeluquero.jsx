@@ -12,7 +12,7 @@ import { formatHora, formatFecha } from '../utils/fecha';
 // Registramos el idioma español para el calendario
 registerLocale('es', es);
 
-// Contenedor para el portal del DatePicker (fuera del componente principal)
+// Contenedor animado para el DatePicker
 const AnimatedPopper = ({ children }) => {
   return (
     <motion.div
@@ -30,10 +30,11 @@ export default function AdministradorPeluquero() {
   const { user } = useUser();
   const config = useConfig();
 
+  // ---------- ESTADOS ----------
   const [peluqueros, setPeluqueros] = useState([]);
   const [turnos, setTurnos] = useState([]);
   const [servicios, setServicios] = useState([]);
-  const [usuarios, setUsuarios] = useState([]); // Para buscar clientes
+  const [usuarios, setUsuarios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedPeluqueroId, setSelectedPeluqueroId] = useState(null);
@@ -48,7 +49,6 @@ export default function AdministradorPeluquero() {
   const [servicioModalDropdownOpen, setServicioModalDropdownOpen] = useState(false);
   const [clienteDropdownOpen, setClienteDropdownOpen] = useState(false);
 
-  // --- Estados para el modal de "Agregar Turno" ---
   const [modalOpen, setModalOpen] = useState(false);
   const [newTurno, setNewTurno] = useState({
     usuario_id: "",
@@ -62,6 +62,7 @@ export default function AdministradorPeluquero() {
   const [cancelConfirmModal, setCancelConfirmModal] = useState({ visible: false, turnoId: null });
   const [disponibilidadModal, setDisponibilidadModal] = useState([]);
 
+  // ---------- MEMOS ----------
   const { morningSlots, eveningSlots } = useMemo(() => {
     if (!config) return { morningSlots: [], eveningSlots: [] };
     const slots = [];
@@ -79,7 +80,6 @@ export default function AdministradorPeluquero() {
     };
   }, [config]);
 
-
   const selectedPeluquero = useMemo(() => {
     return peluqueros.find(p => p.id === selectedPeluqueroId);
   }, [selectedPeluqueroId, peluqueros]);
@@ -88,8 +88,10 @@ export default function AdministradorPeluquero() {
     if (!clienteSearch) return [];
     return usuarios.filter(u =>
       u.rol === 'cliente' &&
-      (u.nombre.toLowerCase().includes(clienteSearch.toLowerCase()) || u.apellido.toLowerCase().includes(clienteSearch.toLowerCase()) || u.email.toLowerCase().includes(clienteSearch.toLowerCase()))
-    ).slice(0, 5); // Mostramos solo los primeros 5 resultados
+      (u.nombre.toLowerCase().includes(clienteSearch.toLowerCase()) ||
+       u.apellido.toLowerCase().includes(clienteSearch.toLowerCase()) ||
+       u.email.toLowerCase().includes(clienteSearch.toLowerCase()))
+    ).slice(0, 5);
   }, [clienteSearch, usuarios]);
 
   const turnosFiltrados = useMemo(() => {
@@ -98,48 +100,35 @@ export default function AdministradorPeluquero() {
     return turnos
       .filter((turno) => {
         if (turno.peluquero_id !== selectedPeluqueroId) return false;
-
-        // Formateamos la fecha del turno en la zona horaria del negocio para comparar (YYYY-MM-DD)
+        // Formatea la fecha del turno en la zona horaria del negocio para comparar
         const turnoFechaStr = new Intl.DateTimeFormat('en-CA', {
           timeZone: config.timeZone,
           year: 'numeric',
           month: '2-digit',
           day: '2-digit',
         }).format(new Date(turno.fecha_timestamp));
-
         return turnoFechaStr === selectedDate;
       })
       .sort((a, b) => a.fecha_timestamp - b.fecha_timestamp);
   }, [turnos, selectedPeluqueroId, selectedDate, config]);
 
+  // ---------- CARGA DE DATOS ----------
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Un peluquero no necesita ni puede ver la lista de todos los usuarios.
-      // Solo el admin la necesita para el modal de "Agregar Turno".
       const isAdmin = user && user.rol === 'admin';
-
-      const promises = [
-        api.getPeluqueros(),
-        api.getTurnosAgenda(),
-        api.getServicios(),
-      ];
-
-      if (isAdmin) {
-        promises.push(api.getUsuarios());
-      }
+      const promises = [api.getPeluqueros(), api.getTurnosAgenda(), api.getServicios()];
+      if (isAdmin) promises.push(api.getUsuarios());
 
       const [peluquerosData, turnosData, serviciosData, usuariosData] = await Promise.all(promises);
-
-      if (!peluquerosData.ok || !turnosData.ok || !serviciosData.ok || (isAdmin && !usuariosData.ok) ) {
+      if (!peluquerosData.ok || !turnosData.ok || !serviciosData.ok || (isAdmin && !usuariosData.ok)) {
         throw new Error("Error al cargar los datos de la agenda.");
       }
 
       setPeluqueros(peluquerosData.data);
       setTurnos(turnosData.data);
       setServicios(serviciosData.data);
-      setUsuarios(usuariosData ? usuariosData.data : []); // Si usuariosData existe, usa su data, si no, un array vacío.
-
+      setUsuarios(usuariosData ? usuariosData.data : []);
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     } finally {
@@ -148,20 +137,16 @@ export default function AdministradorPeluquero() {
   }, [user]);
 
   useEffect(() => {
-    if (user && user.rol === 'peluquero') {
-      setSelectedPeluqueroId(user.id);
-    }
+    if (user && user.rol === 'peluquero') setSelectedPeluqueroId(user.id);
   }, [user]);
 
-  // Efecto para cargar la disponibilidad en el modal
+  // Carga la disponibilidad en el modal al abrirlo
   useEffect(() => {
     const fetchDisponibilidadModal = async () => {
       if (modalOpen && newTurno.fecha && newTurno.peluquero_id) {
         try {
           const res = await api.getDisponibilidad(newTurno.fecha, newTurno.peluquero_id);
-          if (res.ok) {
-            setDisponibilidadModal(res.data[newTurno.peluquero_id] || []);
-          }
+          if (res.ok) setDisponibilidadModal(res.data[newTurno.peluquero_id] || []);
         } catch (error) {
           console.error("Error fetching modal disponibilidad:", error);
         }
@@ -174,29 +159,25 @@ export default function AdministradorPeluquero() {
     fetchData();
   }, [fetchData]);
 
+  // Cierra los dropdowns al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (peluqueroDropdownRef.current && !peluqueroDropdownRef.current.contains(event.target)) {
+      if (peluqueroDropdownRef.current && !peluqueroDropdownRef.current.contains(event.target))
         setPeluqueroDropdownOpen(false);
-      }
-      if (peluqueroModalDropdownRef.current && !peluqueroModalDropdownRef.current.contains(event.target)) {
+      if (peluqueroModalDropdownRef.current && !peluqueroModalDropdownRef.current.contains(event.target))
         setPeluqueroModalDropdownOpen(false);
-      }
-      if (servicioModalDropdownRef.current && !servicioModalDropdownRef.current.contains(event.target)) {
+      if (servicioModalDropdownRef.current && !servicioModalDropdownRef.current.contains(event.target))
         setServicioModalDropdownOpen(false);
-      }
-      if (clienteDropdownRef.current && !clienteDropdownRef.current.contains(event.target)) {
+      if (clienteDropdownRef.current && !clienteDropdownRef.current.contains(event.target))
         setClienteDropdownOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (!config) return null;
 
+  // ---------- MANEJADORES ----------
   const handleClienteSearchChange = (e) => {
     setClienteSearch(e.target.value);
     setNewTurno({ ...newTurno, usuario_id: '' });
@@ -211,9 +192,9 @@ export default function AdministradorPeluquero() {
     setClienteSearch('');
     setNewTurno({
       usuario_id: "",
-      servicio_id: "", // Iniciar vacío
-      peluquero_id: "", // Iniciar vacío
-      fecha: "", // Iniciar vacío
+      servicio_id: "",
+      peluquero_id: "",
+      fecha: "",
       hora: "",
     });
     setModalOpen(true);
@@ -236,15 +217,13 @@ export default function AdministradorPeluquero() {
         usuario_id: parseInt(newTurno.usuario_id, 10),
         peluquero_id: parseInt(newTurno.peluquero_id, 10),
         servicio_id: parseInt(newTurno.servicio_id, 10),
-        fecha: newTurno.fecha,   // ya en YYYY-MM-DD
-        hora: newTurno.hora      // ya en HH:MM
+        fecha: newTurno.fecha,
+        hora: newTurno.hora
       };
       const data = await api.createTurno(payload);
       if (!data.ok) throw new Error(data.message || "Error al crear el turno.");
-
-      await fetchData(); // Recargamos los datos para ver el nuevo turno
+      await fetchData();
       setModalOpen(false);
-
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     }
@@ -254,13 +233,10 @@ export default function AdministradorPeluquero() {
     setIsUpdating(true);
     try {
       const data = await api.updateTurno(turnoId, { estado: nuevoEstado });
-      if (!data.ok) throw new Error(data.message || "Error al actualizar el estado del turno.");
-
-      // Actualizamos el estado localmente para una respuesta visual inmediata
+      if (!data.ok) throw new Error(data.message || "Error al actualizar el estado.");
       setTurnos(prevTurnos =>
         prevTurnos.map(t => t.id === turnoId ? { ...t, estado: nuevoEstado } : t)
       );
-
     } catch (err) {
       setErrorModal({ visible: true, message: err.message });
     } finally {
@@ -286,8 +262,8 @@ export default function AdministradorPeluquero() {
   const renderHorarioButtonModal = (hora) => {
     const servicioSeleccionado = servicios.find(s => s.id === newTurno.servicio_id);
     const datosIncompletos = !newTurno.fecha || !servicioSeleccionado || !newTurno.peluquero_id;
-
     const duracionSlots = servicioSeleccionado ? Math.ceil(servicioSeleccionado.duracion_minutos / 30) : 1;
+
     const bloquesSeleccionados = [];
     if (newTurno.hora) {
       const [h, m] = newTurno.hora.split(':').map(Number);
@@ -301,8 +277,6 @@ export default function AdministradorPeluquero() {
 
     const isDisponible = () => {
       if (datosIncompletos) return false;
-
-      // Obtener fecha/hora actual en Argentina de forma confiable
       const ahora = new Date();
       const ahoraArg = new Date(ahora.toLocaleString('en-US', { timeZone: config.timeZone }));
       const hoyStr = ahoraArg.toISOString().split('T')[0];
@@ -311,14 +285,11 @@ export default function AdministradorPeluquero() {
       const [hour, minute] = hora.split(':').map(Number);
       const minutosTurno = hour * 60 + minute;
 
-      // Deshabilitar si la fecha es hoy y la hora ya pasó (con 10 min de margen)
       if (newTurno.fecha === hoyStr && minutosAhora > minutosTurno - 10) return false;
 
-      // Deshabilitar fines de semana
       const diaSeleccionado = new Date(`${newTurno.fecha}T00:00:00`);
       if ([0, 6].includes(diaSeleccionado.getDay())) return false;
 
-      // Verificar que haya slots continuos para la duración del servicio
       for (let i = 0; i < duracionSlots; i++) {
         const bloqueMin = minutosTurno + i * 30;
         const hr = Math.floor(bloqueMin / 60);
@@ -345,10 +316,9 @@ export default function AdministradorPeluquero() {
     );
   };
 
-  // Función para deshabilitar fines de semana en el calendario
   const isWeekday = (date) => ![0, 6].includes(date.getDay());
 
-
+  // ---------- RENDERIZADO ----------
   return (
     <section className="admin-peluquero-container">
       <h1>Administrador de Turnos</h1>
@@ -408,7 +378,7 @@ export default function AdministradorPeluquero() {
 
         {user && user.rol === 'admin' && (
           <div className="agenda-control-group">
-            <label className="label-placeholder">&nbsp;</label> {/* Espacio para alinear */}
+            <label className="label-placeholder">&nbsp;</label>
             <button className="btn-add-turno" onClick={handleOpenModal}>Agregar Turno</button>
           </div>
         )}
@@ -450,10 +420,8 @@ export default function AdministradorPeluquero() {
                         : turno.estado.charAt(0).toUpperCase() + turno.estado.slice(1)}
                   </span></p>
                 </div>
-                {/* Acciones disponibles para el peluquero y el administrador */}
                 {user && (user.rol === 'peluquero' || user.rol === 'admin') && (
                   <>
-                    {/* Solo mostrar acciones si el turno no está ya cancelado */}
                     {turno.estado !== 'cancelado' && (
                       <div className="turno-acciones">
                         {turno.fecha_timestamp > Date.now() ? (
@@ -462,7 +430,7 @@ export default function AdministradorPeluquero() {
                               <button className="accion-btn accion-cancelar" onClick={() => handleCancelClick(turno.id)} disabled={isUpdating}>Cancelar</button>
                             )}
                           </>
-                        ) : ( // Turno pasado
+                        ) : (
                           <>
                             {turno.estado === 'asistio' && (
                               <button className="accion-btn accion-no-asistio" onClick={() => handleEstadoChange(turno.id, 'no_asistio')} disabled={isUpdating}>No Asistió</button>
@@ -486,7 +454,7 @@ export default function AdministradorPeluquero() {
         </div>
       </div>
 
-      {/* --- Modal para Agregar Turno --- */}
+      {/* Modal para Agregar Turno */}
       <AnimatePresence>
         {modalOpen && (
           <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -550,23 +518,23 @@ export default function AdministradorPeluquero() {
                       {peluqueros.find(p => p.id === newTurno.peluquero_id)?.nombre || 'Seleccionar...'}
                       <span className="agenda-dropdown-arrow">{peluqueroModalDropdownOpen ? '▲' : '▼'}</span>
                     </button>
-                  <AnimatePresence>
-                    {peluqueroModalDropdownOpen && (
-                      <motion.div
-                        className="agenda-dropdown-menu"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {peluqueros.map(p => (
-                          <div key={p.id} className="agenda-dropdown-item" onClick={() => { setNewTurno({ ...newTurno, peluquero_id: p.id, hora: '' }); setPeluqueroModalDropdownOpen(false); }}>
-                            {p.nombre} {p.apellido}
-                          </div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    <AnimatePresence>
+                      {peluqueroModalDropdownOpen && (
+                        <motion.div
+                          className="agenda-dropdown-menu"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {peluqueros.map(p => (
+                            <div key={p.id} className="agenda-dropdown-item" onClick={() => { setNewTurno({ ...newTurno, peluquero_id: p.id, hora: '' }); setPeluqueroModalDropdownOpen(false); }}>
+                              {p.nombre} {p.apellido}
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
                 <div className="modal-form-group">
@@ -576,23 +544,23 @@ export default function AdministradorPeluquero() {
                       {servicios.find(s => s.id === newTurno.servicio_id)?.nombre || 'Seleccionar...'}
                       <span className="agenda-dropdown-arrow">{servicioModalDropdownOpen ? '▲' : '▼'}</span>
                     </button>
-                  <AnimatePresence>
-                    {servicioModalDropdownOpen && (
-                      <motion.div
-                        className="agenda-dropdown-menu"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {servicios.map(s => (
-                          <div key={s.id} className="agenda-dropdown-item" onClick={() => { setNewTurno({ ...newTurno, servicio_id: s.id, hora: '' }); setServicioModalDropdownOpen(false); }}>
-                            {s.nombre}
-                          </div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    <AnimatePresence>
+                      {servicioModalDropdownOpen && (
+                        <motion.div
+                          className="agenda-dropdown-menu"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {servicios.map(s => (
+                            <div key={s.id} className="agenda-dropdown-item" onClick={() => { setNewTurno({ ...newTurno, servicio_id: s.id, hora: '' }); setServicioModalDropdownOpen(false); }}>
+                              {s.nombre}
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -616,7 +584,7 @@ export default function AdministradorPeluquero() {
         )}
       </AnimatePresence>
 
-      {/* --- Modal de Error --- */}
+      {/* Modal de Error */}
       <AnimatePresence>
         {errorModal.visible && (
           <motion.div className="modal-overlay" onClick={() => setErrorModal({ visible: false, message: '' })} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -631,7 +599,7 @@ export default function AdministradorPeluquero() {
         )}
       </AnimatePresence>
 
-      {/* --- Modal de Confirmación de Cancelación --- */}
+      {/* Modal de Confirmación de Cancelación */}
       <AnimatePresence>
         {cancelConfirmModal.visible && (
           <motion.div className="modal-overlay" onClick={closeCancelConfirmModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

@@ -5,7 +5,7 @@ const ProtectedRoute = ({ allowedRoles, redirectPath = '/login' }) => {
   const { user, loading } = useUser();
 
   if (loading) {
-    // Muestra un loader mientras se verifica el estado para evitar parpadeos
+    // Evita parpadeos visuales durante la verificación de autenticación
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
   }
 
