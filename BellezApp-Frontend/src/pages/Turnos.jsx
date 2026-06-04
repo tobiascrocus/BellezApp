@@ -26,7 +26,6 @@ const AnimatedPopper = ({ children }) => {
 };
 
 const Turnos = () => {
-  // ---------- COMPONENTE Y ESTADO ----------
 
   const { user } = useUser();
   const config = useConfig();
@@ -225,6 +224,8 @@ const Turnos = () => {
       usuario_id: user.id,
       peluquero_id: selectedStylist.id,
       servicio_id: selectedService.id,
+      fecha: selectedDate,
+      hora: selectedTime
     };
 
     try {

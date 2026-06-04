@@ -32,7 +32,7 @@ const PASSWORD_ATTEMPT_WINDOW = 15 * 60 * 1000;
 const PASSWORD_LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos de bloqueo
 const failedPasswordAttempts = new Map(); // Almacén en memoria para los intentos
 
-// --- Constantes para el Límite de Intentos de LOGIN ---
+// ---------- LÍMITE DE INTENTOS DE LOGIN ----------
 const LOGIN_ATTEMPT_LIMIT = 5;
 const LOGIN_ATTEMPT_WINDOW = 15 * 60 * 1000;
 const LOGIN_LOCKOUT_DURATION = 15 * 60 * 1000;
